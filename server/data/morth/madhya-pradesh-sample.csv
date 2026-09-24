@@ -1,0 +1,4 @@
+id,state,district,highway,location_name,accident_count_2025,severity,latitude,longitude,risk_description,safety_advice
+morth-mp-01,Madhya Pradesh,Guna,NH-46,NH-46 Myana Blind Curve,14,CRITICAL,24.5621,77.2145,High frequency sharp curve with poor night lighting. 14 heavy vehicle collisions recorded.,Reduce speed to under 40 km/h. High night fog risk.
+morth-mp-02,Madhya Pradesh,Guna,NH-46,Raghogarh Bypass Intersection,9,HIGH,24.4532,77.1988,Uncontrolled rural crossroad connecting industrial sector to NH-46.,Caution: Frequent stray cattle and high-speed freight trucks.
+morth-mp-03,Madhya Pradesh,Guna,NH-46,Guna South Ghat Incline,11,HIGH,24.6210,77.3050,Steep downhill gradient with oil spills during monsoon.,Use engine braking. Avoid sudden overtaking.

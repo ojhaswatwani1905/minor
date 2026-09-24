@@ -1,0 +1,72 @@
+[
+  {
+    "id": "adm_01",
+    "name": "Command Center Director",
+    "email": "admin@stsms.gov",
+    "password": "$2a$10$8K1p/a0dL1LXMIgoEDFrw.a2D/H1R5/U.P.H0Vz0G7A3W.vBvU5S.",
+    "role": "Super Admin",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
+    "department": "National Tourist Emergency Response",
+    "createdAt": "2026-01-15T08:30:00.000Z"
+  },
+  {
+    "id": "adm_1784910554224",
+    "name": "bhootsingh",
+    "email": "tofop38155@minduls.com",
+    "password": "$2a$10$fnCrLNzWLP0wMpXI/X8m.uqeRb6P/zWaY4htwl/EVM3DBWr1xvmTy",
+    "role": "Regional Admin",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bhootsingh",
+    "department": "National Tourist Emergency Cell",
+    "createdAt": "2026-07-24T16:29:14.224Z"
+  },
+  {
+    "id": "adm_1785131570691",
+    "name": "ojhas",
+    "email": "champakchch8@gmail.com",
+    "password": "$2a$10$iCcnOy.nzCQZqahdeHn6SOz3CVuqGnuA1NP5UDTyps5AzUUR1Gdzq",
+    "role": "Regional Admin",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ojhas",
+    "department": "Tourist Explorer",
+    "createdAt": "2026-07-27T05:52:50.691Z"
+  },
+  {
+    "id": "adm_1785131978036",
+    "name": "Aarav Sharma",
+    "email": "aarav.sharma@example.com",
+    "password": "$2a$10$GrGyDQtUZyyZh3u5Hfe/a.RLNspnHKt0K/jiS0ytwd.GHSAqxjNMi",
+    "role": "Regional Admin",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Aarav%20Sharma",
+    "department": "Tourist Safety Cell",
+    "createdAt": "2026-07-27T05:59:38.036Z"
+  },
+  {
+    "id": "adm_1785132295807",
+    "name": "ojhas",
+    "email": "watwaniojhas@gmail.com",
+    "password": "$2a$10$GyqSFkKAtmZFjryqRWibb.uv75ufJSrm8Kn0b6OXx19BRetG9CVGG",
+    "role": "Regional Admin",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ojhas",
+    "department": "Tourist Explorer",
+    "createdAt": "2026-07-27T06:04:55.807Z"
+  },
+  {
+    "id": "usr_1785132806587",
+    "name": "Kabir Verma",
+    "email": "kabir.verma@example.com",
+    "password": "$2a$10$lfJQ9YLVn1t18IVXp8RdIuHzojH8VX06EQvKMOnaqhiBKLjkOn/1a",
+    "role": "Explorer User",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir%20Verma",
+    "department": "Tourist Explorer",
+    "createdAt": "2026-07-27T06:13:26.587Z"
+  },
+  {
+    "id": "usr_1785133150426",
+    "name": "ojhas ",
+    "email": "241b625@juetguna.in",
+    "password": "$2a$10$Xtcl2MtbnmxuxoN2GVD2S.sPY5EXvcUhFcUuoEYMUKvkgX5pX8nWG",
+    "role": "Explorer User",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ojhas%20",
+    "department": "Tourist Explorer",
+    "createdAt": "2026-07-27T06:19:10.426Z"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "notif_1785131155787",
+    "title": "🚨 MOBILE SOS DISTRESS: Command Center Director",
+    "message": "🚨 1-Tap Mobile SOS Emergency Triggered by Command Center Director! Immediate SAR response required.",
+    "type": "Emergency",
+    "unread": true,
+    "createdAt": "2026-07-27T05:45:55.787Z"
+  },
+  {
+    "id": "notif_1784973657595",
+    "title": "🚨 MOBILE SOS DISTRESS: Command Center Director",
+    "message": "🚨 1-Tap Mobile SOS Emergency Triggered by Command Center Director! Immediate SAR response required.",
+    "type": "Emergency",
+    "unread": true,
+    "createdAt": "2026-07-25T10:00:57.595Z"
+  },
+  {
+    "id": "notif_1784973610374",
+    "title": "🚨 MOBILE SOS DISTRESS: Priya Nair",
+    "message": "🚨 SOS DISTRESS TEST: Mobile emergency beacon activated!",
+    "type": "Emergency",
+    "unread": true,
+    "createdAt": "2026-07-25T10:00:10.374Z"
+  }
+]

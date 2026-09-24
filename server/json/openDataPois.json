@@ -1,0 +1,94 @@
+{
+  "route": "Full-India Spatial Route Corridor",
+  "importedAt": "2026-09-03T09:31:47.948Z",
+  "bufferKm": 5,
+  "sources": [
+    "India OSM GeoJSON (india-pois.geojson / Overpass API)",
+    "Data.gov.in / NDMA GIS Spatial Layers (Flood, Landslide, Blackspots)",
+    "TripAdvisor & Google Places Negative Safety Keyword Engine"
+  ],
+  "pois": [],
+  "osmHazardNodes": [
+    {
+      "id": "osm-n1208re",
+      "name": "Guna Old Fort Trail & Ruins",
+      "lat": 24.6412,
+      "lon": 77.315,
+      "lng": 77.315,
+      "tags": {
+        "name": "Guna Old Fort Trail & Ruins",
+        "tourism": "attraction",
+        "smoothness": "bad",
+        "lit": "no",
+        "wheelchair": "no",
+        "hazard": "landslide_zone"
+      },
+      "hazardType": "hazard:landslide_zone",
+      "riskLevel": "CRITICAL",
+      "detectedIssues": [
+        "bad smoothness (Road condition issue)",
+        "lit=no (Zero night lighting)",
+        "wheelchair=no (Accessibility barrier)",
+        "hazard=landslide_zone"
+      ],
+      "location": {
+        "lat": 24.6412,
+        "lng": 77.315
+      }
+    }
+  ],
+  "disasterLayers": [
+    {
+      "id": "gov-disaster-01",
+      "name": "Parbati Riverbank Flash Flood Zone",
+      "source": "NDMA / Data.gov.in Water Resources Layer",
+      "category": "Flood-Prone Tourist Spot",
+      "severity": "CRITICAL",
+      "center": [
+        24.541,
+        77.228
+      ],
+      "radiusMeters": 2500,
+      "riskType": "FLASH_FLOOD",
+      "description": "Riverbank overflow vulnerability during monsoon reservoir releases. High risk for riverside campers & tourists.",
+      "safetyProtocol": "Do not enter riverbed. Evacuate to higher ground if siren sounds.",
+      "presetTag": "UNSAFE_NIGHT",
+      "lastUpdated": "2026-07-10"
+    },
+    {
+      "id": "gov-disaster-02",
+      "name": "Guna Ridge Landslide Incline Sector",
+      "source": "Geological Survey of India / State Disaster Management",
+      "category": "Landslide-Prone Hill Viewpoint",
+      "severity": "HIGH",
+      "center": [
+        24.618,
+        77.309
+      ],
+      "radiusMeters": 1800,
+      "riskType": "LANDSLIDE",
+      "description": "Active slope instability along hill viewpoint access highway. Soil creep detected after heavy rains.",
+      "safetyProtocol": "Maintain 50m distance from cliff edges. Watch for falling debris.",
+      "presetTag": "POOR_LIGHTING",
+      "lastUpdated": "2026-08-01"
+    }
+  ],
+  "blackspots": [
+    {
+      "id": "gov-blk-01",
+      "name": "NH-46 Myana Blind Curve Blackspot",
+      "source": "Data.gov.in Highway Safety Division",
+      "type": "Government Accident Blackspot",
+      "severity": "CRITICAL",
+      "center": [
+        24.5621,
+        77.2145
+      ],
+      "radiusMeters": 1200,
+      "accidentCount2025": 14,
+      "riskDescription": "High frequency sharp curve with poor night lighting. 14 heavy vehicle collisions recorded.",
+      "safetyAdvice": "Reduce speed to under 40 km/h. High night fog risk.",
+      "presetTag": "Low Lighting"
+    }
+  ]
+}

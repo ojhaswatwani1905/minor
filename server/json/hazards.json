@@ -1,0 +1,299 @@
+{
+  "weather": {
+    "temperatureC": -4,
+    "condition": "Heavy Snow & High Winds",
+    "windSpeedKmH": 48,
+    "avalancheRiskLevel": 4,
+    "avalancheRiskText": "High (Level 4/5)",
+    "freezingAltitudeM": 2800,
+    "visibilityKm": 1.2
+  },
+  "hazardZones": [
+    {
+      "id": "hz-1",
+      "name": "Rohtang Avalanche Pass Sector-B",
+      "type": "Avalanche Danger Zone",
+      "severity": "CRITICAL",
+      "center": [
+        32.37,
+        77.25
+      ],
+      "radiusMeters": 8000,
+      "polygon": [
+        [
+          32.39,
+          77.23
+        ],
+        [
+          32.38,
+          77.28
+        ],
+        [
+          32.34,
+          77.26
+        ],
+        [
+          32.35,
+          77.21
+        ]
+      ],
+      "riskDescription": "Fresh snowpack instability due to 50 km/h gusts."
+    },
+    {
+      "id": "hz-2",
+      "name": "Valley of Flowers Flash Flood Corridor",
+      "type": "Flash Flood & Landslide",
+      "severity": "HIGH",
+      "center": [
+        30.73,
+        79.61
+      ],
+      "radiusMeters": 6000,
+      "polygon": [
+        [
+          30.75,
+          79.59
+        ],
+        [
+          30.74,
+          79.63
+        ],
+        [
+          30.71,
+          79.62
+        ],
+        [
+          30.72,
+          79.58
+        ]
+      ],
+      "riskDescription": "Swollen glacial streams following rapid snowmelt."
+    }
+  ],
+  "blackspots": [
+    {
+      "id": "gov-blk-01",
+      "name": "NH-46 Myana Blind Curve Blackspot",
+      "source": "Data.gov.in Highway Safety Division",
+      "type": "Government Accident Blackspot",
+      "severity": "CRITICAL",
+      "center": [
+        24.5621,
+        77.2145
+      ],
+      "radiusMeters": 1200,
+      "accidentCount2025": 14,
+      "riskDescription": "High frequency sharp curve with poor night lighting. 14 heavy vehicle collisions recorded.",
+      "safetyAdvice": "Reduce speed to under 40 km/h. High night fog risk.",
+      "presetTag": "Low Lighting"
+    }
+  ],
+  "disasterLayers": [
+    {
+      "id": "gov-disaster-01",
+      "name": "Parbati Riverbank Flash Flood Zone",
+      "source": "NDMA / Data.gov.in Water Resources Layer",
+      "category": "Flood-Prone Tourist Spot",
+      "severity": "CRITICAL",
+      "center": [
+        24.541,
+        77.228
+      ],
+      "radiusMeters": 2500,
+      "riskType": "FLASH_FLOOD",
+      "description": "Riverbank overflow vulnerability during monsoon reservoir releases. High risk for riverside campers & tourists.",
+      "safetyProtocol": "Do not enter riverbed. Evacuate to higher ground if siren sounds.",
+      "presetTag": "UNSAFE_NIGHT",
+      "lastUpdated": "2026-07-10"
+    },
+    {
+      "id": "gov-disaster-02",
+      "name": "Guna Ridge Landslide Incline Sector",
+      "source": "Geological Survey of India / State Disaster Management",
+      "category": "Landslide-Prone Hill Viewpoint",
+      "severity": "HIGH",
+      "center": [
+        24.618,
+        77.309
+      ],
+      "radiusMeters": 1800,
+      "riskType": "LANDSLIDE",
+      "description": "Active slope instability along hill viewpoint access highway. Soil creep detected after heavy rains.",
+      "safetyProtocol": "Maintain 50m distance from cliff edges. Watch for falling debris.",
+      "presetTag": "POOR_LIGHTING",
+      "lastUpdated": "2026-08-01"
+    }
+  ],
+  "osmHazardNodes": [
+    {
+      "id": "osm-n1208re",
+      "name": "Guna Old Fort Trail & Ruins",
+      "lat": 24.6412,
+      "lon": 77.315,
+      "lng": 77.315,
+      "tags": {
+        "name": "Guna Old Fort Trail & Ruins",
+        "tourism": "attraction",
+        "smoothness": "bad",
+        "lit": "no",
+        "wheelchair": "no",
+        "hazard": "landslide_zone"
+      },
+      "hazardType": "hazard:landslide_zone",
+      "riskLevel": "CRITICAL",
+      "detectedIssues": [
+        "bad smoothness (Road condition issue)",
+        "lit=no (Zero night lighting)",
+        "wheelchair=no (Accessibility barrier)",
+        "hazard=landslide_zone"
+      ],
+      "location": {
+        "lat": 24.6412,
+        "lng": 77.315
+      },
+      "source": "osm"
+    }
+  ],
+  "communityHazards": [
+    {
+      "id": "pre-rev-rev-tp-101",
+      "source": "TripAdvisor Public Reviews",
+      "placeName": "Highland Dhaba & Night Halt",
+      "review_title": "Pre-Seeded Hazard: Highland Dhaba & Night Halt",
+      "review_body": "Felt very unsafe here after 9 PM. Zero lights in the parking area, stray dogs aggressive, and staff overcharged us double for basic food. Total scam.",
+      "matchedKeywords": [
+        "unsafe",
+        "scam",
+        "stray dogs",
+        "overcharged"
+      ],
+      "selected_tags": [
+        "SCAMS",
+        "POOR_LIGHTING",
+        "UNSAFE_NIGHT",
+        "STRAY_ANIMALS"
+      ],
+      "location": {
+        "lat": 24.588,
+        "lng": 77.239
+      },
+      "severity": 3,
+      "is_verified_traveler": true,
+      "upvotes": 8,
+      "downvotes": 1,
+      "trustScore": 85,
+      "is_active": true,
+      "created_at": "2026-08-14T04:58:32.900Z"
+    },
+    {
+      "id": "pre-rev-rev-gp-102",
+      "source": "Google Places Safety Filter",
+      "placeName": "Sunset Point Cliff View",
+      "review_title": "Pre-Seeded Hazard: Sunset Point Cliff View",
+      "review_body": "Beautiful view but watch out for pickpocketing in the crowd. Extremely isolated access path with no street lights. High risk at dusk.",
+      "matchedKeywords": [
+        "isolated",
+        "pickpocket"
+      ],
+      "selected_tags": [
+        "PICKPOCKETING",
+        "POOR_LIGHTING",
+        "UNSAFE_NIGHT"
+      ],
+      "location": {
+        "lat": 24.602,
+        "lng": 77.251
+      },
+      "severity": 2,
+      "is_verified_traveler": true,
+      "upvotes": 8,
+      "downvotes": 1,
+      "trustScore": 85,
+      "is_active": true,
+      "created_at": "2026-08-14T04:58:32.904Z"
+    },
+    {
+      "id": "pre-rev-rev-tp-103",
+      "source": "TripAdvisor Public Reviews",
+      "placeName": "Old Bridge Crossing",
+      "review_title": "Pre-Seeded Hazard: Old Bridge Crossing",
+      "review_body": "Steep drop-offs with no railing. Road condition is terrible with broken asphalt and sudden landslide rocks on the turn.",
+      "matchedKeywords": [
+        "steep",
+        "landslide"
+      ],
+      "selected_tags": [
+        "UNSAFE_NIGHT"
+      ],
+      "location": {
+        "lat": 24.471,
+        "lng": 77.202
+      },
+      "severity": 2,
+      "is_verified_traveler": true,
+      "upvotes": 8,
+      "downvotes": 1,
+      "trustScore": 85,
+      "is_active": true,
+      "created_at": "2026-08-14T04:58:32.904Z"
+    }
+  ],
+  "drones": [
+    {
+      "id": "dr-101",
+      "name": "SAR Falcon Thermal-1",
+      "status": "READY",
+      "battery": 94,
+      "rangeKm": 25,
+      "payload": "Thermal Camera + Emergency Medical Kit",
+      "baseLocation": "Manalu Base Alpha"
+    },
+    {
+      "id": "dr-102",
+      "name": "SAR Osprey Recon-2",
+      "status": "DISPATCHED",
+      "battery": 68,
+      "rangeKm": 18,
+      "targetCoordinates": [
+        30.728,
+        79.6053
+      ],
+      "targetName": "Priya Nair",
+      "etaMinutes": 4
+    }
+  ],
+  "meshNodes": [
+    {
+      "id": "node-alpha",
+      "name": "Rohtang Satellite Gateway",
+      "status": "ONLINE",
+      "signal": 98,
+      "battery": "100%",
+      "activeClients": 14
+    },
+    {
+      "id": "node-beta",
+      "name": "Kedarkantha Ridge Relay",
+      "status": "ONLINE",
+      "signal": 84,
+      "battery": "78%",
+      "activeClients": 9
+    },
+    {
+      "id": "node-gamma",
+      "name": "Zanskar Mesh Sub-Station",
+      "status": "DEGRADED",
+      "signal": 42,
+      "battery": "31%",
+      "activeClients": 3
+    },
+    {
+      "id": "node-delta",
+      "name": "Silent Valley Cellular Node",
+      "status": "OFFLINE",
+      "signal": 0,
+      "battery": "0%",
+      "activeClients": 0
+    }
+  ]
+}
