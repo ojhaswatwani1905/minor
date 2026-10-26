@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, SafeAreaView, StyleSheet } from 'react-native';
+import * as Location from 'expo-location';
+import * as Battery from 'expo-battery';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
@@ -18,7 +20,45 @@ export const RegisterScreen = ({ onNavigateLogin }) => {
     setError('');
     setLoading(true);
     try {
-      const res = await register({ name, email, password, department: 'Tourist Explorer', guardianPhone });
+      let lat = null;
+      let lng = null;
+      let batteryLevel = null;
+      let locationName = null;
+
+      try {
+        const bat = await Battery.getBatteryLevelAsync();
+        if (bat >= 0) batteryLevel = Math.round(bat * 100);
+      } catch (e) {}
+
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+          if (pos?.coords) {
+            lat = pos.coords.latitude;
+            lng = pos.coords.longitude;
+            try {
+              const rev = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
+              if (rev?.length > 0) {
+                const parts = [rev[0].name, rev[0].city || rev[0].subregion, rev[0].region].filter(Boolean);
+                if (parts.length > 0) locationName = parts.join(', ');
+              }
+            } catch (e) {}
+          }
+        }
+      } catch (e) {}
+
+      const res = await register({ 
+        name, 
+        email, 
+        password, 
+        department: 'Tourist Explorer', 
+        guardianPhone,
+        lat,
+        lng,
+        batteryLevel,
+        locationName
+      });
       if (res && !res.success) {
         setError(res.message || 'Registration failed');
       }

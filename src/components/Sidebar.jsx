@@ -19,19 +19,19 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+// Primary navigation items preserved for active emergency response phase
 const navigationItems = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { name: 'App QR Code', path: '/app-qr', icon: QrCode },
-  { name: 'Users', path: '/users', icon: Users },
-  { name: 'Trips', path: '/trips', icon: MapPin },
-  { name: 'Live Monitoring', path: '/monitoring', icon: Radio },
   { name: 'Emergency Alerts', path: '/emergency', icon: AlertTriangle, badge: 'SOS' },
-  { name: 'Notifications', path: '/notifications', icon: Bell },
-  { name: 'Reports', path: '/reports', icon: FileText },
-  { name: 'Analytics', path: '/analytics', icon: BarChart3 },
-  { name: 'Settings', path: '/settings', icon: Settings },
+  { name: 'Live Monitoring', path: '/monitoring', icon: Radio },
+  { name: 'Users', path: '/users', icon: Users },
+  { name: 'Mobile App QR', path: '/app-qr', icon: QrCode },
   { name: 'Profile', path: '/profile', icon: User },
 ];
+
+// Preserved for future development phases (accessible directly via routes):
+// App QR Code (/app-qr), Users (/users), Trips (/trips), Notifications (/notifications), Reports (/reports), Analytics (/analytics), Settings (/settings)
+
 
 export const Sidebar = ({ collapsed, setCollapsed }) => {
   const { logout } = useAuth();

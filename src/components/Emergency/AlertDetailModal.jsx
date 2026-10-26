@@ -4,6 +4,7 @@ import { StatusBadge } from '../Common/StatusBadge';
 import { 
   AlertTriangle, 
   MapPin, 
+  MapPinOff,
   Phone, 
   Clock, 
   ShieldAlert, 
@@ -11,7 +12,11 @@ import {
   Send, 
   CheckCircle2,
   Battery,
-  Wifi
+  Wifi,
+  Smartphone,
+  Compass,
+  ExternalLink,
+  UserCheck
 } from 'lucide-react';
 
 export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus, onNotifyGuardian }) => {
@@ -34,143 +39,252 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
     }
   };
 
+  const hasCoords = alertDetail.location?.lat != null && alertDetail.location?.lng != null;
+  const lat = hasCoords ? Number(alertDetail.location.lat).toFixed(5) : null;
+  const lng = hasCoords ? Number(alertDetail.location.lng).toFixed(5) : null;
+
+  const batteryLevel = alertDetail.batteryLevel != null ? Number(alertDetail.batteryLevel) : (alertDetail.user?.batteryLevel || null);
+  const batteryColor = 
+    batteryLevel == null ? 'text-slate-500' :
+    batteryLevel < 20 ? 'text-red-400' :
+    batteryLevel < 50 ? 'text-amber-400' : 'text-emerald-400';
+
+  const networkStatus = alertDetail.networkStatus || alertDetail.user?.networkSignal || null;
+
+  const deviceInfo = alertDetail.deviceInfo || null;
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Emergency Incident Command: ${alertDetail.type}`}
+      title={`Emergency Incident Inspection: ${alertDetail.type || 'MANUAL_SOS'}`}
       maxWidth="max-w-3xl"
     >
       <div className="space-y-6 text-xs">
         {/* Top Incident Summary */}
-        <div className="p-4 rounded-2xl bg-red-950/30 border border-red-500/30 space-y-3">
+        <div className="p-5 rounded-2xl bg-red-950/30 border border-red-500/30 space-y-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-base font-extrabold text-white">{alertDetail.type}</span>
+                <span className="text-base font-black text-white tracking-wide">
+                  {alertDetail.type || 'MANUAL_SOS'}
+                </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/40 font-bold uppercase text-[10px] animate-pulse">
-                  {alertDetail.priority} PRIORITY
+                  {alertDetail.priority || 'CRITICAL'} PRIORITY
                 </span>
               </div>
-              <p className="text-slate-300 mt-1 font-medium">{alertDetail.message}</p>
+              <p className="text-slate-200 mt-1.5 font-medium leading-relaxed">{alertDetail.message}</p>
             </div>
 
-            <StatusBadge status={alertDetail.status} />
+            <StatusBadge status={alertDetail.status || 'Pending'} />
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-red-500/20">
+          <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-red-500/20 gap-2">
             <span className="flex items-center gap-1 font-mono text-cyan-400">
-              <MapPin className="w-3.5 h-3.5" />
-              {alertDetail.location?.name} ({alertDetail.location?.lat}, {alertDetail.location?.lng})
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              <span>Timestamp: {new Date(alertDetail.timestamp).toLocaleString()}</span>
             </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
-              {new Date(alertDetail.timestamp).toLocaleString()}
-            </span>
+            <span className="font-mono text-slate-400">Incident ID: {alertDetail.id}</span>
           </div>
         </div>
 
-        {/* Tourist & Guardian Telemetry Card */}
-        {alertDetail.user && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-              <p className="font-bold text-slate-400 uppercase tracking-wider">Tourist Telemetry</p>
-              <p className="text-sm font-bold text-white">{alertDetail.user.fullName}</p>
-              <p className="text-slate-400">{alertDetail.user.phone}</p>
-              <div className="flex items-center gap-4 text-slate-300 pt-1">
-                <span className="flex items-center gap-1">
-                  <Battery className="w-3.5 h-3.5 text-amber-400" />
-                  Battery: <strong>{alertDetail.user.batteryLevel}%</strong>
+        {/* Telemetry Breakdown Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Traveller & Contact Info */}
+          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <UserCheck className="w-3.5 h-3.5 text-cyan-400" />
+              Traveller Identity
+            </p>
+            <p className="text-sm font-extrabold text-white">{alertDetail.userName || 'Anonymous Traveller'}</p>
+            <p className="text-slate-400">
+              User ID: <span className="font-mono text-slate-300">{alertDetail.userId || 'Guest/Unassigned'}</span>
+            </p>
+            {alertDetail.user?.phone && (
+              <p className="text-slate-300 flex items-center gap-1">
+                <Phone className="w-3 h-3 text-cyan-400" />
+                {alertDetail.user.phone}
+              </p>
+            )}
+          </div>
+
+          {/* GPS Coordinates & Map Link */}
+          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                {hasCoords ? <MapPin className="w-3.5 h-3.5 text-cyan-400" /> : <MapPinOff className="w-3.5 h-3.5 text-amber-400" />}
+                GPS Location
+              </p>
+              {hasCoords && (
+                <a
+                  href={`https://maps.google.com/?q=${lat},${lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-bold text-cyan-400 hover:underline flex items-center gap-1"
+                >
+                  <span>Google Maps</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
+
+            {hasCoords ? (
+              <div className="space-y-1">
+                <p className="font-mono text-cyan-400 font-bold text-xs">
+                  Latitude: {lat}
+                </p>
+                <p className="font-mono text-cyan-400 font-bold text-xs">
+                  Longitude: {lng}
+                </p>
+                {alertDetail.location?.name && (
+                  <p className="text-slate-300 text-[11px] mt-1">{alertDetail.location.name}</p>
+                )}
+              </div>
+            ) : (
+              <div className="py-2">
+                <p className="text-amber-400 font-semibold text-xs">
+                  Coordinates Unavailable
+                </p>
+                <p className="text-slate-500 text-[10px] mt-0.5">
+                  GPS was turned off or permission was denied on the traveller device.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Battery & Network Telemetry */}
+          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
+            <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <Battery className="w-3.5 h-3.5 text-emerald-400" />
+              Power & Connectivity
+            </p>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Battery Level:</span>
+                <span className={`font-mono font-bold ${batteryColor}`}>
+                  {batteryLevel != null ? `${batteryLevel}%` : 'Unavailable / Unknown'}
                 </span>
-                <span className="flex items-center gap-1">
-                  <Wifi className="w-3.5 h-3.5 text-cyan-400" />
-                  {alertDetail.user.networkSignal}
+              </div>
+              {batteryLevel != null && (
+                <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${
+                      batteryLevel < 20 ? 'bg-red-500' : batteryLevel < 50 ? 'bg-amber-500' : 'bg-emerald-500'
+                    }`}
+                    style={{ width: `${batteryLevel}%` }}
+                  />
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-1 border-t border-slate-800">
+                <span className="text-slate-400">Network Status:</span>
+                <span className="font-medium text-slate-200">
+                  {networkStatus || 'Unknown / Not Reported'}
                 </span>
               </div>
             </div>
+          </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-              <p className="font-bold text-slate-400 uppercase tracking-wider">Registered Primary Guardian</p>
-              {alertDetail.user.guardians?.[0] ? (
-                <div>
-                  <p className="text-sm font-bold text-cyan-400">{alertDetail.user.guardians[0].name}</p>
-                  <p className="text-slate-300">{alertDetail.user.guardians[0].relation} • {alertDetail.user.guardians[0].phone}</p>
-                  <div className="mt-2">
-                    <button
-                      onClick={() => onNotifyGuardian(alertDetail.id)}
-                      className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold hover:bg-amber-500/20 transition-colors flex items-center gap-1.5 text-[11px]"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>{alertDetail.guardianNotified ? 'Resend Guardian SMS' : 'Dispatch Guardian SMS'}</span>
-                    </button>
-                  </div>
+          {/* Device & Trip Telemetry */}
+          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
+            <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <Smartphone className="w-3.5 h-3.5 text-purple-400" />
+              Device & Trip Association
+            </p>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Device Platform:</span>
+                <span className="font-medium text-slate-200">
+                  {deviceInfo?.platform ? deviceInfo.platform.toUpperCase() : 'Unknown'}
+                </span>
+              </div>
+              {deviceInfo?.model && (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Device Model:</span>
+                  <span className="font-medium text-slate-200">{deviceInfo.model}</span>
                 </div>
-              ) : (
-                <p className="text-slate-500">No primary guardian registered.</p>
               )}
+              {deviceInfo?.osVersion && (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">OS Version:</span>
+                  <span className="font-mono text-slate-200">{deviceInfo.osVersion}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between pt-1 border-t border-slate-800">
+                <span className="text-slate-400">Associated Trip:</span>
+                <span className="font-medium text-cyan-400">
+                  {alertDetail.tripId ? `ID: ${alertDetail.tripId}` : (alertDetail.tripInfo || 'None')}
+                </span>
+              </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Rescue Notes & Incident Log */}
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+        {/* Rescue Notes & Chronological Incident Log */}
+        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
           <h4 className="font-bold text-white flex items-center gap-1.5">
             <ShieldAlert className="w-4 h-4 text-cyan-400" />
-            Rescue Action & Incident Log
+            Incident Action & Telemetry Log
           </h4>
 
           <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
-            {alertDetail.rescueLogs?.map((log, idx) => (
-              <div key={idx} className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-800 space-y-1">
-                <div className="flex items-center justify-between text-[10px] text-slate-400">
-                  <span className="font-bold text-cyan-400">{log.author}</span>
-                  <span>{new Date(log.timestamp).toLocaleString()}</span>
+            {alertDetail.rescueNotes && alertDetail.rescueNotes.length > 0 ? (
+              alertDetail.rescueNotes.map((log, idx) => (
+                <div key={idx} className="p-2.5 rounded-xl bg-slate-800/50 border border-slate-800 space-y-1">
+                  <div className="flex items-center justify-between text-[10px] text-slate-400">
+                    <span className="font-bold text-cyan-400">{log.author || 'System'}</span>
+                    <span>{new Date(log.timestamp).toLocaleString()}</span>
+                  </div>
+                  <p className="text-slate-200">{log.note}</p>
                 </div>
-                <p className="text-slate-200">{log.note}</p>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-slate-500 italic">No notes logged yet.</p>
+            )}
           </div>
         </div>
 
-        {/* Action Form: Update Status & Log Rescue Note */}
+        {/* Incident Command: Status Update & Action Note */}
         <form onSubmit={handleStatusSubmit} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
           <p className="font-bold text-cyan-400 flex items-center gap-1.5">
             <Plus className="w-4 h-4" />
-            Log Rescue Action & Update Incident Status
+            Update Alert Status & Log Command Note
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-slate-400 mb-1">Update Status</label>
+              <label className="block text-slate-400 mb-1 text-[11px] font-semibold">Incident Status</label>
               <select
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold"
               >
-                <option value="">Keep Status ({alertDetail.status})</option>
-                <option value="Active Rescue">Active Rescue</option>
-                <option value="Under Monitoring">Under Monitoring</option>
+                <option value="">Keep ({alertDetail.status})</option>
+                <option value="Pending">Pending</option>
+                <option value="Acknowledged">Acknowledged</option>
                 <option value="Resolved">Resolved</option>
               </select>
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-slate-400 mb-1">Rescue Command Note</label>
+              <label className="block text-slate-400 mb-1 text-[11px] font-semibold">Command Action Note</label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
-                  placeholder="e.g. SDRF Team 4 dispatched from checkpost base."
+                  placeholder="e.g. SOS acknowledged by operator. Emergency services contacted."
                   className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500"
                 />
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold whitespace-nowrap shadow"
+                  className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold whitespace-nowrap shadow-md transition-colors"
                 >
-                  {submitting ? 'Saving...' : 'Update Incident'}
+                  {submitting ? 'Saving...' : 'Save Update'}
                 </button>
               </div>
             </div>

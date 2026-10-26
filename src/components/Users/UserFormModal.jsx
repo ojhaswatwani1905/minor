@@ -10,10 +10,13 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     emergencyContact: '',
     guardianName: '',
     guardianPhone: '',
-    guardianRelation: 'Father',
+    guardianRelation: 'Family',
     documentType: 'Aadhaar Card',
     documentNumber: '',
-    locationName: 'Manali Expedition Base Camp',
+    locationName: '',
+    lat: '',
+    lng: '',
+    batteryLevel: '',
     status: 'Online'
   });
 
@@ -26,10 +29,13 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         emergencyContact: initialData.emergencyContact || '',
         guardianName: initialData.guardians?.[0]?.name || '',
         guardianPhone: initialData.guardians?.[0]?.phone || '',
-        guardianRelation: initialData.guardians?.[0]?.relation || 'Father',
+        guardianRelation: initialData.guardians?.[0]?.relation || 'Family',
         documentType: initialData.documents?.[0]?.type || 'Aadhaar Card',
         documentNumber: initialData.documents?.[0]?.number || '',
-        locationName: initialData.currentLocation?.name || 'Manali Base Camp',
+        locationName: initialData.currentLocation?.name || '',
+        lat: initialData.currentLocation?.lat != null ? String(initialData.currentLocation.lat) : '',
+        lng: initialData.currentLocation?.lng != null ? String(initialData.currentLocation.lng) : '',
+        batteryLevel: initialData.batteryLevel != null ? String(initialData.batteryLevel) : '',
         status: initialData.status || 'Online'
       });
     } else {
@@ -40,10 +46,13 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         emergencyContact: '',
         guardianName: '',
         guardianPhone: '',
-        guardianRelation: 'Father',
+        guardianRelation: 'Family',
         documentType: 'Aadhaar Card',
         documentNumber: '',
-        locationName: 'Manali Expedition Base Camp',
+        locationName: '',
+        lat: '',
+        lng: '',
+        batteryLevel: '',
         status: 'Online'
       });
     }
@@ -225,7 +234,7 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
 
         <div>
           <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
-            Current Base Camp / Location
+            Current Location Name (Optional)
           </label>
           <div className="relative">
             <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -234,8 +243,57 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               name="locationName"
               value={formData.locationName}
               onChange={handleChange}
-              placeholder="Rohtang Pass High Altitude Track"
+              placeholder="e.g. Guna Base Camp, MP (or leave empty for mobile GPS)"
               className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+            />
+          </div>
+        </div>
+
+        {/* Real Coordinates & Battery */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+              Latitude (Real GNSS)
+            </label>
+            <input
+              type="number"
+              step="any"
+              name="lat"
+              value={formData.lat}
+              onChange={handleChange}
+              placeholder="e.g. 24.6467"
+              className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white font-mono"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+              Longitude (Real GNSS)
+            </label>
+            <input
+              type="number"
+              step="any"
+              name="lng"
+              value={formData.lng}
+              onChange={handleChange}
+              placeholder="e.g. 77.3117"
+              className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white font-mono"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+              Battery Level (%)
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              name="batteryLevel"
+              value={formData.batteryLevel}
+              onChange={handleChange}
+              placeholder="e.g. 85"
+              className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white font-mono"
             />
           </div>
         </div>

@@ -1,17 +1,156 @@
 import { readJson, writeJson } from '../utils/jsonDb.js';
+import { isSupabaseConfigured, getSupabaseClient } from '../database/supabase.js';
 
 // Get all users with search, status, and battery filtering
 export const getUsers = async (req, res, next) => {
   try {
     let users = await readJson('users');
+
+    // Also fetch live registered profiles & alerts from Supabase if connected
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = getSupabaseClient();
+        const admins = await readJson('admins');
+
+        const [profileRes, alertRes] = await Promise.all([
+          supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+          supabase.from('alerts').select('*').order('raised_at', { ascending: false })
+        ]);
+
+        const profiles = profileRes.data || [];
+        const alerts = alertRes.data || [];
+
+        profiles.forEach(p => {
+          const existingIndex = users.findIndex(u => u.id === p.id || (p.phone && u.phone === p.phone));
+          if (existingIndex === -1) {
+            users.push({
+              id: p.id,
+              fullName: p.full_name || 'Active Traveller',
+              email: p.email || 'N/A',
+              phone: p.phone || 'N/A',
+              emergencyContact: 'N/A',
+              status: 'Offline',
+              currentLocation: null,
+              batteryLevel: null,
+              networkSignal: 'No GPS Fix (Offline)',
+              offlineDurationMinutes: 10,
+              guardians: [],
+              documents: [],
+              activeTripId: null,
+              source: 'Supabase'
+            });
+          } else {
+            if (p.full_name) users[existingIndex].fullName = p.full_name;
+            if (p.phone) users[existingIndex].phone = p.phone;
+          }
+        });
+
+        // Enrich with real SOS alerts data
+        alerts.forEach(a => {
+          let lat = a.lat != null ? parseFloat(a.lat) : null;
+          let lng = a.lon != null ? parseFloat(a.lon) : null;
+          if ((lat == null || lng == null) && a.location?.coordinates) {
+            lng = parseFloat(a.location.coordinates[0]);
+            lat = parseFloat(a.location.coordinates[1]);
+          }
+
+          let extractedName = null;
+          if (a.message) {
+            const m = a.message.match(/by\s+([^!]+)/i);
+            if (m) extractedName = m[1].trim();
+          }
+
+          const matchedAdmin = admins.find(adm => adm.name && extractedName && adm.name.toLowerCase() === extractedName.toLowerCase());
+
+          const uIdx = users.findIndex(u => 
+            u.id === a.user_id || 
+            (extractedName && u.fullName && u.fullName.toLowerCase() === extractedName.toLowerCase())
+          );
+
+          const isOpen = a.status === 'open' || a.status === 'acknowledged' || a.status === 'dispatched';
+
+          if (uIdx !== -1) {
+            if (extractedName && users[uIdx].fullName === 'Active Traveller') {
+              users[uIdx].fullName = extractedName;
+            }
+            if (matchedAdmin && (!users[uIdx].email || users[uIdx].email === 'N/A')) {
+              users[uIdx].email = matchedAdmin.email;
+            }
+            if (isOpen) {
+              users[uIdx].status = 'EMERGENCY';
+            }
+            if (a.battery != null) {
+              users[uIdx].batteryLevel = a.battery;
+            }
+            if (lat != null && lng != null) {
+              users[uIdx].currentLocation = {
+                name: isOpen ? `🚨 SOS Distress (${lat.toFixed(4)}, ${lng.toFixed(4)})` : `GPS Fix (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
+                lat,
+                lng
+              };
+            }
+          }
+        });
+      } catch (e) {
+        console.error('[SUPABASE GET USERS ERROR]', e.message);
+      }
+    }
+
+    // Active status evaluation: If user is not getting GPS location (missing coords or ping timed out), mark as Offline
+    const now = Date.now();
+    const GPS_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes inactivity threshold
+
+    users = users.map(u => {
+      const hasGps = Boolean(
+        u.currentLocation &&
+        u.currentLocation.lat != null &&
+        u.currentLocation.lng != null &&
+        !isNaN(u.currentLocation.lat) &&
+        !isNaN(u.currentLocation.lng)
+      );
+
+      const lastPingTime = u.lastPing ? new Date(u.lastPing).getTime() : 0;
+      const isFresh = lastPingTime > 0 && (now - lastPingTime) <= GPS_TIMEOUT_MS;
+
+      // Active SOS emergencies stay as EMERGENCY
+      if (u.status === 'EMERGENCY') {
+        return {
+          ...u,
+          offlineDurationMinutes: 0
+        };
+      }
+
+      // If user is not active means not getting GPS location, mark as Offline
+      if (!hasGps || !isFresh) {
+        const offlineMins = lastPingTime > 0
+          ? Math.max(1, Math.floor((now - lastPingTime) / 60000))
+          : (u.offlineDurationMinutes || 15);
+
+        return {
+          ...u,
+          status: 'Offline',
+          networkSignal: hasGps ? 'GPS Signal Stale' : 'No GPS Fix (Offline)',
+          offlineDurationMinutes: offlineMins
+        };
+      }
+
+      // Actively transmitting GPS location
+      return {
+        ...u,
+        status: 'Online',
+        networkSignal: u.networkSignal && !u.networkSignal.includes('Offline') ? u.networkSignal : 'Connected (GNSS Active)',
+        offlineDurationMinutes: 0
+      };
+    });
+
     const { search, status, battery } = req.query;
 
     if (search) {
       const q = search.toLowerCase();
       users = users.filter(u =>
-        u.fullName.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        u.phone.includes(q) ||
+        (u.fullName && u.fullName.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q)) ||
+        (u.phone && u.phone.includes(q)) ||
         (u.documents && u.documents.some(d => d.number && d.number.toLowerCase().includes(q)))
       );
     }
@@ -76,22 +215,26 @@ export const createUser = async (req, res, next) => {
 
     const users = await readJson('users');
 
+    const parsedLat = req.body.lat != null ? parseFloat(req.body.lat) : null;
+    const parsedLng = req.body.lng != null ? parseFloat(req.body.lng) : null;
+    const hasValidCoords = parsedLat != null && parsedLng != null && !isNaN(parsedLat) && !isNaN(parsedLng);
+
     const newUser = {
       id: `usr_${Date.now()}`,
       fullName,
       email: email || `${fullName.toLowerCase().replace(/\s+/g, '.')}@example.com`,
       phone,
       emergencyContact: emergencyContact || phone,
-      status: 'Online',
-      currentLocation: {
-        name: locationName || 'Manali Expedition Base Camp',
-        lat: 32.2432,
-        lng: 77.1892,
-        elevation: '2,050 m'
-      },
-      batteryLevel: 100,
-      networkSignal: 'Good (4G)',
-      offlineDurationMinutes: 0,
+      status: hasValidCoords ? 'Online' : 'Offline',
+      currentLocation: hasValidCoords ? {
+        name: locationName || `GPS Fix (${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)})`,
+        lat: parsedLat,
+        lng: parsedLng,
+        elevation: req.body.elevation || null
+      } : null,
+      batteryLevel: req.body.batteryLevel != null && !isNaN(parseInt(req.body.batteryLevel)) ? parseInt(req.body.batteryLevel) : null,
+      networkSignal: hasValidCoords ? (req.body.networkSignal || 'Good (4G)') : 'No GPS Fix (Offline)',
+      offlineDurationMinutes: hasValidCoords ? 0 : 5,
       guardians: [
         {
           name: guardianName || 'Primary Guardian',
@@ -108,7 +251,7 @@ export const createUser = async (req, res, next) => {
         }
       ],
       activeTripId: null,
-      lastPing: new Date().toISOString()
+      lastPing: hasValidCoords ? new Date().toISOString() : null
     };
 
     users.unshift(newUser);
@@ -134,10 +277,45 @@ export const updateUser = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Tourist profile not found' });
     }
 
+    const parsedLat = req.body.lat != null && req.body.lat !== '' ? parseFloat(req.body.lat) : null;
+    const parsedLng = req.body.lng != null && req.body.lng !== '' ? parseFloat(req.body.lng) : null;
+    const hasValidCoords = parsedLat != null && parsedLng != null && !isNaN(parsedLat) && !isNaN(parsedLng);
+
+    let newLocation = users[index].currentLocation;
+    if (hasValidCoords) {
+      newLocation = {
+        name: req.body.locationName || users[index].currentLocation?.name || `GPS Fix (${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)})`,
+        lat: parsedLat,
+        lng: parsedLng,
+        elevation: req.body.elevation || users[index].currentLocation?.elevation || null
+      };
+    } else if (req.body.locationName && users[index].currentLocation) {
+      newLocation = {
+        ...users[index].currentLocation,
+        name: req.body.locationName
+      };
+    }
+
+    let newBattery = users[index].batteryLevel;
+    if (req.body.batteryLevel !== undefined && req.body.batteryLevel !== '') {
+      const parsedBat = parseInt(req.body.batteryLevel);
+      if (!isNaN(parsedBat)) {
+        newBattery = Math.max(0, Math.min(100, parsedBat));
+      }
+    }
+
+    const hasCoordsNow = Boolean(newLocation && newLocation.lat != null && newLocation.lng != null);
+
     const updatedUser = {
       ...users[index],
       ...req.body,
-      lastPing: new Date().toISOString()
+      status: users[index].status === 'EMERGENCY' 
+        ? 'EMERGENCY' 
+        : (req.body.status ? req.body.status : (hasCoordsNow ? 'Online' : 'Offline')),
+      networkSignal: hasCoordsNow ? (req.body.networkSignal || users[index].networkSignal || 'Good (4G)') : 'No GPS Fix (Offline)',
+      currentLocation: newLocation,
+      batteryLevel: newBattery,
+      lastPing: hasValidCoords ? new Date().toISOString() : users[index].lastPing
     };
 
     users[index] = updatedUser;

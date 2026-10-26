@@ -4,6 +4,26 @@ import L from 'leaflet';
 import { CloudSnow, Wind, ShieldAlert, Thermometer, Layers } from 'lucide-react';
 
 // Custom Marker Icons
+const createEmergencyMarkerIcon = (name) => {
+  const shortName = name && name.length > 15 ? name.substring(0, 15) + '...' : (name || 'Distress');
+  return L.divIcon({
+    className: 'custom-live-marker-sos',
+    html: `
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; transform: translate(-50%, -50%);">
+        <div style="position: absolute; top: -30px; white-space: nowrap; background: #dc2626; color: #ffffff; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 9999px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); border: 1.5px solid #ffffff; letter-spacing: 0.02em; z-index: 100;">
+          🚨 SOS: ${shortName}
+        </div>
+        <div style="position: absolute; width: 44px; height: 44px; border-radius: 50%; background: rgba(239, 68, 68, 0.45); animation: pulse-glow 1.4s infinite ease-in-out;"></div>
+        <div style="position: relative; background: #ef4444; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 16px #ef4444; display: flex; align-items: center; justify-content: center;">
+          <div style="background: #ffffff; width: 7px; height: 7px; border-radius: 50%;"></div>
+        </div>
+      </div>
+    `,
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+  });
+};
+
 const createMarkerIcon = (color) => {
   return L.divIcon({
     className: 'custom-live-marker',
@@ -17,7 +37,6 @@ const createMarkerIcon = (color) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: ${color === '#ef4444' ? 'pulse-glow 1.2s infinite ease-in-out' : 'none'};
     "><div style="background-color: #ffffff; width: 6px; height: 6px; border-radius: 50%;"></div></div>`,
     iconSize: [22, 22],
     iconAnchor: [11, 11],
@@ -26,47 +45,35 @@ const createMarkerIcon = (color) => {
 
 const iconGreen = createMarkerIcon('#10b981');
 const iconYellow = createMarkerIcon('#f59e0b');
-const iconRed = createMarkerIcon('#ef4444');
 
-// Helper to center map view smoothly on selected tourist
-const MapCameraController = ({ selectedLocation }) => {
+// Helper to center map view smoothly on selected tourist or active emergency
+const MapCameraController = ({ selectedLocation, locations = [] }) => {
   const map = useMap();
+  const hasCenteredEmergency = React.useRef(false);
+
   useEffect(() => {
     if (selectedLocation?.location?.lat && selectedLocation?.location?.lng) {
-      map.flyTo([selectedLocation.location.lat, selectedLocation.location.lng], 10, {
-        duration: 1.5
+      map.flyTo([selectedLocation.location.lat, selectedLocation.location.lng], 13, {
+        duration: 1.2
       });
+      return;
     }
-  }, [selectedLocation, map]);
+
+    if (!hasCenteredEmergency.current) {
+      const emergency = locations.find(l => (l.status === 'EMERGENCY' || l.activeAlertsCount > 0) && l.location?.lat && l.location?.lng);
+      if (emergency) {
+        hasCenteredEmergency.current = true;
+        map.flyTo([emergency.location.lat, emergency.location.lng], 12, {
+          duration: 1.5
+        });
+      }
+    }
+  }, [selectedLocation, locations, map]);
+
   return null;
 };
 
-const sampleHazards = [
-  {
-    id: 'hz-1',
-    name: 'Rohtang Avalanche Risk Zone',
-    severity: 'CRITICAL',
-    polygon: [
-      [32.39, 77.23],
-      [32.38, 77.28],
-      [32.34, 77.26],
-      [32.35, 77.21]
-    ]
-  },
-  {
-    id: 'hz-2',
-    name: 'Valley of Flowers Flash Flood',
-    severity: 'HIGH',
-    polygon: [
-      [30.75, 79.59],
-      [30.74, 79.63],
-      [30.71, 79.62],
-      [30.72, 79.58]
-    ]
-  }
-];
-
-export const LiveMap = ({ locations, selectedTouristId, onSelectTourist, hazardZones = sampleHazards, weather }) => {
+export const LiveMap = ({ locations, selectedTouristId, onSelectTourist, hazardZones = [], weather }) => {
   const [showHazards, setShowHazards] = useState(true);
   const selectedLocation = locations.find(l => l.id === selectedTouristId);
 
@@ -83,7 +90,7 @@ export const LiveMap = ({ locations, selectedTouristId, onSelectTourist, hazardZ
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <MapCameraController selectedLocation={selectedLocation} />
+        <MapCameraController selectedLocation={selectedLocation} locations={locations} />
 
         {/* High-Altitude Avalanche & Flood Danger Polygons */}
         {showHazards && (hazardZones || sampleHazards).map((hz) => (
@@ -113,7 +120,11 @@ export const LiveMap = ({ locations, selectedTouristId, onSelectTourist, hazardZ
         {locations.map((loc) => {
           if (!loc.location?.lat || !loc.location?.lng) return null;
 
-          const icon = loc.status === 'EMERGENCY' ? iconRed : loc.status === 'Offline' ? iconYellow : iconGreen;
+          const icon = loc.status === 'EMERGENCY'
+            ? createEmergencyMarkerIcon(loc.fullName)
+            : loc.status === 'Offline'
+            ? iconYellow
+            : iconGreen;
           const isSelected = selectedTouristId === loc.id;
 
           return (

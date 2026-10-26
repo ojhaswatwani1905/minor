@@ -44,11 +44,13 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
           </div>
 
           <div className="flex items-center gap-3 bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-800 text-xs">
-            <Battery className={`w-4 h-4 ${userDetail.batteryLevel < 20 ? 'text-red-500 animate-pulse' : 'text-emerald-400'}`} />
-            <span className="font-bold text-white">{userDetail.batteryLevel}%</span>
+            <Battery className={`w-4 h-4 ${userDetail.batteryLevel != null && userDetail.batteryLevel < 20 ? 'text-red-500 animate-pulse' : 'text-emerald-400'}`} />
+            <span className="font-bold text-white">
+              {userDetail.batteryLevel != null ? `${userDetail.batteryLevel}%` : 'Awaiting Ping'}
+            </span>
             <span className="text-slate-500">•</span>
             <Wifi className="w-4 h-4 text-cyan-400" />
-            <span className="text-slate-300 font-medium">{userDetail.networkSignal}</span>
+            <span className="text-slate-300 font-medium">{userDetail.networkSignal || 'Pending'}</span>
           </div>
         </div>
 
@@ -86,10 +88,12 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
                 <MapPin className="w-4 h-4 text-cyan-400" />
                 Current Registered Location
               </p>
-              <p className="text-sm font-extrabold text-white">{userDetail.currentLocation?.name}</p>
+              <p className="text-sm font-extrabold text-white">
+                {userDetail.currentLocation?.name || 'Awaiting Mobile GPS Fix'}
+              </p>
               <div className="flex items-center gap-4 text-slate-400 pt-1">
                 <span>Elevation: <strong className="text-slate-200">{userDetail.currentLocation?.elevation || 'N/A'}</strong></span>
-                <span>Offline: <strong className="text-slate-200">{userDetail.offlineDurationMinutes}m</strong></span>
+                <span>Offline: <strong className="text-slate-200">{userDetail.offlineDurationMinutes || 0}m</strong></span>
               </div>
             </div>
 
@@ -98,15 +102,23 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
                 <Compass className="w-4 h-4 text-cyan-400" />
                 GPS Coordinates Telemetry
               </p>
-              <p className="text-sm font-mono font-bold text-cyan-400">
-                Latitude: {userDetail.currentLocation?.lat} N
-              </p>
-              <p className="text-sm font-mono font-bold text-cyan-400">
-                Longitude: {userDetail.currentLocation?.lng} E
-              </p>
+              {userDetail.currentLocation?.lat != null && userDetail.currentLocation?.lng != null ? (
+                <>
+                  <p className="text-sm font-mono font-bold text-cyan-400">
+                    Latitude: {Number(userDetail.currentLocation.lat).toFixed(4)}°
+                  </p>
+                  <p className="text-sm font-mono font-bold text-cyan-400">
+                    Longitude: {Number(userDetail.currentLocation.lng).toFixed(4)}°
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm italic text-slate-500">
+                  No GNSS satellite coordinates reported yet.
+                </p>
+              )}
               <p className="text-[10px] text-slate-500 pt-1 flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                Last Ping: {new Date(userDetail.lastPing).toLocaleString()}
+                Last Ping: {userDetail.lastPing ? new Date(userDetail.lastPing).toLocaleString() : 'Never'}
               </p>
             </div>
           </div>

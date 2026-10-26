@@ -1,242 +1,36 @@
 [
   {
-    "id": "usr_1785133150426",
-    "fullName": "ojhas ",
-    "email": "241b625@juetguna.in",
-    "phone": "7999596310",
-    "emergencyContact": "7999596310",
+    "id": "usr_1792995231631",
+    "fullName": "Champak chacha",
+    "email": "qwerty@gmail.com",
+    "phone": "9898989898",
+    "emergencyContact": "9898989898",
     "status": "Online",
     "currentLocation": {
-      "name": "Manali Base Camp (2,050m)",
-      "lat": 32.2426,
-      "lng": 77.1892,
-      "elevation": "2,050 m"
-    },
-    "batteryLevel": 92,
-    "networkSignal": "5G Satellite Mesh",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Primary Guardian",
-        "relation": "Family",
-        "phone": "7999596310",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Mobile Safety Pass",
-        "status": "Verified",
-        "number": "SP-621286"
-      }
-    ],
-    "activeTripId": null,
-    "lastPing": "2026-07-27T06:20:04.184Z",
-    "speedKmH": 3.8
-  },
-  {
-    "id": "usr_1785132806587",
-    "fullName": "Kabir Verma",
-    "email": "kabir.verma@example.com",
-    "phone": "+91 99112 23344",
-    "emergencyContact": "+91 99112 23344",
-    "status": "Online",
-    "currentLocation": {
-      "name": "Rohtang Pass GPS Track",
-      "lat": 32.3716,
-      "lng": 77.2466,
-      "elevation": "2,050 m"
-    },
-    "batteryLevel": 47,
-    "networkSignal": "5G Mesh",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Primary Guardian",
-        "relation": "Family",
-        "phone": "+91 99112 23344",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Mobile Safety Pass",
-        "status": "Verified",
-        "number": "SP-859150"
-      }
-    ],
-    "activeTripId": null,
-    "lastPing": "2026-07-27T06:24:44.613Z",
-    "speedKmH": 4.2
-  },
-  {
-    "id": "usr_1784910453263",
-    "fullName": "Rohan Deshmukh",
-    "email": "watwaniojhas@gmail.com",
-    "phone": "7999596310",
-    "emergencyContact": "+91 99887 11111",
-    "status": "Online",
-    "currentLocation": {
-      "name": "mmo",
-      "lat": 32.2432,
-      "lng": 77.1892,
-      "elevation": "2,050 m"
-    },
-    "batteryLevel": 100,
-    "networkSignal": "Good (4G)",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Sunita Deshmukh",
-        "relation": "Spouse",
-        "phone": "+91 99887 11111",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Driving License",
-        "status": "Verified",
-        "number": "MH02-2022091"
-      }
-    ],
-    "activeTripId": null,
-    "lastPing": "2026-07-24T16:27:33.263Z"
-  },
-  {
-    "id": "usr_101",
-    "fullName": "Aarav Sharma",
-    "email": "aarav.sharma@example.com",
-    "phone": "+91 98765 43210",
-    "emergencyContact": "+91 98765 00001",
-    "status": "Online",
-    "currentLocation": {
-      "name": "Rohtang Pass High Altitude Track",
-      "lat": 32.3716,
-      "lng": 77.2466,
-      "elevation": "3,978 m"
+      "name": "23, Mohanpur, Madhya Pradesh",
+      "lat": 24.4365117,
+      "lng": 77.1610799,
+      "elevation": "388 m"
     },
     "batteryLevel": 88,
-    "networkSignal": "Weak (2G / Satellite)",
+    "networkSignal": "Mobile GNSS (Online)",
     "offlineDurationMinutes": 0,
     "guardians": [
       {
-        "name": "Rajesh Sharma",
-        "relation": "Father",
-        "phone": "+91 98765 00001",
+        "name": "Primary Guardian",
+        "relation": "Family",
+        "phone": "9898989898",
         "verified": true
       }
     ],
     "documents": [
       {
-        "type": "Aadhaar Card",
+        "type": "Mobile Safety Pass",
         "status": "Verified",
-        "number": "XXXX-XXXX-4921"
+        "number": "SP-243858"
       }
     ],
-    "activeTripId": "trp_301",
-    "lastPing": "2026-07-23T15:35:00.000Z"
-  },
-  {
-    "id": "usr_102",
-    "fullName": "Priya Nair",
-    "email": "priya.nair@example.com",
-    "phone": "+91 91234 56789",
-    "emergencyContact": "+91 91234 99999",
-    "status": "EMERGENCY",
-    "currentLocation": {
-      "name": "Manali Base Camp (2,050m)",
-      "lat": 24.43491,
-      "lng": 77.1619599,
-      "elevation": "3,400 m"
-    },
-    "batteryLevel": 92,
-    "networkSignal": "5G Satellite Mesh",
-    "offlineDurationMinutes": 45,
-    "guardians": [
-      {
-        "name": "Rohan Nair",
-        "phone": "+91 98765 43210",
-        "relationship": "Guardian Emergency Contact"
-      }
-    ],
-    "documents": [
-      {
-        "type": "Passport",
-        "status": "Verified",
-        "number": "Z8921044"
-      }
-    ],
-    "activeTripId": "trp_1784974045592",
-    "lastPing": "2026-07-27T06:06:25.829Z",
-    "speedKmH": 3.8
-  },
-  {
-    "id": "usr_104",
-    "fullName": "Emily Watson",
-    "email": "emily.watson@worldtravel.com",
-    "phone": "+44 7700 900077",
-    "emergencyContact": "+44 7700 900088",
-    "status": "Offline",
-    "currentLocation": {
-      "name": "Silent Valley Forest Reserve",
-      "lat": 11.0827,
-      "lng": 76.4428,
-      "elevation": "1,100 m"
-    },
-    "batteryLevel": 41,
-    "networkSignal": "No Signal (Beacon Active)",
-    "offlineDurationMinutes": 120,
-    "guardians": [
-      {
-        "name": "John Watson",
-        "relation": "Spouse",
-        "phone": "+44 7700 900088",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Foreign Passport",
-        "status": "Verified",
-        "number": "GB90182741"
-      }
-    ],
-    "activeTripId": "trp_304",
-    "lastPing": "2026-07-23T13:40:00.000Z"
-  },
-  {
-    "id": "usr_105",
-    "fullName": "Vikramaditya Verma",
-    "email": "vikram.verma@example.com",
-    "phone": "+91 97110 12345",
-    "emergencyContact": "+91 97110 54321",
-    "status": "Online",
-    "currentLocation": {
-      "name": "Zanskar Frozen River Route",
-      "lat": 33.7782,
-      "lng": 76.8273,
-      "elevation": "3,500 m"
-    },
-    "batteryLevel": 95,
-    "networkSignal": "Satellite Tracked",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Karan Verma",
-        "relation": "Brother",
-        "phone": "+91 97110 54321",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Aadhaar Card",
-        "status": "Verified",
-        "number": "XXXX-XXXX-9012"
-      }
-    ],
-    "activeTripId": "trp_305",
-    "lastPing": "2026-07-23T15:40:00.000Z"
+    "activeTripId": null,
+    "lastPing": "2026-10-26T06:18:52.045Z"
   }
 ]

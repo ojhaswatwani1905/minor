@@ -63,18 +63,8 @@ export const Navbar = ({ collapsed }) => {
                 <span className="text-[11px] text-[#007AFF] font-bold cursor-pointer hover:underline">Mark all read</span>
               </div>
               <div className="space-y-2.5 max-h-64 overflow-y-auto">
-                <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs">
-                  <div className="font-bold text-red-500 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                    CRITICAL: SOS Triggered
-                  </div>
-                  <p className="text-slate-700 dark:text-slate-300 mt-1">Priya Nair activated SOS at Valley of Flowers.</p>
-                  <span className="text-[10px] text-slate-400 mt-1 block">5 mins ago</span>
-                </div>
-                <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs">
-                  <div className="font-bold text-amber-500">Offline Warning</div>
-                  <p className="text-slate-700 dark:text-slate-300 mt-1">Emily Watson offline for 120m in Silent Valley.</p>
-                  <span className="text-[10px] text-slate-400 mt-1 block">1 hour ago</span>
+                <div className="py-8 text-center text-xs text-slate-400">
+                  No active distress notifications.
                 </div>
               </div>
             </div>

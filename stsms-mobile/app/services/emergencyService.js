@@ -4,7 +4,7 @@ import { Linking, Platform } from 'react-native';
 export const emergencyService = {
   // Trigger 1-Tap SOS Distress Signal to backend & Admin Dashboard
   triggerSos: async (sosData) => {
-    return await apiFetch('/alerts/simulate', {
+    return await apiFetch('/alerts/sos', {
       method: 'POST',
       body: JSON.stringify(sosData),
     });
@@ -14,12 +14,12 @@ export const emergencyService = {
   // Generates direct native device SMS with GNSS coordinates when offline
   triggerOfflineNativeSmsFallback: async (coords, emergencyContactPhone, messageNote) => {
     try {
-      const lat = coords?.lat || 24.6467;
-      const lng = coords?.lng || 77.3117;
-      const phone = emergencyContactPhone || '+91 98765 43210';
-      const mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
+      const lat = coords?.lat != null ? coords.lat : null;
+      const lng = coords?.lng != null ? coords.lng : null;
+      const phone = emergencyContactPhone || '';
+      const mapsUrl = lat != null && lng != null ? `https://maps.google.com/?q=${lat},${lng}` : 'Coordinates Pending';
       
-      const body = `[STSMS SATELLITE GNSS SOS DISTRESS ALERT]\nLocation: ${lat.toFixed(4)}, ${lng.toFixed(4)}\nTime: ${new Date().toLocaleTimeString()}\nMaps: ${mapsUrl}\nDetails: ${messageNote || 'Manual SOS triggered in low/zero cellular coverage zone.'}`;
+      const body = `[STSMS SATELLITE GNSS SOS DISTRESS ALERT]\nLocation: ${lat != null && lng != null ? `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}` : 'Awaiting GNSS satellite fix'}\nTime: ${new Date().toLocaleTimeString()}\nMaps: ${mapsUrl}\nDetails: ${messageNote || 'Manual SOS triggered in low/zero cellular coverage zone.'}`;
 
       const smsUrl = Platform.OS === 'ios' 
         ? `sms:${phone}&body=${encodeURIComponent(body)}` 

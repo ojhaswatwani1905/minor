@@ -3,6 +3,7 @@
     "name": "STSMS Tourist Safety",
     "slug": "stsms-mobile",
     "version": "1.0.0",
+    "sdkVersion": "58.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -32,6 +33,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-status-bar"
+    ]
   }
 }

@@ -13,6 +13,7 @@
     "import:morth": "node server/scripts/fetchMorthFromDataGovIn.js && node server/scripts/importMorthBlackspots.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "bcryptjs": "^2.4.3",
     "chart.js": "^4.4.1",
     "cors": "^2.8.5",

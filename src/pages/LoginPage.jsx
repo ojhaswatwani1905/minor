@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
 export const LoginPage = () => {
-  const [email, setEmail] = useState('admin@stsms.gov');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -119,17 +119,6 @@ export const LoginPage = () => {
               )}
             </button>
           </form>
-
-          {/* Quick Demo Credentials Box */}
-          <div className="mt-6 p-3.5 rounded-2xl bg-[#007AFF]/10 border border-[#007AFF]/20 text-xs text-[#007AFF] flex items-start gap-2.5">
-            <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-bold">Default Demo Credentials:</p>
-              <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-0.5">
-                Email: <span className="font-mono font-bold text-slate-900 dark:text-white">admin@stsms.gov</span> | Password: <span className="font-mono font-bold text-slate-900 dark:text-white">Admin@123</span>
-              </p>
-            </div>
-          </div>
 
           <div className="mt-6 pt-4 border-t border-slate-200 dark:border-[#38383A] text-center text-xs text-slate-500">
             Don't have an admin profile?{' '}

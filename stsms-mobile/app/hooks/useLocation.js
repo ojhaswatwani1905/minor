@@ -22,17 +22,17 @@ const getDistanceMeters = (lat1, lon1, lat2, lon2) => {
 
 export const useLocation = (trackingActive = true, isOffline = false) => {
   const { user } = useAuth();
-  const [coords, setCoords] = useState({ lat: 24.6467, lng: 77.3117, name: 'Guna-Raghogarh NH-46 Highway' });
-  const [speedKmH, setSpeedKmH] = useState(12.4);
-  const [batteryLevel, setBatteryLevel] = useState(88);
+  const [coords, setCoords] = useState(null);
+  const [speedKmH, setSpeedKmH] = useState(0);
+  const [batteryLevel, setBatteryLevel] = useState(null);
   const [networkStatus, setNetworkStatus] = useState('Satellite GNSS Active');
-  const [lastSync, setLastSync] = useState(new Date().toLocaleTimeString());
+  const [lastSync, setLastSync] = useState(null);
   const [hasPermission, setHasPermission] = useState(false);
   
   // Adaptive Polling Metrics (36+ Hours Battery Extension)
   const [pollingMode, setPollingMode] = useState('Adaptive 100m Polling (36h+ Battery)');
   const [distanceTraveledMeters, setDistanceTraveledMeters] = useState(0);
-  const lastLoggedPositionRef = useRef({ lat: 24.6467, lng: 77.3117 });
+  const lastLoggedPositionRef = useRef(null);
 
   // Read hardware battery level
   useEffect(() => {
@@ -84,9 +84,9 @@ export const useLocation = (trackingActive = true, isOffline = false) => {
     let interval;
     if (trackingActive) {
       const syncLocation = async () => {
-        let currentLat = coords.lat;
-        let currentLng = coords.lng;
-        let currentSpeed = speedKmH;
+        let currentLat = null;
+        let currentLng = null;
+        let currentSpeed = 0;
         let currentBattery = batteryLevel;
 
         try {
@@ -105,28 +105,34 @@ export const useLocation = (trackingActive = true, isOffline = false) => {
             if (loc && loc.coords) {
               currentLat = loc.coords.latitude;
               currentLng = loc.coords.longitude;
-              currentSpeed = loc.coords.speed ? +(loc.coords.speed * 3.6).toFixed(1) : speedKmH;
+              currentSpeed = loc.coords.speed ? +(loc.coords.speed * 3.6).toFixed(1) : 0;
             }
           } catch (e) {
-            // Drift simulation for remote Guna-Raghogarh highway stretch
-            currentLat = +(currentLat + (Math.random() - 0.3) * 0.0015).toFixed(4);
-            currentLng = +(currentLng + (Math.random() - 0.3) * 0.0015).toFixed(4);
+            try {
+              const last = await Location.getLastKnownPositionAsync();
+              if (last && last.coords) {
+                currentLat = last.coords.latitude;
+                currentLng = last.coords.longitude;
+              }
+            } catch (err) {}
           }
-        } else {
-          // Simulation mode drift
-          currentLat = +(currentLat + (Math.random() - 0.3) * 0.0015).toFixed(4);
-          currentLng = +(currentLng + (Math.random() - 0.3) * 0.0015).toFixed(4);
+        }
+
+        if (currentLat == null || currentLng == null) {
+          return;
         }
 
         // Calculate displacement from last logged position
-        const distFromLast = getDistanceMeters(
-          lastLoggedPositionRef.current.lat,
-          lastLoggedPositionRef.current.lng,
-          currentLat,
-          currentLng
-        );
+        const distFromLast = lastLoggedPositionRef.current
+          ? getDistanceMeters(
+              lastLoggedPositionRef.current.lat,
+              lastLoggedPositionRef.current.lng,
+              currentLat,
+              currentLng
+            )
+          : 999; // Force log on first fix
 
-        setCoords(prev => ({ ...prev, lat: currentLat, lng: currentLng }));
+        setCoords({ lat: currentLat, lng: currentLng });
         setSpeedKmH(currentSpeed);
 
         // ADAPTIVE POLLING FILTER (PRD Bottleneck B):
@@ -143,7 +149,7 @@ export const useLocation = (trackingActive = true, isOffline = false) => {
             email: user?.email || 'traveler@safety.org',
             lat: currentLat,
             lng: currentLng,
-            locationName: coords.name || 'Guna-Raghogarh Stretch (NH-46)',
+            locationName: coords?.name || `GPS Fix (${currentLat.toFixed(4)}, ${currentLng.toFixed(4)})`,
             speedKmH: currentSpeed,
             batteryLevel: currentBattery,
             networkSignal: isOffline ? 'Offline (Local SQLite Buffer)' : networkStatus,

@@ -7,10 +7,10 @@ import { Header } from '../components/Header';
 
 export const ProfileScreen = ({ onBack }) => {
   const { user, logout } = useAuth();
-  const [name, setName] = useState(user?.name || 'Priya Nair');
-  const [phone, setPhone] = useState('+91 98765 43210');
-  const [bloodGroup, setBloodGroup] = useState('O+ Positive');
-  const [guardianName, setGuardianName] = useState('Rohan Nair');
+  const [name, setName] = useState(user?.name || user?.fullName || 'Registered Traveller');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [bloodGroup, setBloodGroup] = useState(user?.bloodGroup || '');
+  const [guardianName, setGuardianName] = useState(user?.guardians?.[0]?.name || '');
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
@@ -31,11 +31,11 @@ export const ProfileScreen = ({ onBack }) => {
       {/* User Header Badge */}
       <View style={styles.userCard}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{name.charAt(0)}</Text>
+          <Text style={styles.avatarText}>{name ? name.charAt(0) : 'T'}</Text>
         </View>
         <View>
           <Text style={styles.userName}>{name}</Text>
-          <Text style={styles.userEmail}>{user?.email || 'priya@example.com'}</Text>
+          <Text style={styles.userEmail}>{user?.email || ''}</Text>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>Registered Traveler</Text>
           </View>

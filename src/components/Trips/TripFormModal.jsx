@@ -28,8 +28,8 @@ export const TripFormModal = ({ isOpen, onClose, onSubmit, initialData, tourists
       });
     } else {
       setFormData({
-        userId: tourists?.[0]?.id || 'usr_101',
-        userName: tourists?.[0]?.fullName || 'Aarav Sharma',
+        userId: tourists?.[0]?.id || '',
+        userName: tourists?.[0]?.fullName || '',
         destination: '',
         route: '',
         startDate: new Date().toISOString().split('T')[0],

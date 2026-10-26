@@ -38,9 +38,27 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/hazards', hazardRoutes);
 
+import os from 'os';
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'STSMS Wilderness Safety Engine & Dead Man Switch Active' });
+});
+
+// Dynamic LAN IP discovery endpoint for mobile pairing
+app.get('/api/network-ip', (req, res) => {
+  const interfaces = os.networkInterfaces();
+  let localIp = '127.0.0.1';
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        localIp = iface.address;
+        break;
+      }
+    }
+    if (localIp !== '127.0.0.1') break;
+  }
+  res.json({ success: true, ip: localIp });
 });
 
 // Centralized error handler

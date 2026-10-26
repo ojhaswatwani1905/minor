@@ -10,16 +10,6 @@
     "createdAt": "2026-01-15T08:30:00.000Z"
   },
   {
-    "id": "adm_1784910554224",
-    "name": "bhootsingh",
-    "email": "tofop38155@minduls.com",
-    "password": "$2a$10$fnCrLNzWLP0wMpXI/X8m.uqeRb6P/zWaY4htwl/EVM3DBWr1xvmTy",
-    "role": "Regional Admin",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bhootsingh",
-    "department": "National Tourist Emergency Cell",
-    "createdAt": "2026-07-24T16:29:14.224Z"
-  },
-  {
     "id": "adm_1785131570691",
     "name": "ojhas",
     "email": "champakchch8@gmail.com",
@@ -28,16 +18,6 @@
     "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ojhas",
     "department": "Tourist Explorer",
     "createdAt": "2026-07-27T05:52:50.691Z"
-  },
-  {
-    "id": "adm_1785131978036",
-    "name": "Aarav Sharma",
-    "email": "aarav.sharma@example.com",
-    "password": "$2a$10$GrGyDQtUZyyZh3u5Hfe/a.RLNspnHKt0K/jiS0ytwd.GHSAqxjNMi",
-    "role": "Regional Admin",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Aarav%20Sharma",
-    "department": "Tourist Safety Cell",
-    "createdAt": "2026-07-27T05:59:38.036Z"
   },
   {
     "id": "adm_1785132295807",
@@ -50,23 +30,33 @@
     "createdAt": "2026-07-27T06:04:55.807Z"
   },
   {
-    "id": "usr_1785132806587",
-    "name": "Kabir Verma",
-    "email": "kabir.verma@example.com",
-    "password": "$2a$10$lfJQ9YLVn1t18IVXp8RdIuHzojH8VX06EQvKMOnaqhiBKLjkOn/1a",
-    "role": "Explorer User",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir%20Verma",
-    "department": "Tourist Explorer",
-    "createdAt": "2026-07-27T06:13:26.587Z"
-  },
-  {
     "id": "usr_1785133150426",
-    "name": "ojhas ",
+    "name": "ojhas",
     "email": "241b625@juetguna.in",
     "password": "$2a$10$Xtcl2MtbnmxuxoN2GVD2S.sPY5EXvcUhFcUuoEYMUKvkgX5pX8nWG",
     "role": "Explorer User",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ojhas%20",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ojhas",
     "department": "Tourist Explorer",
     "createdAt": "2026-07-27T06:19:10.426Z"
+  },
+  {
+    "id": "usr_1792947823537",
+    "name": "vansh yadav",
+    "email": "vanshyadav@gmail.con",
+    "password": "$2a$10$wHg/QVdw88qnFd5U3LRwseAZVp3uKRCJL/zD89HIy3xRLq7djd4Pm",
+    "role": "Explorer User",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=vansh%20yadav",
+    "department": "Tourist Explorer",
+    "createdAt": "2026-10-25T17:03:43.537Z"
+  },
+  {
+    "id": "usr_1792995231631",
+    "name": "Champak chacha",
+    "email": "qwerty@gmail.com",
+    "password": "$2a$10$wJokVmn7X2MDeZvhuECqt.WNkpSUtpn5MynHvyI7nnfYAATWaFO5i",
+    "role": "Explorer User",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Champak%20chacha",
+    "department": "Tourist Explorer",
+    "createdAt": "2026-10-26T06:13:51.631Z"
   }
 ]

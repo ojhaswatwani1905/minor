@@ -3,21 +3,24 @@ import React from 'react';
 export const StatusBadge = ({ status }) => {
   const getBadgeStyle = () => {
     switch (status?.toLowerCase()) {
+      case 'resolved':
       case 'online':
       case 'active':
-      case 'resolved':
       case 'passed':
-        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-      case 'emergency':
+        return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40';
+      case 'pending':
+      case 'manual_sos':
+      case 'manual sos':
       case 'critical':
+      case 'emergency':
       case 'sos request':
-      case 'fall detection':
-        return 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse';
-      case 'offline':
-      case 'warning':
+      case 'active rescue':
+        return 'bg-red-500/25 text-red-400 border-red-500/50 animate-pulse';
+      case 'acknowledged':
       case 'under monitoring':
-      case 'no movement':
-        return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+      case 'warning':
+      case 'offline':
+        return 'bg-amber-500/15 text-amber-400 border-amber-500/40';
       default:
         return 'bg-slate-500/10 text-slate-400 border-slate-500/30';
     }

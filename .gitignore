@@ -24,3 +24,4 @@ server/data/osm/india-latest.osm.pbf
 server/data/osm/india-pois.geojson
 server/data/morth/.geocode-cache.json
 server/data/morth/raw/
+server/json_backup/

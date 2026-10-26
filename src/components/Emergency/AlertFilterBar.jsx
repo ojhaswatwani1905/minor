@@ -71,9 +71,11 @@ export const AlertFilterBar = ({
             className="bg-transparent text-white font-bold focus:outline-none cursor-pointer"
           >
             <option value="All" className="bg-slate-900">All Statuses</option>
-            <option value="Active Rescue" className="bg-slate-900">Active Rescue</option>
-            <option value="Under Monitoring" className="bg-slate-900">Under Monitoring</option>
-            <option value="Resolved" className="bg-slate-900">Resolved</option>
+            <option value="Pending" className="bg-slate-900">🔴 Pending</option>
+            <option value="Acknowledged" className="bg-slate-900">🟡 Acknowledged</option>
+            <option value="Resolved" className="bg-slate-900">🟢 Resolved</option>
+            <option value="Active Rescue" className="bg-slate-900">Active Rescue (Legacy)</option>
+            <option value="Under Monitoring" className="bg-slate-900">Under Monitoring (Legacy)</option>
           </select>
         </div>
 

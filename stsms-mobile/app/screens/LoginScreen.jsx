@@ -6,12 +6,16 @@ import { Input } from '../components/Input';
 
 export const LoginScreen = ({ onNavigateRegister, onNavigateForgot }) => {
   const { login } = useAuth();
-  const [email, setEmail] = useState('admin@stsms.gov');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Please enter your email and password');
+      return;
+    }
     setError('');
     setLoading(true);
     try {
@@ -88,6 +92,7 @@ export const LoginScreen = ({ onNavigateRegister, onNavigateForgot }) => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -178,6 +183,21 @@ const styles = StyleSheet.create({
   registerLink: {
     color: '#22d3ee',
     fontWeight: 'bold',
+  },
+  quickAccessBtn: {
+    marginTop: 12,
+    paddingVertical: 12,
+    borderRadius: 14,
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(6, 182, 212, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickAccessText: {
+    color: '#22d3ee',
+    fontWeight: '800',
+    fontSize: 12,
   },
 });
 

@@ -99,6 +99,10 @@ export const register = async (req, res, next) => {
     await writeJson('admins', admins);
 
     // Also register user into users.json (Tourist Registry) so they immediately display on the Admin Dashboard & Live Map!
+    const parsedLat = req.body.lat != null ? parseFloat(req.body.lat) : null;
+    const parsedLng = req.body.lng != null ? parseFloat(req.body.lng) : null;
+    const hasValidCoords = parsedLat != null && parsedLng != null && !isNaN(parsedLat) && !isNaN(parsedLng);
+
     const newUserProfile = {
       id: userId,
       fullName: name,
@@ -106,14 +110,14 @@ export const register = async (req, res, next) => {
       phone: req.body.phone || guardianPhone,
       emergencyContact: guardianPhone,
       status: 'Online',
-      currentLocation: {
-        name: 'Manali Expedition Base Camp',
-        lat: 32.2432,
-        lng: 77.1892,
-        elevation: '2,050 m'
-      },
-      batteryLevel: 100,
-      networkSignal: 'Good (5G)',
+      currentLocation: hasValidCoords ? {
+        name: req.body.locationName || `GPS Fix (${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)})`,
+        lat: parsedLat,
+        lng: parsedLng,
+        elevation: req.body.elevation || null
+      } : null,
+      batteryLevel: req.body.batteryLevel != null && !isNaN(parseInt(req.body.batteryLevel)) ? parseInt(req.body.batteryLevel) : null,
+      networkSignal: req.body.networkSignal || 'Good (5G)',
       offlineDurationMinutes: 0,
       guardians: [
         {
@@ -131,7 +135,7 @@ export const register = async (req, res, next) => {
         }
       ],
       activeTripId: null,
-      lastPing: new Date().toISOString()
+      lastPing: hasValidCoords ? new Date().toISOString() : null
     };
     users.unshift(newUserProfile);
     await writeJson('users', users);
