@@ -94,19 +94,19 @@ export const NotificationsPage = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-3xl bg-[#25433E] border border-white/10 shadow-xl text-white">
         <div className="flex items-center gap-3">
-          <Filter className="w-4 h-4 text-cyan-400" />
+          <Filter className="w-4 h-4 text-honey" />
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-white cursor-pointer"
+            className="px-4 py-2.5 rounded-2xl bg-[#1E3732] border border-white/15 text-xs font-bold text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-honey/50"
           >
-            <option value="All">All Categories</option>
-            <option value="Emergency">Emergency SOS</option>
-            <option value="Warning">Warning Alerts</option>
-            <option value="Trip">Trip Notifications</option>
-            <option value="System">System & Guardian SMS</option>
+            <option value="All" className="bg-[#1E3732] text-white">All Categories</option>
+            <option value="Emergency" className="bg-[#1E3732] text-white">Emergency SOS</option>
+            <option value="Warning" className="bg-[#1E3732] text-white">Warning Alerts</option>
+            <option value="Trip" className="bg-[#1E3732] text-white">Trip Notifications</option>
+            <option value="System" className="bg-[#1E3732] text-white">System & Guardian SMS</option>
           </select>
         </div>
 
@@ -114,11 +114,11 @@ export const NotificationsPage = () => {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-white cursor-pointer"
+            className="px-4 py-2.5 rounded-2xl bg-[#1E3732] border border-white/15 text-xs font-bold text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-honey/50"
           >
-            <option value="All">All Statuses</option>
-            <option value="Unread">Unread Only</option>
-            <option value="Read">Read Only</option>
+            <option value="All" className="bg-[#1E3732] text-white">All Statuses</option>
+            <option value="Unread" className="bg-[#1E3732] text-white">Unread Only</option>
+            <option value="Read" className="bg-[#1E3732] text-white">Read Only</option>
           </select>
         </div>
       </div>
@@ -127,9 +127,9 @@ export const NotificationsPage = () => {
       {loading ? (
         <Loader message="Fetching Notification Audit Logs..." />
       ) : notifications.length === 0 ? (
-        <div className="p-12 text-center bg-slate-900/40 rounded-3xl border border-slate-800 text-slate-400 space-y-2">
-          <Bell className="w-10 h-10 text-slate-500 mx-auto" />
-          <h4 className="text-base font-bold text-white">No Notification Logs</h4>
+        <div className="p-12 text-center bg-[#25433E]/40 rounded-3xl border border-white/10 text-white/70 space-y-2">
+          <Bell className="w-10 h-10 text-honey mx-auto" />
+          <h4 className="text-base font-bold text-white font-sans">No Notification Logs</h4>
           <p className="text-xs">Notification history is empty.</p>
         </div>
       ) : (
@@ -141,24 +141,24 @@ export const NotificationsPage = () => {
                 n.type === 'Emergency'
                   ? 'bg-red-500/10 border-red-500/30 text-red-200'
                   : n.unread
-                  ? 'bg-slate-900 border-cyan-500/40 shadow-glow-blue'
-                  : 'bg-slate-900/50 border-slate-800 text-slate-300'
+                  ? 'bg-[#25433E] border-honey/40 shadow-md text-white'
+                  : 'bg-[#25433E]/70 border-white/10 text-white/80'
               }`}
             >
               <div className="flex items-start gap-3">
                 <div className={`p-2.5 rounded-xl border flex-shrink-0 mt-0.5 ${
-                  n.type === 'Emergency' ? 'bg-red-500/20 text-red-400 border-red-500/40' : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
+                  n.type === 'Emergency' ? 'bg-red-500/20 text-red-400 border-red-500/40' : 'bg-honey/15 text-honey border-honey/30'
                 }`}>
                   {n.type === 'Emergency' ? <ShieldAlert className="w-5 h-5" /> : <Send className="w-5 h-5" />}
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-white">{n.title}</span>
+                    <span className="font-bold text-sm text-white font-sans">{n.title}</span>
                     {n.unread && (
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                      <span className="w-2 h-2 rounded-full bg-honey animate-ping" />
                     )}
                   </div>
-                  <p className="text-xs text-slate-300">{n.message}</p>
+                  <p className="text-xs text-white/80 font-sans">{n.message}</p>
                 </div>
               </div>
 

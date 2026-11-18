@@ -48,19 +48,19 @@ export const AppQRPage = () => {
   return (
     <div className="space-y-6 pb-12 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-              <QrCode className="w-7 h-7 text-[#007AFF]" />
+            <h1 className="text-2xl font-black tracking-tight text-[#192E2A] flex items-center gap-2.5 font-sans">
+              <QrCode className="w-7 h-7 text-pine" />
               Expo Go Mobile App Pairing
             </h1>
-            <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 shadow-sm">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 flex items-center gap-1.5 shadow-sm">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               Expo SDK 58 Verified
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1 font-sans">
             Scan with the Expo Go app on your physical iOS or Android phone to launch the STSMS Tourist Safety client with live GPS hardware integration.
           </p>
         </div>
@@ -69,24 +69,24 @@ export const AppQRPage = () => {
           href={httpUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all shadow-sm"
+          className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-slate-50 text-xs font-bold text-pine border border-slate-200 transition-all shadow-sm"
         >
-          <ExternalLink className="w-3.5 h-3.5" />
+          <ExternalLink className="w-3.5 h-3.5 text-honey" />
           <span>Open Web Preview</span>
         </a>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* QR Display Card */}
-        <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col items-center justify-center space-y-6 text-center">
+        <div className="p-8 rounded-3xl glass-card flex flex-col items-center justify-center space-y-6 text-center">
           {/* Format Switcher */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 w-full max-w-xs text-xs font-semibold">
+          <div className="flex items-center p-1 bg-slate-100 rounded-full border border-slate-200 w-full max-w-xs text-xs font-semibold">
             <button
               onClick={() => setActiveTab('exp')}
-              className={`flex-1 py-1.5 rounded-xl transition-all ${
+              className={`flex-1 py-1.5 rounded-full transition-all ${
                 activeTab === 'exp'
-                  ? 'bg-white dark:bg-slate-900 text-[#007AFF] shadow-sm font-bold'
-                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-white text-pine shadow-sm font-black'
+                  : 'text-slate-500 hover:text-pine'
               }`}
             >
               exp:// Scheme
@@ -140,15 +140,15 @@ export const AppQRPage = () => {
         {/* Configuration & Instructions Card */}
         <div className="space-y-6">
           {/* Host & Network Configuration */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-              <Wifi className="w-4 h-4 text-[#007AFF]" />
+          <div className="glass-card p-6 md:p-7 space-y-4 shadow-xl">
+            <h2 className="text-sm font-extrabold text-[#192E2A] uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3 font-sans">
+              <Wifi className="w-4 h-4 text-pine" />
               Host & Port Configuration
             </h2>
 
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2">
-                <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-[11px] font-bold text-slate-500 mb-1 font-sans">
                   Local IP Address
                 </label>
                 <input
@@ -156,12 +156,12 @@ export const AppQRPage = () => {
                   value={ipAddress}
                   onChange={(e) => setIpAddress(e.target.value)}
                   placeholder="e.g. 192.168.1.5"
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-[#007AFF]"
+                  className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-200 text-[#192E2A] font-mono font-bold shadow-2xs focus:outline-none focus:border-pine"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                <label className="block text-[11px] font-bold text-slate-500 mb-1 font-sans">
                   Metro Port
                 </label>
                 <input
@@ -169,25 +169,25 @@ export const AppQRPage = () => {
                   value={port}
                   onChange={(e) => setPort(e.target.value)}
                   placeholder="8081"
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-[#007AFF]"
+                  className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-200 text-[#192E2A] font-mono font-bold shadow-2xs focus:outline-none focus:border-pine"
                 />
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 flex items-center gap-1.5 pt-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+            <div className="text-[11px] text-slate-400 flex items-center gap-1.5 pt-1 font-sans">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>Auto-detected LAN interface from backend server.</span>
             </div>
           </div>
 
           {/* Quick How-To Instructions */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-              <Smartphone className="w-4 h-4 text-emerald-500" />
+          <div className="glass-card p-6 md:p-7 space-y-4 shadow-xl">
+            <h2 className="text-sm font-extrabold text-[#192E2A] uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3 font-sans">
+              <Smartphone className="w-4 h-4 text-honey" />
               How to Launch in Expo Go (SDK 58)
             </h2>
 
-            <ol className="space-y-3 text-xs text-slate-600 dark:text-slate-300 list-decimal list-inside leading-relaxed">
+            <ol className="space-y-3 text-xs text-slate-600 list-decimal list-inside leading-relaxed font-sans">
               <li>
                 Ensure your phone is connected to the <strong>same Wi-Fi network</strong> as this laptop.
               </li>
@@ -196,7 +196,7 @@ export const AppQRPage = () => {
               </li>
               <li>
                 <strong>iOS:</strong> Open your iPhone <strong>Camera app</strong> and tap the yellow Expo notification banner, or open Expo Go and paste:
-                <code className="block mt-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 font-mono text-[11px] text-[#007AFF]">
+                <code className="block mt-1 px-3 py-1.5 rounded-xl bg-white border border-slate-200 font-mono text-[11px] text-pine font-bold shadow-2xs">
                   {expoUrl}
                 </code>
               </li>

@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: stsms-backend
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm ci --omit=dev
+    startCommand: node server/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SUPABASE_URL
+        value: https://jdjluwufmorxeankmqwj.supabase.co
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+

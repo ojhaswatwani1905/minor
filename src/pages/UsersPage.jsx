@@ -28,31 +28,38 @@ export const UsersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  const fetchUsers = async (showLoading = true) => {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchUsers = async (isInitial = false) => {
     try {
-      if (showLoading) setLoading(true);
+      if (isInitial && users.length === 0) {
+        setLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
       const res = await userService.getUsers({
         search,
         status: statusFilter,
         battery: batteryFilter
       });
-      if (res.success) {
+      if (res.success && Array.isArray(res.users)) {
         setUsers(res.users);
       }
     } catch (err) {
-      if (showLoading) toast.error(err.message || 'Failed to fetch tourists list');
+      if (isInitial) toast.error(err.message || 'Failed to fetch tourists list');
     } finally {
-      if (showLoading) setLoading(false);
+      setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchUsers(true);
 
-    // Auto-poll every 4s to catch new mobile registrations live
+    // Auto-poll quietly in background without flashing loaders
     const interval = setInterval(() => {
       fetchUsers(false);
-    }, 4000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [search, statusFilter, batteryFilter]);
@@ -65,14 +72,14 @@ export const UsersPage = () => {
           toast.success('Tourist profile updated!');
           setIsFormOpen(false);
           setEditingUser(null);
-          fetchUsers();
+          fetchUsers(false);
         }
       } else {
         const res = await userService.createUser(formData);
         if (res.success) {
           toast.success('New tourist registered!');
           setIsFormOpen(false);
-          fetchUsers();
+          fetchUsers(false);
         }
       }
     } catch (err) {
@@ -94,15 +101,20 @@ export const UsersPage = () => {
 
   const handleDeleteConfirm = async () => {
     if (!deletingId) return;
+    const targetId = deletingId;
+    // Optimistically remove from state immediately
+    setUsers(prev => prev.filter(u => u.id !== targetId));
+    setDeletingId(null);
+
     try {
-      const res = await userService.deleteUser(deletingId);
+      const res = await userService.deleteUser(targetId);
       if (res.success) {
         toast.success(res.message);
-        setDeletingId(null);
-        fetchUsers();
+        fetchUsers(false);
       }
     } catch (err) {
       toast.error(err.message || 'Delete operation failed');
+      fetchUsers(false);
     }
   };
 
@@ -115,17 +127,17 @@ export const UsersPage = () => {
   );
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 select-none">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <h1 className="text-2xl font-black tracking-tight text-[#192E2A] flex items-center gap-2.5 font-sans">
             Tourist User Registry
-            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+            <span className="text-xs font-mono px-3 py-1 rounded-full bg-pine/10 text-pine border border-pine/20 font-extrabold">
               {users.length} Active Profiles
             </span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1 font-sans">
             Search, filter, and monitor traveler telemetry, guardians, & safety checkposts
           </p>
         </div>
@@ -143,7 +155,7 @@ export const UsersPage = () => {
           setEditingUser(null);
           setIsFormOpen(true);
         }}
-        onRefresh={fetchUsers}
+        onRefresh={() => fetchUsers(false)}
       />
 
       {/* Table Data */}
@@ -203,16 +215,16 @@ export const UsersPage = () => {
           </div>
           <p className="text-xs text-slate-300">Are you sure you want to delete this tourist record?</p>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
             <button
               onClick={() => setDeletingId(null)}
-              className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700"
+              className="px-4 py-2 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={handleDeleteConfirm}
-              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-lg"
+              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-lg transition-all active:scale-95"
             >
               Delete Record
             </button>

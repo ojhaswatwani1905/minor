@@ -8,6 +8,37 @@ export default {
   theme: {
     extend: {
       colors: {
+        pine: {
+          DEFAULT: '#25433E',
+          50: '#F0F5F4',
+          100: '#DCE8E6',
+          500: '#25433E',
+          600: '#1F3934',
+          700: '#1A312D',
+          800: '#142724',
+          900: '#0E1C1A',
+        },
+        honey: {
+          DEFAULT: '#E5A93C',
+          50: '#FDF8EE',
+          100: '#FBF0D9',
+          400: '#EDB958',
+          500: '#E5A93C',
+          600: '#DF9E2E',
+          700: '#CD8D20',
+        },
+        sage: {
+          DEFAULT: '#E6EFEF',
+          50: '#F6F9F9',
+          100: '#E6EFEF',
+          200: '#D2E3E3',
+          300: '#B8D4D4',
+        },
+        ocean: {
+          DEFAULT: '#1E7B75',
+          500: '#1E7B75',
+          600: '#176560',
+        },
         apple: {
           bg: '#F5F5F7',
           darkBg: '#161618',
@@ -27,7 +58,7 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Plus Jakarta Sans', 'Inter', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'sans-serif'],
       },
       boxShadow: {
         'apple': '0 8px 30px rgba(0, 0, 0, 0.06)',

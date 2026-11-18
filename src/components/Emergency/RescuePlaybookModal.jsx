@@ -90,7 +90,7 @@ DATE: ${new Date().toLocaleString()}
 
           <button
             onClick={handleExportBriefing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 font-bold transition-all text-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1E3732] hover:brightness-110 text-honey border border-white/10 font-bold transition-all text-xs"
           >
             <FileText className="w-4 h-4" />
             <span>SAR Briefing</span>
@@ -99,9 +99,9 @@ DATE: ${new Date().toLocaleString()}
 
         {/* SOP Step-by-Step Interactive Checklist */}
         <div className="space-y-3">
-          <h5 className="font-bold text-white text-xs uppercase tracking-wider text-slate-400 flex items-center justify-between">
+          <h5 className="font-bold text-white text-xs uppercase tracking-wider text-white/70 flex items-center justify-between">
             <span>Rescue SOP Standard Checklist</span>
-            <span className="text-cyan-400 font-mono text-xs">{completedSteps.length} of 4 Done</span>
+            <span className="text-honey font-mono text-xs">{completedSteps.length} of 4 Done</span>
           </h5>
 
           <div className="space-y-2">
@@ -113,18 +113,18 @@ DATE: ${new Date().toLocaleString()}
                   onClick={() => toggleStep(step.id)}
                   className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 ${
                     isDone 
-                      ? 'bg-emerald-950/30 border-emerald-800/60 text-slate-200' 
-                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                      ? 'bg-emerald-950/40 border-emerald-500/50 text-white' 
+                      : 'bg-[#1E3732] border-white/10 text-white/70 hover:border-white/20'
                   }`}
                 >
                   <button className="mt-0.5 text-emerald-400">
-                    {isDone ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <Circle className="w-5 h-5 text-slate-600" />}
+                    {isDone ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <Circle className="w-5 h-5 text-white/30" />}
                   </button>
                   <div className="flex-1">
-                    <p className={`font-bold text-xs ${isDone ? 'text-white' : 'text-slate-300'}`}>
+                    <p className={`font-bold text-xs ${isDone ? 'text-white' : 'text-white/90'}`}>
                       Step {step.id}: {step.title}
                     </p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{step.desc}</p>
+                    <p className="text-[11px] text-white/60 mt-0.5">{step.desc}</p>
                   </div>
                 </div>
               );
@@ -133,24 +133,24 @@ DATE: ${new Date().toLocaleString()}
         </div>
 
         {/* Drone Dispatch Launcher */}
-        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-4">
+        <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+            <div className="p-2.5 rounded-xl bg-honey/15 border border-honey/30 text-honey">
               <Flame className="w-5 h-5" />
             </div>
             <div>
               <p className="font-bold text-white text-xs">Autonomous SAR Thermal Recon Drone</p>
-              <p className="text-[10px] text-slate-400">Deploy Falcon-1 with IR sensor & Emergency MedKit</p>
+              <p className="text-[10px] text-white/60">Deploy Falcon-1 with IR sensor & Emergency MedKit</p>
             </div>
           </div>
 
           <button
             onClick={handleDispatchDrone}
             disabled={dispatchingDrone || droneStatus === 'DISPATCHED'}
-            className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg transition-all ${
+            className={`px-4 py-2 rounded-xl font-black text-xs flex items-center gap-2 shadow-lg transition-all ${
               droneStatus === 'DISPATCHED'
                 ? 'bg-emerald-600 text-white cursor-default'
-                : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white'
+                : 'bg-honey hover:brightness-105 text-[#25433E]'
             }`}
           >
             <Navigation className={`w-3.5 h-3.5 ${dispatchingDrone ? 'animate-spin' : ''}`} />
@@ -162,7 +162,7 @@ DATE: ${new Date().toLocaleString()}
         <div className="flex justify-end gap-3 pt-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-all"
+            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all"
           >
             Close Playbook
           </button>

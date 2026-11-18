@@ -47,9 +47,9 @@ export const useSafetyMonitoring = (activeTrip) => {
     setGeofenceViolated(true);
     try {
       await emergencyService.triggerSos({
-        type: 'Boundary Crossed',
-        priority: 'MEDIUM',
-        message: 'Traveler passed 5.0km geofence safety perimeter.'
+        type: 'GEOFENCE_BREACH',
+        priority: 'CRITICAL',
+        message: '🚨 [GEOFENCE_BREACH] Automatic boundary breach confirmed: Traveler crossed 5.0km geofence safety perimeter.'
       });
     } catch (e) {}
   };

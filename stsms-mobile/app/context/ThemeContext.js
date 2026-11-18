@@ -4,7 +4,8 @@ import { COLORS } from '../constants/colors';
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [isDark, setIsDark] = useState(true);
+  // Default to false for the flagship Pastel Pink & Warm Cream consumer theme
+  const [isDark, setIsDark] = useState(false);
 
   const toggleTheme = () => setIsDark(prev => !prev);
 

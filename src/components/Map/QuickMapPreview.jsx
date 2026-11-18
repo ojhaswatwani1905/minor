@@ -42,8 +42,8 @@ const createStandardIcon = (color) => {
   });
 };
 
-const iconOnline = createStandardIcon('#10b981');
-const iconOffline = createStandardIcon('#f59e0b');
+const iconOnline = createStandardIcon('#25433E'); // Pine Green marker
+const iconOffline = createStandardIcon('#E5A93C'); // Honey Gold marker
 
 // Camera controller to automatically fly to coordinates
 const MapCameraController = ({ targetCoords, targetZoom }) => {
@@ -103,10 +103,6 @@ export const QuickMapPreview = () => {
     (l) => l.status === 'EMERGENCY' || l.status === 'Pending' || l.activeAlertsCount > 0
   ).length;
 
-  // Determine priority focus coordinates:
-  // 1. First active SOS emergency tourist
-  // 2. Any active GPS tourist
-  // 3. Clean India geographic center
   const priorityTarget = emergencyTourists.length > 0
     ? emergencyTourists[0]
     : validGpsTourists.length > 0
@@ -125,14 +121,14 @@ export const QuickMapPreview = () => {
 
   if (!mounted) {
     return (
-      <div className="w-full h-80 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500">
-        Initializing Satellite Map Engine...
+      <div className="w-full h-80 rounded-3xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+        Initializing Spatial Radar Engine...
       </div>
     );
   }
 
   return (
-    <div className="w-full h-80 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl relative group">
+    <div className="w-full h-80 rounded-3xl overflow-hidden border border-slate-200/80 shadow-md relative group">
       <MapContainer
         center={targetCoords}
         zoom={targetZoom}
@@ -165,17 +161,17 @@ export const QuickMapPreview = () => {
           return (
             <React.Fragment key={tourist.id}>
               <Marker position={[lat, lng]} icon={icon}>
-                <Popup className="leaflet-popup-dark">
-                  <div className="p-2 text-slate-100 min-w-[200px] space-y-2">
-                    <div className="flex items-center justify-between border-b border-slate-700/80 pb-1.5">
+                <Popup>
+                  <div className="p-2 text-white min-w-[200px] space-y-2">
+                    <div className="flex items-center justify-between border-b border-white/20 pb-1.5">
                       <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-                        isEmergency ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-700 text-slate-200'
+                        isEmergency ? 'bg-red-500 text-white animate-pulse' : 'bg-white/20 text-white'
                       }`}>
                         {isEmergency ? '🚨 CRITICAL SOS' : tourist.status}
                       </span>
                       {tourist.batteryLevel != null && (
-                        <div className="flex items-center gap-1 text-[11px] font-mono text-slate-300">
-                          <Battery className="w-3.5 h-3.5 text-amber-400" />
+                        <div className="flex items-center gap-1 text-[11px] font-mono text-white/80">
+                          <Battery className="w-3.5 h-3.5 text-honey" />
                           <span>{tourist.batteryLevel}%</span>
                         </div>
                       )}
@@ -183,14 +179,14 @@ export const QuickMapPreview = () => {
 
                     <div>
                       <p className="font-extrabold text-sm text-white">{tourist.fullName}</p>
-                      <p className="text-[11px] text-cyan-400 font-mono flex items-center gap-1 mt-0.5">
+                      <p className="text-[11px] text-honey font-mono flex items-center gap-1 mt-0.5">
                         <MapPin className="w-3 h-3 shrink-0" />
                         <span>{lat.toFixed(4)}° N, {lng.toFixed(4)}° E</span>
                       </p>
                     </div>
 
                     {tourist.activeAlert?.message && (
-                      <p className="text-[11px] text-slate-300 bg-red-950/50 p-2 rounded-xl border border-red-500/30">
+                      <p className="text-[11px] text-white/90 bg-red-900/60 p-2 rounded-xl border border-red-400/40">
                         {tourist.activeAlert.message}
                       </p>
                     )}
@@ -241,20 +237,20 @@ export const QuickMapPreview = () => {
         </div>
       )}
 
-      {/* Floating Map Legend Overlay */}
-      <div className="absolute bottom-3 left-3 z-[400] bg-slate-900/90 backdrop-blur-md border border-slate-700/80 px-3.5 py-2 rounded-xl flex items-center gap-4 text-xs font-semibold shadow-xl text-white">
+      {/* Floating Light Pill Legend Overlay */}
+      <div className="absolute bottom-3 left-3 z-[400] bg-white/95 backdrop-blur-md border border-slate-200/90 px-3.5 py-2 rounded-2xl flex items-center gap-4 text-xs font-bold shadow-lg text-[#192E2A]">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-glow-emerald" />
+          <span className="w-2.5 h-2.5 rounded-full bg-pine shadow-sm" />
           <span>Active ({activeCount})</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+          <span className="w-2.5 h-2.5 rounded-full bg-honey shadow-sm" />
           <span>Offline ({offlineCount})</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className={`w-2.5 h-2.5 rounded-full ${emergencyCount > 0 ? 'bg-red-500 animate-ping' : 'bg-slate-500'}`} />
-          <span className={emergencyCount > 0 ? 'text-red-400 font-bold' : 'text-slate-400'}>
-            SOS Distress ({emergencyCount})
+          <span className={`w-2.5 h-2.5 rounded-full ${emergencyCount > 0 ? 'bg-red-500 animate-ping' : 'bg-slate-400'}`} />
+          <span className={emergencyCount > 0 ? 'text-red-500 font-extrabold' : 'text-slate-500'}>
+            Distress ({emergencyCount})
           </span>
         </div>
       </div>

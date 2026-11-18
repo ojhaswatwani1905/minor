@@ -78,36 +78,36 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         {/* Full Name & Email */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
               Tourist Full Name *
             </label>
             <div className="relative">
-              <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
               <input
                 type="text"
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="Rohan Sharma"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-honey"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="rohan@example.com"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-honey"
               />
             </div>
           </div>
@@ -116,63 +116,63 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         {/* Phone & Emergency Contact */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
               Mobile Phone *
             </label>
             <div className="relative">
-              <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
               <input
                 type="text"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+91 98765 43210"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-honey"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
               Emergency Contact Phone
             </label>
             <div className="relative">
-              <Shield className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Shield className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
               <input
                 type="text"
                 name="emergencyContact"
                 value={formData.emergencyContact}
                 onChange={handleChange}
                 placeholder="+91 98765 00001"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-honey"
               />
             </div>
           </div>
         </div>
 
         {/* Guardian Information */}
-        <div className="p-4 rounded-2xl bg-slate-800/40 border border-slate-800 space-y-3">
-          <p className="text-xs font-bold text-cyan-400 uppercase tracking-wider">Guardian Details</p>
+        <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-3">
+          <p className="text-xs font-bold text-honey uppercase tracking-wider">Guardian Details</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-[11px] text-slate-400 mb-1">Guardian Name</label>
+              <label className="block text-[11px] text-white/70 mb-1">Guardian Name</label>
               <input
                 type="text"
                 name="guardianName"
                 value={formData.guardianName}
                 onChange={handleChange}
                 placeholder="Rajesh Sharma"
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+                className="w-full px-3 py-2 rounded-xl bg-[#25433E] border border-white/15 text-xs text-white"
               />
             </div>
             <div>
-              <label className="block text-[11px] text-slate-400 mb-1">Relation</label>
+              <label className="block text-[11px] text-white/70 mb-1">Relation</label>
               <select
                 name="guardianRelation"
                 value={formData.guardianRelation}
                 onChange={handleChange}
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+                className="w-full px-3 py-2 rounded-xl bg-[#25433E] border border-white/15 text-xs text-white"
               >
                 <option value="Father">Father</option>
                 <option value="Mother">Mother</option>
@@ -182,14 +182,14 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               </select>
             </div>
             <div>
-              <label className="block text-[11px] text-slate-400 mb-1">Guardian Phone</label>
+              <label className="block text-[11px] text-white/70 mb-1">Guardian Phone</label>
               <input
                 type="text"
                 name="guardianPhone"
                 value={formData.guardianPhone}
                 onChange={handleChange}
                 placeholder="+91 98765 00001"
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+                className="w-full px-3 py-2 rounded-xl bg-[#25433E] border border-white/15 text-xs text-white"
               />
             </div>
           </div>
@@ -198,14 +198,14 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         {/* Identity Document & Location */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
               Identity Document Type
             </label>
             <select
               name="documentType"
               value={formData.documentType}
               onChange={handleChange}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+              className="w-full px-3 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white"
             >
               <option value="Aadhaar Card">Aadhaar Card</option>
               <option value="Passport">Passport</option>
@@ -215,36 +215,36 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
               Document Number
             </label>
             <div className="relative">
-              <FileText className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <FileText className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
               <input
                 type="text"
                 name="documentNumber"
                 value={formData.documentNumber}
                 onChange={handleChange}
                 placeholder="XXXX-XXXX-4921"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white"
               />
             </div>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
             Current Location Name (Optional)
           </label>
           <div className="relative">
-            <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
             <input
               type="text"
               name="locationName"
               value={formData.locationName}
               onChange={handleChange}
               placeholder="e.g. Guna Base Camp, MP (or leave empty for mobile GPS)"
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white"
             />
           </div>
         </div>
@@ -252,7 +252,7 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         {/* Real Coordinates & Battery */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
               Latitude (Real GNSS)
             </label>
             <input
@@ -262,12 +262,12 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               value={formData.lat}
               onChange={handleChange}
               placeholder="e.g. 24.6467"
-              className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white font-mono"
+              className="w-full px-3 py-2 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
               Longitude (Real GNSS)
             </label>
             <input
@@ -277,12 +277,12 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               value={formData.lng}
               onChange={handleChange}
               placeholder="e.g. 77.3117"
-              className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white font-mono"
+              className="w-full px-3 py-2 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1">
               Battery Level (%)
             </label>
             <input
@@ -293,23 +293,23 @@ export const UserFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               value={formData.batteryLevel}
               onChange={handleChange}
               placeholder="e.g. 85"
-              className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white font-mono"
+              className="w-full px-3 py-2 rounded-xl bg-[#1E3732] border border-white/10 text-xs text-white font-mono"
             />
           </div>
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700 transition-colors"
+            className="px-4 py-2 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-400 hover:to-sky-400 text-white text-xs font-bold shadow-lg shadow-cyan-500/20"
+            className="px-5 py-2.5 rounded-xl bg-honey hover:brightness-105 text-[#25433E] text-xs font-black shadow-lg transition-all active:scale-95"
           >
             {initialData ? "Save Profile Changes" : "Complete Registration"}
           </button>

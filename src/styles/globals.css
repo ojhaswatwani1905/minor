@@ -4,56 +4,88 @@
 
 @layer base {
   :root {
-    --bg-primary: #F5F5F7;
-    --bg-card: #FFFFFF;
-    --bg-card-hover: #F0F0F2;
-    --border-color: #E5E5EA;
-    --text-primary: #1D1D1F;
-    --text-secondary: #8E8E93;
-    --accent-glow: rgba(0, 122, 255, 0.12);
-  }
-
-  .dark {
-    --bg-primary: #161618;
-    --bg-card: #242426;
-    --bg-card-hover: #2C2C2E;
-    --border-color: #38383A;
-    --text-primary: #F5F5F7;
-    --text-secondary: #98989D;
-    --accent-glow: rgba(0, 122, 255, 0.25);
+    --bg-canvas: #E6EFEF;
+    --pine-bg: #25433E;
+    --pine-dark: #1A312D;
+    --honey-gold: #E5A93C;
+    --text-primary: #192E2A;
+    --text-secondary: #58706B;
+    --border-glass: rgba(255, 255, 255, 0.7);
   }
 
   body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif;
-    letter-spacing: -0.01em;
+    background-color: #E6EFEF;
+    color: #192E2A;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    letter-spacing: -0.015em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Apple Frosted Glass Utilities */
-.apple-glass {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+/* =========================================================================
+   Organic Sage Mineral Canvas (Reference Background)
+   ========================================================================= */
+
+.mineral-canvas {
+  background-color: #E6EFEF;
+  background-image: 
+    radial-gradient(ellipse at 5% 0%, rgba(198, 222, 219, 0.6) 0%, transparent 60%),
+    radial-gradient(ellipse at 95% 100%, rgba(229, 169, 60, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
 }
 
-.dark .apple-glass {
-  background: rgba(36, 36, 38, 0.75);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* =========================================================================
+   Pristine Frosted Glassmorphism
+   ========================================================================= */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 16px 36px -10px rgba(26, 49, 45, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.5),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+  border-radius: 28px;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.apple-card {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  border-radius: 20px;
-}
-
-.apple-card:hover {
+.glass-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 32px -8px var(--accent-glow);
+  box-shadow: 
+    0 24px 44px -10px rgba(26, 49, 45, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.8),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 16px rgba(26, 49, 45, 0.04);
+}
+
+/* Backward compatibility for apple-glass and apple-card */
+.apple-card, .live-card {
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 
+    0 16px 36px -10px rgba(26, 49, 45, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+  border-radius: 28px !important;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.apple-glass, .live-glass {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
 }
 
 /* Apple Pill Badges */
@@ -82,22 +114,23 @@
   background: rgba(142, 142, 147, 0.7);
 }
 
-/* Leaflet Map Apple styling overrides */
+/* Leaflet Map Styling */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  border-radius: 20px;
+  border-radius: 24px;
+  background: #E6EFEF !important;
   z-index: 10;
 }
 
 @keyframes pulse-glow {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8), 0 0 16px rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 0 0 rgba(229, 169, 60, 0.8), 0 0 16px rgba(229, 169, 60, 0.6);
   }
   50% {
     transform: scale(1.2);
-    box-shadow: 0 0 0 16px rgba(239, 68, 68, 0), 0 0 24px rgba(239, 68, 68, 0.9);
+    box-shadow: 0 0 0 16px rgba(229, 169, 60, 0), 0 0 24px rgba(229, 169, 60, 0.9);
   }
 }
 
@@ -106,14 +139,36 @@
 }
 
 .leaflet-popup-content-wrapper {
-  background: #0f172a !important;
-  color: #f8fafc !important;
-  border-radius: 16px !important;
-  border: 1px solid rgba(51, 65, 85, 0.8) !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+  background: rgba(37, 67, 62, 0.98) !important;
+  backdrop-filter: blur(16px) !important;
+  color: #FFFFFF !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.45) !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  line-height: 1.4 !important;
+  color: #FFFFFF !important;
 }
 
 .leaflet-popup-tip {
-  background: #0f172a !important;
+  background: rgba(37, 67, 62, 0.98) !important;
+}
+
+.leaflet-popup-close-button {
+  color: #FFFFFF !important;
+  opacity: 0.85 !important;
+  font-size: 18px !important;
+  top: 10px !important;
+  right: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: #E5A93C !important;
+  opacity: 1 !important;
+  transform: scale(1.1) !important;
 }
 

@@ -106,12 +106,12 @@ export const LiveMap = ({ locations, selectedTouristId, onSelectTourist, hazardZ
             }}
           >
             <Popup className="leaflet-popup-dark">
-              <div className="p-1.5 text-slate-900 space-y-1">
-                <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-bold text-[9px] uppercase">
+              <div className="p-2 text-white space-y-1.5 min-w-[180px]">
+                <span className="px-2 py-0.5 rounded bg-red-600 text-white font-extrabold text-[9px] uppercase tracking-wider inline-block">
                   ⚠️ {hz.severity} DANGER ZONE
                 </span>
-                <p className="font-extrabold text-xs">{hz.name}</p>
-                <p className="text-[10px] text-slate-600">{hz.riskDescription || 'Avalanche risk level 4/5. 50 km/h gusts.'}</p>
+                <p className="font-black text-sm text-white font-sans">{hz.name}</p>
+                <p className="text-[11px] text-white/80 leading-relaxed font-sans">{hz.riskDescription || 'Avalanche risk level 4/5. 50 km/h gusts.'}</p>
               </div>
             </Popup>
           </Polygon>
@@ -137,22 +137,31 @@ export const LiveMap = ({ locations, selectedTouristId, onSelectTourist, hazardZ
                 }}
               >
                 <Popup className="leaflet-popup-dark">
-                  <div className="p-1.5 text-slate-900 space-y-1">
-                    <p className="font-bold text-xs">{loc.fullName}</p>
-                    <p className="text-[10px] text-slate-600">{loc.location.name}</p>
-                    <div className="flex items-center justify-between text-[10px] pt-1 border-t border-slate-200">
-                      <span className={`font-bold px-1.5 py-0.5 rounded ${
-                        loc.status === 'EMERGENCY' ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-800'
+                  <div className="p-2 text-white space-y-2 min-w-[200px]">
+                    <div>
+                      <p className="font-black text-sm text-white font-sans">{loc.fullName}</p>
+                      <p className="text-[11px] text-white/70 font-sans mt-0.5">{loc.location.name}</p>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-white/20">
+                      <span className={`font-black px-2 py-0.5 rounded text-[10px] uppercase tracking-wider ${
+                        loc.status === 'EMERGENCY' 
+                          ? 'bg-red-500 text-white shadow-sm' 
+                          : loc.status === 'Offline'
+                          ? 'bg-amber-400 text-[#192E2A] font-extrabold'
+                          : 'bg-emerald-500 text-white font-extrabold'
                       }`}>
                         {loc.status}
                       </span>
-                      <span className="font-mono text-cyan-700 font-bold">{loc.speedKmH} km/h</span>
+                      <span className="font-mono text-honey font-black text-xs">{loc.speedKmH || 0} km/h</span>
                     </div>
+
                     <button
                       onClick={() => onSelectTourist(loc.id)}
-                      className="w-full mt-1.5 py-1 rounded bg-cyan-600 text-white text-[10px] font-bold shadow"
+                      className="w-full mt-1 py-1.5 px-3 rounded-xl bg-honey hover:brightness-105 active:scale-95 text-[#25433E] text-xs font-black shadow-md transition-all flex items-center justify-center gap-1.5"
                     >
-                      Track Telemetry →
+                      <span>Track Telemetry</span>
+                      <span>→</span>
                     </button>
                   </div>
                 </Popup>
@@ -177,19 +186,19 @@ export const LiveMap = ({ locations, selectedTouristId, onSelectTourist, hazardZ
       </MapContainer>
 
       {/* Floating High-Altitude Weather Radar Badge Overlay */}
-      <div className="absolute top-3 left-3 z-[400] bg-slate-900/90 backdrop-blur-md border border-slate-700/80 px-3.5 py-2 rounded-2xl flex items-center gap-3 text-xs font-semibold shadow-xl text-white">
-        <div className="flex items-center gap-1.5 text-cyan-400">
-          <CloudSnow className="w-4 h-4 animate-bounce text-cyan-300" />
-          <span className="font-bold">{weather?.temperatureC ?? -4}°C</span>
+      <div className="absolute top-3 left-3 z-[400] bg-[#25433E]/95 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-2xl flex items-center gap-3 text-xs font-semibold shadow-xl text-white">
+        <div className="flex items-center gap-1.5 text-honey">
+          <CloudSnow className="w-4 h-4 animate-bounce text-honey" />
+          <span className="font-extrabold">{weather?.temperatureC ?? -4}°C</span>
         </div>
-        <div className="h-3 w-px bg-slate-700" />
-        <div className="flex items-center gap-1.5 text-slate-300">
-          <Wind className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="h-3 w-px bg-white/20" />
+        <div className="flex items-center gap-1.5 text-white/90">
+          <Wind className="w-3.5 h-3.5 text-white/80" />
           <span>{weather?.windSpeedKmH ?? 48} km/h</span>
         </div>
-        <div className="h-3 w-px bg-slate-700" />
-        <div className="px-2 py-0.5 rounded-lg bg-red-500/20 border border-red-500/40 text-red-400 font-extrabold text-[10px] flex items-center gap-1">
-          <ShieldAlert className="w-3 h-3" />
+        <div className="h-3 w-px bg-white/20" />
+        <div className="px-2.5 py-0.5 rounded-lg bg-red-500/25 border border-red-400/40 text-red-300 font-extrabold text-[10px] flex items-center gap-1">
+          <ShieldAlert className="w-3 h-3 text-red-300" />
           <span>Avalanche Level {weather?.avalancheRiskLevel ?? 4}/5</span>
         </div>
       </div>
@@ -197,9 +206,9 @@ export const LiveMap = ({ locations, selectedTouristId, onSelectTourist, hazardZ
       {/* Hazard Layer Toggle Button */}
       <button
         onClick={() => setShowHazards(!showHazards)}
-        className="absolute top-3 right-3 z-[400] bg-slate-900/90 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 hover:text-cyan-400 flex items-center gap-1.5 shadow-lg transition-all"
+        className="absolute top-3 right-3 z-[400] bg-[#25433E]/95 backdrop-blur-md border border-white/20 px-3.5 py-2 rounded-2xl text-xs font-extrabold text-white hover:text-honey flex items-center gap-1.5 shadow-xl transition-all"
       >
-        <Layers className="w-3.5 h-3.5 text-cyan-400" />
+        <Layers className="w-3.5 h-3.5 text-honey" />
         <span>{showHazards ? 'Hide Hazard Polygons' : 'Show Hazard Polygons'}</span>
       </button>
     </div>

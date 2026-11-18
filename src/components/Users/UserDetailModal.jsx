@@ -3,16 +3,15 @@ import { Modal } from '../Common/Modal';
 import { StatusBadge } from '../Common/StatusBadge';
 import { 
   Radio, 
+  MapPin, 
   Battery, 
   Wifi, 
-  MapPin, 
+  Clock, 
   ShieldCheck, 
   FileText, 
-  Clock, 
-  AlertTriangle,
-  Phone,
-  User,
-  Compass
+  User, 
+  Compass,
+  AlertTriangle 
 } from 'lucide-react';
 
 export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
@@ -24,38 +23,38 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Tourist Profile: ${userDetail.fullName}`}
+      title="Tourist Traveler Command Dossier"
       maxWidth="max-w-3xl"
     >
-      <div className="space-y-6">
+      <div className="space-y-6 select-none">
         {/* Header Profile Summary */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-800/60 border border-slate-800">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#1E3732] border border-white/10 shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500 to-cyan-400 text-white font-extrabold text-xl flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-honey via-[#E5A93C] to-[#F3C878] text-[#25433E] font-black text-xl flex items-center justify-center shadow-lg">
               {userDetail.fullName.charAt(0)}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-white">{userDetail.fullName}</h3>
+                <h3 className="text-lg font-extrabold text-white font-sans">{userDetail.fullName}</h3>
                 <StatusBadge status={userDetail.status} />
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">{userDetail.email} • {userDetail.phone}</p>
+              <p className="text-xs text-white/70 font-sans mt-0.5">{userDetail.email} • {userDetail.phone}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-800 text-xs">
-            <Battery className={`w-4 h-4 ${userDetail.batteryLevel != null && userDetail.batteryLevel < 20 ? 'text-red-500 animate-pulse' : 'text-emerald-400'}`} />
-            <span className="font-bold text-white">
+          <div className="flex items-center gap-3 bg-white/10 px-3.5 py-2 rounded-xl border border-white/10 text-xs">
+            <Battery className={`w-4 h-4 ${userDetail.batteryLevel != null && userDetail.batteryLevel < 20 ? 'text-red-400 animate-pulse' : 'text-emerald-300'}`} />
+            <span className="font-extrabold text-white">
               {userDetail.batteryLevel != null ? `${userDetail.batteryLevel}%` : 'Awaiting Ping'}
             </span>
-            <span className="text-slate-500">•</span>
-            <Wifi className="w-4 h-4 text-cyan-400" />
-            <span className="text-slate-300 font-medium">{userDetail.networkSignal || 'Pending'}</span>
+            <span className="text-white/40">•</span>
+            <Wifi className="w-4 h-4 text-honey" />
+            <span className="text-white/80 font-medium">{userDetail.networkSignal || 'Pending'}</span>
           </div>
         </div>
 
         {/* Modal Navigation Tabs */}
-        <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+        <div className="flex items-center gap-2 border-b border-white/10 pb-2">
           {[
             { id: 'telemetry', label: 'Live Telemetry & GPS', icon: Radio },
             { id: 'guardians', label: 'Guardians & Contacts', icon: ShieldCheck },
@@ -67,10 +66,10 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition-all ${
                   activeTab === tab.id
-                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    ? 'bg-honey text-[#25433E] shadow-sm font-extrabold'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -83,40 +82,40 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
         {/* Tab 1: Telemetry */}
         {activeTab === 'telemetry' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-              <p className="font-bold text-slate-400 flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-cyan-400" />
+            <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-2 shadow-sm">
+              <p className="font-bold text-white/70 flex items-center gap-1.5 font-sans">
+                <MapPin className="w-4 h-4 text-honey" />
                 Current Registered Location
               </p>
-              <p className="text-sm font-extrabold text-white">
+              <p className="text-sm font-extrabold text-white font-sans">
                 {userDetail.currentLocation?.name || 'Awaiting Mobile GPS Fix'}
               </p>
-              <div className="flex items-center gap-4 text-slate-400 pt-1">
-                <span>Elevation: <strong className="text-slate-200">{userDetail.currentLocation?.elevation || 'N/A'}</strong></span>
-                <span>Offline: <strong className="text-slate-200">{userDetail.offlineDurationMinutes || 0}m</strong></span>
+              <div className="flex items-center gap-4 text-white/70 pt-1 font-sans">
+                <span>Elevation: <strong className="text-white">{userDetail.currentLocation?.elevation || 'N/A'}</strong></span>
+                <span>Offline: <strong className="text-white">{userDetail.offlineDurationMinutes || 0}m</strong></span>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-              <p className="font-bold text-slate-400 flex items-center gap-1.5">
-                <Compass className="w-4 h-4 text-cyan-400" />
+            <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-2 shadow-sm">
+              <p className="font-bold text-white/70 flex items-center gap-1.5 font-sans">
+                <Compass className="w-4 h-4 text-honey" />
                 GPS Coordinates Telemetry
               </p>
               {userDetail.currentLocation?.lat != null && userDetail.currentLocation?.lng != null ? (
                 <>
-                  <p className="text-sm font-mono font-bold text-cyan-400">
+                  <p className="text-sm font-mono font-extrabold text-honey">
                     Latitude: {Number(userDetail.currentLocation.lat).toFixed(4)}°
                   </p>
-                  <p className="text-sm font-mono font-bold text-cyan-400">
+                  <p className="text-sm font-mono font-extrabold text-honey">
                     Longitude: {Number(userDetail.currentLocation.lng).toFixed(4)}°
                   </p>
                 </>
               ) : (
-                <p className="text-sm italic text-slate-500">
+                <p className="text-sm italic text-white/50">
                   No GNSS satellite coordinates reported yet.
                 </p>
               )}
-              <p className="text-[10px] text-slate-500 pt-1 flex items-center gap-1">
+              <p className="text-[10px] text-white/50 pt-1 flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 Last Ping: {userDetail.lastPing ? new Date(userDetail.lastPing).toLocaleString() : 'Never'}
               </p>
@@ -128,17 +127,17 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
         {activeTab === 'guardians' && (
           <div className="space-y-3 text-xs">
             {userDetail.guardians?.map((g, idx) => (
-              <div key={idx} className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+              <div key={idx} className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
+                  <div className="w-10 h-10 rounded-xl bg-honey/20 text-honey flex items-center justify-center font-bold">
                     <User className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-bold text-white">{g.name}</p>
-                    <p className="text-slate-400">Relation: {g.relation} • {g.phone}</p>
+                    <p className="font-bold text-white font-sans">{g.name}</p>
+                    <p className="text-white/70 font-sans">Relation: {g.relation} • {g.phone}</p>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-extrabold">
                   Verified Contact
                 </span>
               </div>
@@ -150,15 +149,15 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
         {activeTab === 'documents' && (
           <div className="space-y-3 text-xs">
             {userDetail.documents?.map((d, idx) => (
-              <div key={idx} className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+              <div key={idx} className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-3">
-                  <FileText className="w-6 h-6 text-cyan-400" />
+                  <FileText className="w-6 h-6 text-honey" />
                   <div>
-                    <p className="font-bold text-white">{d.type}</p>
-                    <p className="text-slate-400 font-mono">Reference No: {d.number}</p>
+                    <p className="font-bold text-white font-sans">{d.type}</p>
+                    <p className="text-white/70 font-mono">Reference No: {d.number}</p>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-extrabold">
                   {d.status}
                 </span>
               </div>
@@ -170,18 +169,17 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
         {activeTab === 'trips' && (
           <div className="space-y-3 text-xs">
             {userDetail.trips?.length === 0 ? (
-              <p className="text-center py-6 text-slate-500">No expedition trips recorded for this traveler.</p>
+              <p className="text-center py-6 text-white/50 font-sans">No expedition trips recorded for this traveler.</p>
             ) : (
               userDetail.trips?.map((t) => (
-                <div key={t.id} className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
+                <div key={t.id} className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-2 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm text-white">{t.destination}</span>
+                    <span className="font-extrabold text-sm text-white font-sans">{t.destination}</span>
                     <StatusBadge status={t.status} />
                   </div>
-                  <p className="text-slate-400">Route: {t.route}</p>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-800">
-                    <span>Boundary Radius: <strong className="text-slate-300">{t.boundaryRadiusKm} km</strong></span>
-                    <span>Started: {new Date(t.startDate).toLocaleDateString()}</span>
+                  <div className="flex items-center justify-between text-white/70 text-[11px] font-sans">
+                    <span>Radius: {t.boundaryRadiusKm} km</span>
+                    <span>Created: {new Date(t.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               ))

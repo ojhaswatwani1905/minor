@@ -4,7 +4,6 @@ import { MonitoringFilterBar } from '../components/Monitoring/MonitoringFilterBa
 import { LiveMap } from '../components/Monitoring/LiveMap';
 import { TouristTelemetryPanel } from '../components/Monitoring/TouristTelemetryPanel';
 import { MeshNodeStatusPanel } from '../components/Satellite/MeshNodeStatusPanel';
-import { DeadManSwitchAndOpenDataPanel } from '../components/Monitoring/DeadManSwitchAndOpenDataPanel';
 import { GeofenceBroadcastModal } from '../components/Broadcast/GeofenceBroadcastModal';
 import { Loader } from '../components/Common/Loader';
 import { Radio, Volume2 } from 'lucide-react';
@@ -20,15 +19,15 @@ export const MonitoringPage = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
 
-  const fetchLiveData = async () => {
+  const fetchLiveData = async (isBackground = false) => {
     try {
       const res = await monitoringService.getLiveLocations();
-      if (res.success) {
+      if (res.success && Array.isArray(res.locations)) {
         setLocations(res.locations);
       }
     } catch (err) {
       console.error('Failed to fetch live locations:', err);
-      toast.error('Satellite feed sync error');
+      if (!isBackground) toast.error('Satellite feed sync error');
     } finally {
       setLoading(false);
     }
@@ -71,8 +70,8 @@ export const MonitoringPage = () => {
     let interval;
     if (autoRefresh) {
       interval = setInterval(() => {
-        fetchLiveData();
-      }, 3000);
+        fetchLiveData(true);
+      }, 5000);
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -93,16 +92,16 @@ export const MonitoringPage = () => {
   return (
     <div className="space-y-6 pb-12 min-h-[calc(100vh-100px)] flex flex-col">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-3 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4 flex-shrink-0">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <h1 className="text-2xl font-black tracking-tight text-[#192E2A] flex items-center gap-2.5 font-sans">
             Satellite Live GPS Command
-            <span className="flex h-2.5 w-2.5 relative">
+            <span className="flex h-3 w-3 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
             </span>
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-1 font-sans">
             Real-time tourist telemetry, biometric health sensors, heading compass, & hazard zone overlays
           </p>
         </div>
@@ -110,14 +109,14 @@ export const MonitoringPage = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsBroadcastOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition-all"
+            className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-500 text-white font-black text-xs flex items-center gap-2 shadow-md transition-all active:scale-95"
           >
             <Volume2 className="w-4 h-4 animate-pulse" />
             <span>Transmit Geofenced Broadcast</span>
           </button>
 
-          <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-1.5 shadow-glow-emerald">
-            <Radio className="w-3.5 h-3.5 animate-pulse" />
+          <span className="px-3.5 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 text-xs font-extrabold flex items-center gap-1.5 shadow-sm">
+            <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-600" />
             Live Mesh Active
           </span>
         </div>
@@ -128,10 +127,6 @@ export const MonitoringPage = () => {
         <MeshNodeStatusPanel />
       </div>
 
-      {/* Dead Man's Switch, Open Data Engine & Community Reviews Panel */}
-      <div className="flex-shrink-0">
-        <DeadManSwitchAndOpenDataPanel />
-      </div>
 
       {/* Filter & Control Bar */}
       <div className="flex-shrink-0">

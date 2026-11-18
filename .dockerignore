@@ -1,0 +1,13 @@
+node_modules
+stsms-mobile
+src
+.git
+.github
+*.apk
+*.log
+.DS_Store
+.env
+.env.local
+.expo
+VIVA_HANDOVER
+

@@ -30,9 +30,11 @@ export const TripsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  const fetchTripsData = async () => {
+  const fetchTripsData = async (isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial && trips.length === 0) {
+        setLoading(true);
+      }
       const [tripsRes, usersRes] = await Promise.all([
         tripService.getTrips({
           search,
@@ -42,18 +44,18 @@ export const TripsPage = () => {
         userService.getUsers()
       ]);
 
-      if (tripsRes.success) setTrips(tripsRes.trips);
-      if (usersRes.success) setTourists(usersRes.users);
+      if (tripsRes.success && Array.isArray(tripsRes.trips)) setTrips(tripsRes.trips);
+      if (usersRes.success && Array.isArray(usersRes.users)) setTourists(usersRes.users);
     } catch (err) {
-      toast.error(err.message || 'Failed to fetch expedition list');
+      if (isInitial) toast.error(err.message || 'Failed to fetch expedition list');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTripsData();
-    const interval = setInterval(fetchTripsData, 3000);
+    fetchTripsData(true);
+    const interval = setInterval(() => fetchTripsData(false), 6000);
     return () => clearInterval(interval);
   }, [search, statusFilter, geofenceFilter]);
 
@@ -108,15 +110,18 @@ export const TripsPage = () => {
 
   const handleDeleteConfirm = async () => {
     if (!deletingId) return;
+    const targetId = deletingId;
+    setTrips(prev => prev.filter(t => t.id !== targetId));
+    setDeletingId(null);
     try {
-      const res = await tripService.deleteTrip(deletingId);
+      const res = await tripService.deleteTrip(targetId);
       if (res.success) {
         toast.success(res.message);
-        setDeletingId(null);
-        fetchTripsData();
+        fetchTripsData(false);
       }
     } catch (err) {
       toast.error(err.message || 'Delete operation failed');
+      fetchTripsData(false);
     }
   };
 
@@ -129,17 +134,17 @@ export const TripsPage = () => {
   );
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 select-none">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <h1 className="text-2xl font-black tracking-tight text-[#192E2A] flex items-center gap-2.5 font-sans">
             Tourist Expedition & Route Command
-            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+            <span className="text-xs font-mono px-3 py-1 rounded-full bg-pine/10 text-pine border border-pine/20 font-extrabold">
               {trips.length} Registered Trips
             </span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1 font-sans">
             Configure expedition routes, boundary safety radius, checkpoints, and monitor arrival schedules
           </p>
         </div>
@@ -157,7 +162,7 @@ export const TripsPage = () => {
           setEditingTrip(null);
           setIsFormOpen(true);
         }}
-        onRefresh={fetchTripsData}
+        onRefresh={() => fetchTripsData(false)}
       />
 
       {/* Table Data */}
@@ -219,16 +224,16 @@ export const TripsPage = () => {
           </div>
           <p className="text-xs text-slate-300">Are you sure you want to delete this trip record?</p>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
             <button
               onClick={() => setDeletingId(null)}
-              className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700"
+              className="px-4 py-2 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={handleDeleteConfirm}
-              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-lg"
+              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-lg transition-all active:scale-95"
             >
               Delete Trip
             </button>

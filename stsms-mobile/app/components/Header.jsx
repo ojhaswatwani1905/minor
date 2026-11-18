@@ -1,21 +1,43 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
+import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
 
-export const Header = ({ title, subtitle, onBack, rightAction }) => {
+export const Header = ({ title, subtitle, onBack, rightAction, style }) => {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { borderBottomColor: colors.cardBorderLight || '#FDF0F4' }, style]}>
       <View style={styles.leftGroup}>
         {onBack && (
-          <TouchableOpacity style={styles.backBtn} onPress={onBack} activeOpacity={0.8}>
-            <Text style={styles.backBtnText}>←</Text>
+          <TouchableOpacity
+            style={[
+              styles.backBtn,
+              {
+                backgroundColor: colors.cardWarm || '#FFFBF7',
+                borderColor: colors.cardBorder || '#F6DFE6',
+              },
+              SHADOWS.soft,
+            ]}
+            onPress={onBack}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="chevron-back" size={20} color={colors.text} />
           </TouchableOpacity>
         )}
-        <View>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+        <View style={styles.titleWrap}>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+            {title}
+          </Text>
+          {subtitle ? (
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              {subtitle}
+            </Text>
+          ) : null}
         </View>
       </View>
-      {rightAction && <View>{rightAction}</View>}
+      {rightAction ? <View style={styles.rightActionWrap}>{rightAction}</View> : null}
     </View>
   );
 };
@@ -25,40 +47,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 4,
     borderBottomWidth: 1,
-    borderBottomColor: '#1e293b',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   leftGroup: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
     gap: 12,
   },
+  titleWrap: {
+    flex: 1,
+  },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: '#0f172a',
+    width: 38,
+    height: 38,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: '#1e293b',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backBtnText: {
-    color: '#cbd5e1',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
   title: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#ffffff',
+    ...TYPOGRAPHY.h2,
+    fontSize: 19,
+    fontWeight: '800',
   },
   subtitle: {
-    fontSize: 11,
-    color: '#94a3b8',
+    ...TYPOGRAPHY.caption,
     marginTop: 2,
   },
+  rightActionWrap: {
+    marginLeft: 8,
+  },
 });
-

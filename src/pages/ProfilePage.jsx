@@ -103,54 +103,54 @@ export const ProfilePage = () => {
         {/* Left Column: Profile Card & Edit Form */}
         <div className="lg:col-span-2 space-y-6">
           {/* Admin Avatar Header Card */}
-          <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 flex items-center gap-5 shadow-xl">
+          <div className="p-6 rounded-3xl bg-[#25433E] border border-white/10 flex items-center gap-5 shadow-xl text-white">
             <img
               src={profile?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"}
               alt="Admin Avatar"
-              className="w-20 h-20 rounded-2xl object-cover ring-4 ring-cyan-500/30"
+              className="w-20 h-20 rounded-2xl object-cover ring-4 ring-honey/40"
             />
             <div>
-              <h3 className="text-xl font-extrabold text-white">{profile?.name}</h3>
-              <p className="text-xs text-cyan-400 font-bold mt-0.5">{profile?.role}</p>
-              <p className="text-xs text-slate-400 mt-1">{profile?.department} • {profile?.email}</p>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold mt-2">
-                <CheckCircle2 className="w-3 h-3" />
+              <h3 className="text-xl font-extrabold text-white font-sans">{profile?.name}</h3>
+              <p className="text-xs text-honey font-bold mt-0.5">{profile?.role}</p>
+              <p className="text-xs text-white/70 mt-1">{profile?.department} • {profile?.email}</p>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-extrabold mt-2">
+                <CheckCircle2 className="w-3.5 h-3.5" />
                 Active Authenticated Session
               </span>
             </div>
           </div>
 
           {/* Edit Profile Form */}
-          <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <User className="w-4 h-4 text-cyan-400" />
+          <div className="p-6 rounded-3xl bg-[#25433E] border border-white/10 shadow-xl space-y-4 text-white">
+            <h3 className="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2 font-sans">
+              <User className="w-4 h-4 text-honey" />
               Edit Account Information
             </h3>
 
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
                     Full Name
                   </label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1E3732] border border-white/15 text-xs text-white focus:ring-2 focus:ring-honey/50 font-sans"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
                     Department
                   </label>
                   <input
                     type="text"
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1E3732] border border-white/15 text-xs text-white focus:ring-2 focus:ring-honey/50 font-sans"
                     required
                   />
                 </div>
@@ -181,15 +181,15 @@ export const ProfilePage = () => {
           </div>
 
           {/* Change Password Form */}
-          <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <Lock className="w-4 h-4 text-cyan-400" />
+          <div className="p-6 rounded-3xl bg-[#25433E] border border-white/10 shadow-xl space-y-4 text-white">
+            <h3 className="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2 font-sans">
+              <Lock className="w-4 h-4 text-honey" />
               Security & Password Updates
             </h3>
 
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5 font-sans">
                   Current Password
                 </label>
                 <input
@@ -197,14 +197,14 @@ export const ProfilePage = () => {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:ring-2 focus:ring-cyan-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1E3732] border border-white/15 text-xs text-white focus:ring-2 focus:ring-honey/50 font-sans"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5 font-sans">
                     New Password
                   </label>
                   <input
@@ -212,13 +212,13 @@ export const ProfilePage = () => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1E3732] border border-white/15 text-xs text-white focus:ring-2 focus:ring-honey/50 font-sans"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5 font-sans">
                     Confirm New Password
                   </label>
                   <input
@@ -226,7 +226,7 @@ export const ProfilePage = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1E3732] border border-white/15 text-xs text-white focus:ring-2 focus:ring-honey/50 font-sans"
                     required
                   />
                 </div>
@@ -236,7 +236,7 @@ export const ProfilePage = () => {
                 <button
                   type="submit"
                   disabled={changingPass}
-                  className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg"
+                  className="px-5 py-2.5 rounded-xl bg-honey hover:brightness-105 text-[#25433E] font-black text-xs shadow-md transition-all active:scale-95"
                 >
                   {changingPass ? 'Updating Password...' : 'Update Security Password'}
                 </button>
@@ -247,19 +247,19 @@ export const ProfilePage = () => {
 
         {/* Right Column: Activity Logs Audit Trail */}
         <div className="space-y-6">
-          <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <Clock className="w-4 h-4 text-cyan-400" />
+          <div className="p-6 rounded-3xl bg-[#25433E] border border-white/10 shadow-xl space-y-4 text-white">
+            <h3 className="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2 font-sans">
+              <Clock className="w-4 h-4 text-honey" />
               Admin Audit Activity Trail
             </h3>
 
             <div className="space-y-3">
               {activityLogs.map((log) => (
-                <div key={log.id} className="p-3 rounded-2xl bg-slate-800/40 border border-slate-800 text-xs space-y-1">
-                  <p className="font-semibold text-slate-200">{log.action}</p>
-                  <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1">
-                    <span>IP: {log.ip}</span>
-                    <span>{new Date(log.timestamp).toLocaleString()}</span>
+                <div key={log.id} className="p-3.5 rounded-2xl bg-[#1E3732] border border-white/10 text-xs space-y-1 shadow-sm">
+                  <p className="font-bold text-white font-sans">{log.action}</p>
+                  <div className="flex items-center justify-between text-[10px] text-white/60 pt-1 font-mono">
+                    <span>IP: {log.ip || '127.0.0.1'}</span>
+                    <span>{new Date(log.timestamp).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}</span>
                   </div>
                 </div>
               ))}

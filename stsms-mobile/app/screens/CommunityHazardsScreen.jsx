@@ -3,6 +3,8 @@ import { View, Text, ScrollView, TextInput, TouchableOpacity, Image, StyleSheet,
 import { Header } from '../components/Header';
 import { Button } from '../components/Button';
 import { apiFetch } from '../utils/api';
+import { useTheme } from '../context/ThemeContext';
+import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
 
 const PRESET_TAGS = ['PICKPOCKETING', 'POOR_LIGHTING', 'STRAY_ANIMALS', 'UNSAFE_NIGHT', 'SCAMS'];
 const REC_CATEGORIES = [
@@ -13,6 +15,7 @@ const REC_CATEGORIES = [
 ];
 
 export const CommunityHazardsScreen = ({ onBack }) => {
+  const { colors } = useTheme();
   const [activeSubTab, setActiveSubTab] = useState('hazards'); // 'hazards' | 'recommendations'
   const [hazards, setHazards] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
@@ -145,7 +148,7 @@ export const CommunityHazardsScreen = ({ onBack }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background || '#FFF0F5' }]}>
       <Header title="Community Intelligence" subtitle="PostGIS Geo-schema & Content Moderation" onBack={onBack} />
 
       {/* Sub-tab Switcher: Hazards vs Open Data vs Recommendations */}

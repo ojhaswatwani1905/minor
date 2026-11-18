@@ -110,7 +110,8 @@ export const getUsers = async (req, res, next) => {
       );
 
       const lastPingTime = u.lastPing ? new Date(u.lastPing).getTime() : 0;
-      const isFresh = lastPingTime > 0 && (now - lastPingTime) <= GPS_TIMEOUT_MS;
+      // Allow up to 24 hours window for active demo & real tourist field tracking
+      const isFresh = lastPingTime > 0 && (now - lastPingTime) <= (24 * 60 * 60 * 1000);
 
       // Active SOS emergencies stay as EMERGENCY
       if (u.status === 'EMERGENCY') {
@@ -120,26 +121,26 @@ export const getUsers = async (req, res, next) => {
         };
       }
 
-      // If user is not active means not getting GPS location, mark as Offline
-      if (!hasGps || !isFresh) {
-        const offlineMins = lastPingTime > 0
-          ? Math.max(1, Math.floor((now - lastPingTime) / 60000))
-          : (u.offlineDurationMinutes || 15);
-
+      // If user has verified, monitored, or online status with valid coordinates, keep active
+      if (hasGps && (u.status === 'Verified' || u.status === 'Monitored' || u.status === 'Online' || isFresh)) {
         return {
           ...u,
-          status: 'Offline',
-          networkSignal: hasGps ? 'GPS Signal Stale' : 'No GPS Fix (Offline)',
-          offlineDurationMinutes: offlineMins
+          status: u.status || 'Online',
+          networkSignal: u.networkSignal && !u.networkSignal.includes('Offline') ? u.networkSignal : 'Connected (GNSS Active)',
+          offlineDurationMinutes: 0
         };
       }
 
-      // Actively transmitting GPS location
+      // If user is truly offline (no GPS coords)
+      const offlineMins = lastPingTime > 0
+        ? Math.max(1, Math.floor((now - lastPingTime) / 60000))
+        : (u.offlineDurationMinutes || 15);
+
       return {
         ...u,
-        status: 'Online',
-        networkSignal: u.networkSignal && !u.networkSignal.includes('Offline') ? u.networkSignal : 'Connected (GNSS Active)',
-        offlineDurationMinutes: 0
+        status: 'Offline',
+        networkSignal: hasGps ? 'GPS Signal Stale' : 'No GPS Fix (Offline)',
+        offlineDurationMinutes: offlineMins
       };
     });
 

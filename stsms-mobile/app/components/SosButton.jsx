@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
+import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
 
-export const SosButton = ({ onSosTriggered }) => {
+export const SosButton = ({ onSosTriggered, style }) => {
+  const { colors } = useTheme();
   const [pressing, setPressing] = useState(false);
 
   const handleSos = () => {
@@ -9,21 +13,26 @@ export const SosButton = ({ onSosTriggered }) => {
     setTimeout(() => {
       setPressing(false);
       onSosTriggered && onSosTriggered();
-    }, 400);
+    }, 250);
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        onPress={handleSos}
-        activeOpacity={0.8}
-        style={[styles.button, pressing && styles.buttonPressing]}
-      >
-        <Text style={styles.sosText}>SOS</Text>
-        <Text style={styles.subText}>1-Tap Alert</Text>
-      </TouchableOpacity>
-      <Text style={styles.description}>
-        Press for 1-Tap Immediate Distress Beacon to Command Center & Guardians
+    <View style={[styles.container, style]}>
+      {/* Outer Pulse Glow Ring */}
+      <View style={styles.pulseRing}>
+        <TouchableOpacity
+          onPress={handleSos}
+          activeOpacity={0.88}
+          style={[styles.sosCircle, pressing && styles.sosCirclePressed, SHADOWS.glowDanger]}
+        >
+          <Ionicons name="alert-circle" size={32} color="#FFFFFF" style={{ marginBottom: 2 }} />
+          <Text style={styles.sosText}>SOS</Text>
+          <Text style={styles.sosSubText}>EMERGENCY</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={[styles.description, { color: colors.textSecondary }]}>
+        Press for 1-Tap Immediate Distress Alert to Police Helpline (112), Command Center & Guardians
       </Text>
     </View>
   );
@@ -33,47 +42,48 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
+    paddingVertical: 14,
   },
-  button: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: '#dc2626',
-    borderWidth: 4,
-    borderColor: 'rgba(248, 113, 113, 0.4)',
+  pulseRing: {
+    width: 146,
+    height: 146,
+    borderRadius: 73,
+    backgroundColor: 'rgba(255, 59, 105, 0.14)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
-    shadowColor: '#dc2626',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 12,
+    marginBottom: 10,
   },
-  buttonPressing: {
-    backgroundColor: '#b91c1c',
-    transform: [{ scale: 0.95 }],
+  sosCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#FF3B69',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+  },
+  sosCirclePressed: {
+    backgroundColor: '#E02450',
+    transform: [{ scale: 0.94 }],
   },
   sosText: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: '900',
-    color: '#ffffff',
+    color: '#FFFFFF',
+    letterSpacing: 1.5,
   },
-  subText: {
-    fontSize: 10,
+  sosSubText: {
+    fontSize: 9,
     fontWeight: '800',
-    color: '#fecaca',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginTop: 2,
+    color: 'rgba(255, 255, 255, 0.9)',
+    letterSpacing: 1.2,
+    marginTop: 1,
   },
   description: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#94a3b8',
+    ...TYPOGRAPHY.caption,
     textAlign: 'center',
-    maxWidth: 240,
+    maxWidth: 260,
+    lineHeight: 16,
   },
 });
-

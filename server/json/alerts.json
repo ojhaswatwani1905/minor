@@ -1,1 +1,162 @@
-[]
+[
+  {
+    "id": "8528ccb1-62f7-49ac-8dd9-16d19dffa5ad",
+    "userId": "usr_1794942568604",
+    "userName": "yash randi",
+    "tripId": "f0c11a23-4202-48a9-8ba5-51874a05a1d0",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 MANUAL SOS triggered by yash randi ! Immediate emergency response required.",
+    "location": {
+      "lat": 24.4365214,
+      "lng": 77.161118
+    },
+    "batteryLevel": 20,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-17T19:10:18.969Z"
+  },
+  {
+    "id": "7ee0472c-07b3-4c55-a902-d0646fbb85b5",
+    "userId": "adm_01",
+    "userName": "Priya Sharma",
+    "tripId": "6fa1f5aa-0c7c-450a-864c-576fcd9b0fc4",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Test Manual SOS #2 — Follow-up distress call",
+    "location": {
+      "lat": 32.241,
+      "lng": 77.1895
+    },
+    "batteryLevel": 93,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-17T16:49:04.619Z",
+    "updatedAt": "2026-11-17T16:49:04.620Z"
+  },
+  {
+    "id": "f7ac62f7-d0a5-42c7-8bcc-2c768f909f71",
+    "userId": "usr_1794933686909",
+    "userName": "Bhavna Sen",
+    "tripId": "69854757-91bf-4bd8-aafa-d2b473b5ca69",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 User B SOS: Tourist Bhavna requests assistance",
+    "location": {
+      "lat": 23.1995,
+      "lng": 77.4332
+    },
+    "batteryLevel": 92,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-17T16:41:42.489Z"
+  },
+  {
+    "id": "3e1af641-374a-48aa-9a21-6b6d62878870",
+    "userId": "usr_1794933686833",
+    "userName": "Aarav Patel",
+    "tripId": "4d9916e0-f460-4d33-afcf-7324c62eedda",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Second SOS: New incident later in the day",
+    "location": {
+      "lat": 23.49,
+      "lng": 77.74
+    },
+    "batteryLevel": 65,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-17T16:41:39.212Z",
+    "updatedAt": "2026-11-17T16:41:39.212Z"
+  },
+  {
+    "id": "287bfd68-1b58-4fa6-b2a8-ac99dfdf9816",
+    "userId": "usr_1794907506310",
+    "userName": "Bhavna Sen",
+    "tripId": null,
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 User B SOS: Tourist Bhavna requests assistance",
+    "location": {
+      "lat": 23.1995,
+      "lng": 77.4332
+    },
+    "batteryLevel": 92,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-17T09:25:20.759Z",
+    "updatedAt": "2026-11-17T09:25:20.760Z"
+  },
+  {
+    "id": "01911619-1b2c-4266-9723-6202b94a01cb",
+    "userId": "usr_1794907506236",
+    "userName": "Aarav Patel",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Rapid SOS: Second tap with updated location & battery",
+    "location": {
+      "lat": 23.487,
+      "lng": 77.739
+    },
+    "batteryLevel": 87,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-17T09:25:12.550Z",
+    "updatedAt": "2026-11-17T09:25:12.550Z",
+    "tripId": null
+  },
+  {
+    "id": "alt_geo_1794814851236",
+    "userId": "usr_test_k",
+    "userName": "Kailash Traveler",
+    "tripId": "sz_trp_1794814850859",
+    "type": "GEOFENCE_BREACH",
+    "priority": "CRITICAL",
+    "message": "🚨 [GEOFENCE_BREACH] Automatic boundary breach confirmed for Kailash Traveler! Exited designated 5km Safe Zone around Manali Mall Road. Distance outside: 12626m. Lat: 32.1000, Lng: 77.1000. Battery: null%.",
+    "location": {
+      "lat": 32.1,
+      "lng": 77.1,
+      "name": "Geofence Breach Exit (32.1000, 77.1000)"
+    },
+    "batteryLevel": null,
+    "status": "Pending",
+    "source": "app",
+    "timestamp": "2026-11-16T07:40:51.236Z"
+  },
+  {
+    "id": "alt_geo_1794814847786",
+    "userId": "usr_test_1794814845482",
+    "userName": "Tenzing Norgay",
+    "tripId": "sz_trp_1794814845489",
+    "type": "GEOFENCE_BREACH",
+    "priority": "CRITICAL",
+    "message": "🚨 [GEOFENCE_BREACH] Automatic boundary breach confirmed for Tenzing Norgay! Exited designated 5km Safe Zone around Solang Valley. Distance outside: 4462m. Lat: 32.3816, Lng: 77.2225. Battery: 86%.",
+    "location": {
+      "lat": 32.3816,
+      "lng": 77.2225,
+      "name": "Geofence Breach Exit (32.3816, 77.2225)"
+    },
+    "batteryLevel": 86,
+    "status": "Pending",
+    "source": "app",
+    "timestamp": "2026-11-16T07:40:47.786Z"
+  },
+  {
+    "id": "alt_geo_1794813361887",
+    "userId": "usr_test_01",
+    "userName": "Aarav Sharma",
+    "tripId": "sz_trp_1794813130795",
+    "type": "GEOFENCE_BREACH",
+    "priority": "CRITICAL",
+    "message": "🚨 [GEOFENCE_BREACH] Automatic boundary breach confirmed for Aarav Sharma! Exited designated 5km Safe Zone around Rohtang Pass Summit. Distance outside: 4372m. Lat: 32.2980, Lng: 77.1980. Battery: 80%.",
+    "location": {
+      "lat": 32.298,
+      "lng": 77.198,
+      "name": "Geofence Breach Exit (32.2980, 77.1980)"
+    },
+    "batteryLevel": 80,
+    "status": "Pending",
+    "source": "app",
+    "timestamp": "2026-11-16T07:16:01.881Z"
+  }
+]

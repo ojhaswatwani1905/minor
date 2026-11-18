@@ -37,4 +37,27 @@ export const tripService = {
       body: JSON.stringify(checkpointData),
     });
   },
+
+  getAllSafeZones: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await apiFetch(`/safe-zones/all${query ? `?${query}` : ''}`);
+  },
+
+  getSafeZoneIncidents: async () => {
+    return await apiFetch('/safe-zones/incidents');
+  },
+
+  updateSafeZoneStatus: async (id, action) => {
+    return await apiFetch(`/safe-zones/${id}/status`, {
+      method: 'POST',
+      body: JSON.stringify({ action }),
+    });
+  },
+
+  confirmSafe: async (id, note) => {
+    return await apiFetch(`/safe-zones/${id}/confirm-safe`, {
+      method: 'POST',
+      body: JSON.stringify({ note }),
+    });
+  },
 };

@@ -91,28 +91,28 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
         {/* Telemetry Breakdown Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Traveller & Contact Info */}
-          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-            <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
-              <UserCheck className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-2">
+            <p className="font-bold text-white/70 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <UserCheck className="w-3.5 h-3.5 text-honey" />
               Traveller Identity
             </p>
             <p className="text-sm font-extrabold text-white">{alertDetail.userName || 'Anonymous Traveller'}</p>
-            <p className="text-slate-400">
-              User ID: <span className="font-mono text-slate-300">{alertDetail.userId || 'Guest/Unassigned'}</span>
+            <p className="text-white/70">
+              User ID: <span className="font-mono text-white/90">{alertDetail.userId || 'Guest/Unassigned'}</span>
             </p>
             {alertDetail.user?.phone && (
-              <p className="text-slate-300 flex items-center gap-1">
-                <Phone className="w-3 h-3 text-cyan-400" />
+              <p className="text-white/80 flex items-center gap-1">
+                <Phone className="w-3 h-3 text-honey" />
                 {alertDetail.user.phone}
               </p>
             )}
           </div>
 
           {/* GPS Coordinates & Map Link */}
-          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-2">
             <div className="flex items-center justify-between">
-              <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
-                {hasCoords ? <MapPin className="w-3.5 h-3.5 text-cyan-400" /> : <MapPinOff className="w-3.5 h-3.5 text-amber-400" />}
+              <p className="font-bold text-white/70 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                {hasCoords ? <MapPin className="w-3.5 h-3.5 text-honey" /> : <MapPinOff className="w-3.5 h-3.5 text-amber-400" />}
                 GPS Location
               </p>
               {hasCoords && (
@@ -120,7 +120,7 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
                   href={`https://maps.google.com/?q=${lat},${lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] font-bold text-cyan-400 hover:underline flex items-center gap-1"
+                  className="text-[10px] font-bold text-honey hover:underline flex items-center gap-1"
                 >
                   <span>Google Maps</span>
                   <ExternalLink className="w-3 h-3" />
@@ -130,14 +130,14 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
 
             {hasCoords ? (
               <div className="space-y-1">
-                <p className="font-mono text-cyan-400 font-bold text-xs">
+                <p className="font-mono text-honey font-bold text-xs">
                   Latitude: {lat}
                 </p>
-                <p className="font-mono text-cyan-400 font-bold text-xs">
+                <p className="font-mono text-honey font-bold text-xs">
                   Longitude: {lng}
                 </p>
                 {alertDetail.location?.name && (
-                  <p className="text-slate-300 text-[11px] mt-1">{alertDetail.location.name}</p>
+                  <p className="text-white/80 text-[11px] mt-1">{alertDetail.location.name}</p>
                 )}
               </div>
             ) : (
@@ -145,7 +145,7 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
                 <p className="text-amber-400 font-semibold text-xs">
                   Coordinates Unavailable
                 </p>
-                <p className="text-slate-500 text-[10px] mt-0.5">
+                <p className="text-white/50 text-[10px] mt-0.5">
                   GPS was turned off or permission was denied on the traveller device.
                 </p>
               </div>
@@ -153,21 +153,21 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
           </div>
 
           {/* Battery & Network Telemetry */}
-          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
-            <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+          <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-3">
+            <p className="font-bold text-white/70 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
               <Battery className="w-3.5 h-3.5 text-emerald-400" />
               Power & Connectivity
             </p>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Battery Level:</span>
+                <span className="text-white/70">Battery Level:</span>
                 <span className={`font-mono font-bold ${batteryColor}`}>
                   {batteryLevel != null ? `${batteryLevel}%` : 'Unavailable / Unknown'}
                 </span>
               </div>
               {batteryLevel != null && (
-                <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-black/20 overflow-hidden">
                   <div
                     className={`h-full rounded-full ${
                       batteryLevel < 20 ? 'bg-red-500' : batteryLevel < 50 ? 'bg-amber-500' : 'bg-emerald-500'
@@ -177,9 +177,9 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-1 border-t border-slate-800">
-                <span className="text-slate-400">Network Status:</span>
-                <span className="font-medium text-slate-200">
+              <div className="flex items-center justify-between pt-1 border-t border-white/10">
+                <span className="text-white/70">Network Status:</span>
+                <span className="font-medium text-white/90">
                   {networkStatus || 'Unknown / Not Reported'}
                 </span>
               </div>
@@ -187,34 +187,34 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
           </div>
 
           {/* Device & Trip Telemetry */}
-          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
-            <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
-              <Smartphone className="w-3.5 h-3.5 text-purple-400" />
+          <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-3">
+            <p className="font-bold text-white/70 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <Smartphone className="w-3.5 h-3.5 text-honey" />
               Device & Trip Association
             </p>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Device Platform:</span>
-                <span className="font-medium text-slate-200">
+                <span className="text-white/70">Device Platform:</span>
+                <span className="font-medium text-white/90">
                   {deviceInfo?.platform ? deviceInfo.platform.toUpperCase() : 'Unknown'}
                 </span>
               </div>
               {deviceInfo?.model && (
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Device Model:</span>
-                  <span className="font-medium text-slate-200">{deviceInfo.model}</span>
+                  <span className="text-white/70">Device Model:</span>
+                  <span className="font-medium text-white/90">{deviceInfo.model}</span>
                 </div>
               )}
               {deviceInfo?.osVersion && (
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">OS Version:</span>
-                  <span className="font-mono text-slate-200">{deviceInfo.osVersion}</span>
+                  <span className="text-white/70">OS Version:</span>
+                  <span className="font-mono text-white/90">{deviceInfo.osVersion}</span>
                 </div>
               )}
-              <div className="flex items-center justify-between pt-1 border-t border-slate-800">
-                <span className="text-slate-400">Associated Trip:</span>
-                <span className="font-medium text-cyan-400">
+              <div className="flex items-center justify-between pt-1 border-t border-white/10">
+                <span className="text-white/70">Associated Trip:</span>
+                <span className="font-medium text-honey">
                   {alertDetail.tripId ? `ID: ${alertDetail.tripId}` : (alertDetail.tripInfo || 'None')}
                 </span>
               </div>
@@ -223,43 +223,43 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
         </div>
 
         {/* Rescue Notes & Chronological Incident Log */}
-        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
+        <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-3">
           <h4 className="font-bold text-white flex items-center gap-1.5">
-            <ShieldAlert className="w-4 h-4 text-cyan-400" />
+            <ShieldAlert className="w-4 h-4 text-honey" />
             Incident Action & Telemetry Log
           </h4>
 
           <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
             {alertDetail.rescueNotes && alertDetail.rescueNotes.length > 0 ? (
               alertDetail.rescueNotes.map((log, idx) => (
-                <div key={idx} className="p-2.5 rounded-xl bg-slate-800/50 border border-slate-800 space-y-1">
-                  <div className="flex items-center justify-between text-[10px] text-slate-400">
-                    <span className="font-bold text-cyan-400">{log.author || 'System'}</span>
+                <div key={idx} className="p-2.5 rounded-xl bg-[#25433E] border border-white/10 space-y-1">
+                  <div className="flex items-center justify-between text-[10px] text-white/60">
+                    <span className="font-bold text-honey">{log.author || 'System'}</span>
                     <span>{new Date(log.timestamp).toLocaleString()}</span>
                   </div>
-                  <p className="text-slate-200">{log.note}</p>
+                  <p className="text-white/90">{log.note}</p>
                 </div>
               ))
             ) : (
-              <p className="text-slate-500 italic">No notes logged yet.</p>
+              <p className="text-white/50 italic">No notes logged yet.</p>
             )}
           </div>
         </div>
 
         {/* Incident Command: Status Update & Action Note */}
-        <form onSubmit={handleStatusSubmit} className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-          <p className="font-bold text-cyan-400 flex items-center gap-1.5">
+        <form onSubmit={handleStatusSubmit} className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-3">
+          <p className="font-bold text-honey flex items-center gap-1.5">
             <Plus className="w-4 h-4" />
             Update Alert Status & Log Command Note
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-slate-400 mb-1 text-[11px] font-semibold">Incident Status</label>
+              <label className="block text-white/70 mb-1 text-[11px] font-semibold">Incident Status</label>
               <select
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold"
+                className="w-full px-3 py-2 rounded-xl bg-[#25433E] border border-white/15 text-white font-bold"
               >
                 <option value="">Keep ({alertDetail.status})</option>
                 <option value="Pending">Pending</option>
@@ -269,20 +269,20 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-slate-400 mb-1 text-[11px] font-semibold">Command Action Note</label>
+              <label className="block text-white/70 mb-1 text-[11px] font-semibold">Command Action Note</label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                   placeholder="e.g. SOS acknowledged by operator. Emergency services contacted."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500"
+                  className="w-full px-3 py-2 rounded-xl bg-[#25433E] border border-white/15 text-white placeholder-white/40"
                 />
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold whitespace-nowrap shadow-md transition-colors"
+                  className="px-4 py-2 rounded-xl bg-honey hover:brightness-105 text-[#25433E] font-black whitespace-nowrap shadow-md transition-colors"
                 >
                   {submitting ? 'Saving...' : 'Save Update'}
                 </button>

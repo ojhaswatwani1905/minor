@@ -81,21 +81,21 @@ export const ReportsPage = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-3xl bg-[#25433E] border border-white/10 shadow-xl text-white">
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Filter className="w-4 h-4 text-cyan-400" />
+          <Filter className="w-4 h-4 text-honey" />
           <select
             value={reportType}
             onChange={(e) => setReportType(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-white focus:ring-2 focus:ring-cyan-500 cursor-pointer"
+            className="px-4 py-2.5 rounded-2xl bg-[#1E3732] border border-white/15 text-xs font-bold text-white focus:ring-2 focus:ring-honey/50 cursor-pointer"
           >
-            <option value="Daily Safety Summary">Daily Safety Summary Report</option>
-            <option value="Emergency">Monthly Emergency Incident Report</option>
-            <option value="Trips">Expedition Route Safety Report</option>
+            <option value="Daily Safety Summary" className="bg-[#1E3732] text-white">Daily Safety Summary Report</option>
+            <option value="Emergency" className="bg-[#1E3732] text-white">Monthly Emergency Incident Report</option>
+            <option value="Trips" className="bg-[#1E3732] text-white">Expedition Route Safety Report</option>
           </select>
         </div>
 
-        <div className="text-xs font-mono text-slate-400">
+        <div className="text-xs font-mono text-white/70">
           Generated At: <strong className="text-white">{new Date().toLocaleString()}</strong>
         </div>
       </div>
@@ -104,11 +104,11 @@ export const ReportsPage = () => {
       {report?.summary && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {Object.entries(report.summary).map(([key, val]) => (
-            <div key={key} className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
-              <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+            <div key={key} className="p-4 rounded-3xl bg-[#25433E] border border-white/10 shadow-md">
+              <p className="text-[10px] text-white/70 uppercase font-black tracking-wider">
                 {key.replace(/([A-Z])/g, ' $1')}
               </p>
-              <h3 className="text-2xl font-extrabold text-white mt-1">{val}</h3>
+              <h3 className="text-2xl font-black text-white mt-1">{val}</h3>
             </div>
           ))}
         </div>
@@ -118,13 +118,13 @@ export const ReportsPage = () => {
       {loading ? (
         <Loader message="Compiling Safety Report Data..." />
       ) : (
-        <div className="overflow-x-auto rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <FileText className="w-4 h-4 text-cyan-400" />
+        <div className="overflow-x-auto rounded-3xl border border-white/10 bg-[#25433E] text-white shadow-xl p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+              <FileText className="w-4 h-4 text-honey" />
               {reportType} Preview
             </h3>
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-xs font-mono text-white/70">
               {report?.reportData?.length || 0} Total Records
             </span>
           </div>

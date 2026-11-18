@@ -12,9 +12,11 @@ import reportRoutes from './routes/reportRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import settingRoutes from './routes/settingRoutes.js';
 import hazardRoutes from './routes/hazardRoutes.js';
+import safeZoneRoutes from './routes/safeZoneRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { startDeadManSwitchWorker } from './services/deadManSwitchService.js';
 import { importAndMergeOpenData } from './scripts/importOpenData.js';
+import { isSupabaseConfigured } from './database/supabase.js';
 
 dotenv.config();
 
@@ -37,12 +39,20 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/hazards', hazardRoutes);
+app.use('/api/safe-zones', safeZoneRoutes);
 
 import os from 'os';
 
-// Health check endpoint
+// Health check endpoint with database & uptime diagnostics
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'STSMS Wilderness Safety Engine & Dead Man Switch Active' });
+  res.json({
+    status: 'ok',
+    service: 'STSMS Wilderness Safety Engine & Dead Man Switch',
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.floor(process.uptime()),
+    environment: process.env.NODE_ENV || 'development',
+    database: isSupabaseConfigured() ? 'Supabase PostgreSQL (Connected)' : 'Local JSON Fallback'
+  });
 });
 
 // Dynamic LAN IP discovery endpoint for mobile pairing

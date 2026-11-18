@@ -6,36 +6,65 @@
     "sdkVersion": "58.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0B0F17"
+      "backgroundColor": "#FFF0F5"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.stsms.tourist",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ],
+        "NSLocationWhenInUseUsageDescription": "STSMS requires your location to monitor your position inside the 5km Safe Travel Zone.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "STSMS requires continuous background location to safeguard you and trigger automated rescue beacons if you cross the 5km safe boundary.",
+        "NSLocationAlwaysUsageDescription": "STSMS requires background location to detect safe-zone boundary crossings while travelling with your device locked."
+      }
     },
     "android": {
+      "package": "com.stsms.tourist",
+      "versionCode": 1,
+      "usesCleartextTraffic": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0B0F17"
+        "backgroundColor": "#FFF0F5"
       },
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
-        "CAMERA",
-        "RECORD_AUDIO"
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION",
+        "POST_NOTIFICATIONS",
+        "WAKE_LOCK",
+        "RECEIVE_BOOT_COMPLETED"
       ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "extra": {
+      "apiUrl": "https://stsms-backend.onrender.com/api"
+    },
     "plugins": [
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "STSMS requires continuous location to monitor your position inside the 5km Safe Travel Zone and trigger emergency rescue beacons if you exit.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      "expo-task-manager",
+      "expo-dev-client"
     ]
   }
 }

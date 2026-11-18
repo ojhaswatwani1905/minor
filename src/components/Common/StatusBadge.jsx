@@ -7,7 +7,8 @@ export const StatusBadge = ({ status }) => {
       case 'online':
       case 'active':
       case 'passed':
-        return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40';
+      case 'verified':
+        return 'bg-pine/10 text-pine border-pine/25';
       case 'pending':
       case 'manual_sos':
       case 'manual sos':
@@ -15,20 +16,21 @@ export const StatusBadge = ({ status }) => {
       case 'emergency':
       case 'sos request':
       case 'active rescue':
-        return 'bg-red-500/25 text-red-400 border-red-500/50 animate-pulse';
+        return 'bg-red-500/15 text-red-600 border-red-500/30 animate-pulse';
       case 'acknowledged':
       case 'under monitoring':
+      case 'monitored':
       case 'warning':
       case 'offline':
-        return 'bg-amber-500/15 text-amber-400 border-amber-500/40';
+        return 'bg-honey/15 text-[#C48419] border-honey/30';
       default:
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/30';
+        return 'bg-slate-100 text-slate-600 border-slate-200';
     }
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border uppercase tracking-wider ${getBadgeStyle()}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${getBadgeStyle()}`}
     >
       <span className="w-1.5 h-1.5 rounded-full bg-current" />
       {status}

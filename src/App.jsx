@@ -16,6 +16,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { UsersPage } from './pages/UsersPage';
 import { TripsPage } from './pages/TripsPage';
+import { SafeZonePage } from './pages/SafeZonePage';
 import { MonitoringPage } from './pages/MonitoringPage';
 import { EmergencyPage } from './pages/EmergencyPage';
 import { ReportsPage } from './pages/ReportsPage';
@@ -78,11 +79,15 @@ const ProtectedLayout = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0F17] text-slate-100 flex">
+    <div className="min-h-screen mineral-canvas text-[#192E2A] flex relative overflow-x-hidden font-sans">
+      {/* Soft Ambient Backdrop Orbs for Glassmorphism */}
+      <div className="fixed top-[-10%] left-[20%] w-[500px] h-[500px] rounded-full bg-honey/8 blur-[120px] pointer-events-none" />
+      <div className="fixed bottom-[-10%] right-[10%] w-[600px] h-[600px] rounded-full bg-pine/5 blur-[140px] pointer-events-none" />
+
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <Navbar collapsed={collapsed} />
       <main
-        className={`flex-1 transition-all duration-300 pt-20 px-6 pb-8 ${
+        className={`flex-1 transition-all duration-300 pt-28 px-6 md:px-8 pb-12 relative z-10 ${
           collapsed ? 'ml-20' : 'ml-64'
         }`}
       >
@@ -146,6 +151,14 @@ export const App = () => {
               }
             />
             <Route
+              path="/safe-zones"
+              element={
+                <ProtectedLayout>
+                  <SafeZonePage />
+                </ProtectedLayout>
+              }
+            />
+            <Route
               path="/monitoring"
               element={
                 <ProtectedLayout>
@@ -177,14 +190,7 @@ export const App = () => {
                 </ProtectedLayout>
               }
             />
-            <Route
-              path="/analytics"
-              element={
-                <ProtectedLayout>
-                  <AnalyticsPage />
-                </ProtectedLayout>
-              }
-            />
+
             <Route
               path="/settings"
               element={
@@ -211,7 +217,7 @@ export const App = () => {
           position="bottom-right"
           autoClose={3000}
           theme="dark"
-          toastClassName="font-sans text-xs rounded-xl border border-slate-700 bg-slate-900"
+          toastClassName="font-sans text-xs rounded-xl border border-white/15 bg-[#25433E] text-white shadow-2xl"
         />
       </AuthProvider>
     </ThemeProvider>

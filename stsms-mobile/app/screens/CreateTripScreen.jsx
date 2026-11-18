@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { tripService } from '../services/tripService';
+import { useTheme } from '../context/ThemeContext';
+import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
 
 export const CreateTripScreen = ({ onBack, onTripCreated }) => {
+  const { colors } = useTheme();
   const [startLocation, setStartLocation] = useState('');
   const [destination, setDestination] = useState('');
   const [route, setRoute] = useState('');
@@ -13,7 +17,6 @@ export const CreateTripScreen = ({ onBack, onTripCreated }) => {
   const [boundaryRadiusKm, setBoundaryRadiusKm] = useState('5.0');
   const [guardianName, setGuardianName] = useState('');
   const [guardianPhone, setGuardianPhone] = useState('');
-  const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,7 +37,6 @@ export const CreateTripScreen = ({ onBack, onTripCreated }) => {
         boundaryRadiusKm,
         guardianName,
         guardianPhone,
-        notes
       });
       if (res.success) {
         onTripCreated && onTripCreated(res.trip);
@@ -49,150 +51,118 @@ export const CreateTripScreen = ({ onBack, onTripCreated }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <Header title="Register Expedition Trip" subtitle="Setup route parameters & guardian alerts" onBack={onBack} />
-
-      <View style={styles.formCard}>
-        {!!error && (
-          <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>🚨 {error}</Text>
-          </View>
-        )}
-
-        <Input
-          label="Starting Location / Base Camp"
-          value={startLocation}
-          onChangeText={setStartLocation}
-          placeholder="e.g. Manali Base Camp (2,050m)"
-          required
-        />
-
-        <Input
-          label="Destination / Target Peak"
-          value={destination}
-          onChangeText={setDestination}
-          placeholder="e.g. Rohtang Pass Summit (3,978m)"
-          required
-        />
-
-        <Input
-          label="Expedition Route Path"
-          value={route}
-          onChangeText={setRoute}
-          placeholder="e.g. Manali Base -> Solang Trail -> Rohtang Peak"
-        />
-
-
-        <Input
-          label="Expected Return Date & Time"
-          value={expectedArrival}
-          onChangeText={setExpectedArrival}
-          placeholder="e.g. Today, 18:00"
-        />
-
-        <Input
-          label="Geofence Safety Radius (km)"
-          value={boundaryRadiusKm}
-          onChangeText={setBoundaryRadiusKm}
-          placeholder="5.0"
-        />
-
-        <View style={styles.sectionDivider}>
-          <Text style={styles.sectionTitle}>Guardian Alert Contact</Text>
-          <Input
-            label="Primary Guardian Name"
-            value={guardianName}
-            onChangeText={setGuardianName}
-            placeholder="e.g. Rohan Nair"
-          />
-          <Input
-            label="Guardian Emergency Phone"
-            value={guardianPhone}
-            onChangeText={setGuardianPhone}
-            placeholder="+91 98765 43210"
-          />
-        </View>
-
-        <View style={styles.sectionDivider}>
-          <Text style={styles.label}>EXPEDITION NOTES / GEAR INFO</Text>
-          <TextInput
-            multiline
-            numberOfLines={3}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder="e.g. Carrying 2-way satellite mesh beacon + thermal sleeping bag."
-            placeholderTextColor="#64748b"
-            style={styles.textArea}
-          />
-        </View>
-
-        <Button title="Register & Activate Satellite Safety →" onPress={handleSubmit} loading={loading} variant="primary" />
+    <View style={[styles.screenContainer, { backgroundColor: colors.background || '#FFF0F5' }]}>
+      <View style={styles.headerWrapper}>
+        <Header title="Plan New Trip" subtitle="Set parameters & safe zone corridor" onBack={onBack} />
       </View>
-    </ScrollView>
+
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
+        showsVerticalScrollIndicator={false}
+      >
+        <View
+          style={[
+            styles.formCard,
+            { backgroundColor: colors.cardWarm || '#FFFBF7', borderColor: colors.cardBorder || '#F6DFE6' },
+            SHADOWS.card,
+          ]}
+        >
+          {!!error && (
+            <View style={styles.errorBanner}>
+              <Ionicons name="alert-circle" size={18} color="#FF3B69" style={{ marginRight: 6 }} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+
+          <Input
+            icon={<Ionicons name="location-outline" size={18} color={colors.textSecondary} />}
+            label="Starting Location / Base"
+            value={startLocation}
+            onChangeText={setStartLocation}
+            placeholder="e.g. Bhopal Center"
+            required
+          />
+
+          <Input
+            icon={<Ionicons name="flag-outline" size={18} color={colors.textSecondary} />}
+            label="Destination"
+            value={destination}
+            onChangeText={setDestination}
+            placeholder="e.g. Sanchi Stupa"
+            required
+          />
+
+          <Input
+            icon={<Ionicons name="map-outline" size={18} color={colors.textSecondary} />}
+            label="Route Path"
+            value={route}
+            onChangeText={setRoute}
+            placeholder="e.g. NH-86 Corridor"
+          />
+
+          <Input
+            icon={<Ionicons name="time-outline" size={18} color={colors.textSecondary} />}
+            label="Expected Return"
+            value={expectedArrival}
+            onChangeText={setExpectedArrival}
+            placeholder="e.g. Today, 18:00"
+          />
+
+          <Input
+            icon={<Ionicons name="radio-button-on-outline" size={18} color={colors.textSecondary} />}
+            label="Safe Zone Radius (km)"
+            value={boundaryRadiusKm}
+            onChangeText={setBoundaryRadiusKm}
+            placeholder="5.0"
+            keyboardType="numeric"
+          />
+
+          <Button
+            title="Create Expedition & Activate Safe Zone"
+            onPress={handleSubmit}
+            loading={loading}
+            variant="primary"
+            style={{ marginTop: 14 }}
+          />
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screenContainer: {
+    flex: 1,
+  },
+  headerWrapper: {
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 44,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
     paddingBottom: 40,
   },
   formCard: {
-    backgroundColor: '#0f172a',
-    borderRadius: 24,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: '#1e293b',
-    marginTop: 6,
+    borderRadius: RADIUS.xl,
+    padding: 20,
+    borderWidth: 1.5,
   },
   errorBanner: {
-    backgroundColor: 'rgba(127, 29, 29, 0.4)',
-    borderWidth: 1,
-    borderColor: '#991b1b',
-    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFEAEF',
+    borderRadius: RADIUS.md,
     padding: 10,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#FFD1DC',
   },
   errorText: {
-    color: '#f87171',
+    color: '#FF3B69',
     fontSize: 12,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  sectionDivider: {
-    borderTopWidth: 1,
-    borderTopColor: '#1e293b',
-    paddingTop: 12,
-    marginTop: 10,
-  },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#22d3ee',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 8,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#94a3b8',
-    textTransform: 'uppercase',
-    marginBottom: 6,
-    letterSpacing: 0.5,
-  },
-  textArea: {
-    backgroundColor: '#05080e',
-    borderWidth: 1,
-    borderColor: '#1e293b',
-    borderRadius: 16,
-    padding: 12,
-    color: '#ffffff',
-    fontSize: 12,
-    textAlignVertical: 'top',
-    minHeight: 60,
-    marginBottom: 14,
+    fontWeight: '600',
+    flex: 1,
   },
 });
-

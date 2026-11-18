@@ -23,10 +23,10 @@ export const StatCard = ({ title, value, trend, icon: Icon, color = 'cyan', high
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 font-sans">
             {title}
           </p>
-          <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white mt-1.5 tracking-tight">
+          <h3 className="text-2xl md:text-3xl font-black text-[#192E2A] mt-1.5 tracking-tight font-sans">
             {typeof value === 'number' ? value.toLocaleString() : value}
           </h3>
         </div>

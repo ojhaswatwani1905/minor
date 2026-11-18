@@ -1,1 +1,1164 @@
-[]
+[
+  {
+    "id": "sz_trp_1794934340117",
+    "userId": "usr_test_k",
+    "userName": "Kailash Traveler",
+    "userPhone": "+91 98765 43210",
+    "destination": "Manali Mall Road",
+    "destinationName": "Manali Mall Road",
+    "destinationCoords": {
+      "lat": 32.2396,
+      "lng": 77.1887
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-17T16:52:20.117Z",
+    "currentLocation": {
+      "lat": 32.099,
+      "lng": 77.099,
+      "accuracy": 12,
+      "name": "GPS Fix (32.0990, 77.0990)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 17768,
+    "distanceOutsideBoundaryMeters": 12768,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 3,
+    "warningStartedAt": "2026-11-17T16:52:21.113Z",
+    "breachConfirmedAt": "2026-11-17T16:52:21.120Z",
+    "activeAlertId": "16e4b0da-59fd-4b20-beb4-62cf066c7e7c",
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-17T16:52:20.117Z",
+    "updatedAt": "2026-11-17T16:52:25.209Z",
+    "history": [
+      {
+        "timestamp": "2026-11-17T16:52:21.120Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 12626m."
+      },
+      {
+        "timestamp": "2026-11-17T16:52:21.113Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Tourist crossed 5km perimeter. Outside by 12626m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-17T16:52:20.117Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Manali Mall Road (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 12,
+    "lastPingAt": "2026-11-17T16:52:25.209Z",
+    "supabaseTripId": "8c4a54b5-3e39-4a68-9cee-d74d2098410e"
+  },
+  {
+    "id": "sz_trp_1794934333392",
+    "userId": "usr_test_1794934333385",
+    "userName": "Tenzing Norgay",
+    "userPhone": "+91 98765 43210",
+    "destination": "Solang Valley",
+    "destinationName": "Solang Valley",
+    "destinationCoords": {
+      "lat": 32.3166,
+      "lng": 77.1575
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "COMPLETED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-17T16:52:14.510Z",
+    "currentLocation": {
+      "lat": 32.3196,
+      "lng": 77.1605,
+      "accuracy": 18,
+      "name": "GPS Fix (32.3196, 77.1605)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 437,
+    "distanceOutsideBoundaryMeters": 0,
+    "batteryLevel": 84,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": "2026-11-17T16:52:14.560Z",
+    "activeAlertId": null,
+    "guardianName": "Emergency Contact",
+    "guardianPhone": "+91 98765 00001",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-17T16:52:13.392Z",
+    "updatedAt": "2026-11-17T16:52:20.116Z",
+    "history": [
+      {
+        "timestamp": "2026-11-17T16:52:20.116Z",
+        "event": "STATUS_COMPLETE",
+        "status": "COMPLETED",
+        "note": "Safe Travel Zone monitoring set to COMPLETED by User"
+      },
+      {
+        "timestamp": "2026-11-17T16:52:20.115Z",
+        "event": "STATUS_PAUSE",
+        "status": "PAUSED",
+        "note": "Safe Travel Zone monitoring set to PAUSED by User"
+      },
+      {
+        "timestamp": "2026-11-17T16:52:17.680Z",
+        "event": "SAFE_CONFIRMED",
+        "previousStatus": "BREACHED",
+        "status": "ACTIVE",
+        "note": "Stopped at viewpoints cafe, all secure."
+      },
+      {
+        "timestamp": "2026-11-17T16:52:14.560Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 9462,
+        "distanceOutside": 4462,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 4462m."
+      },
+      {
+        "timestamp": "2026-11-17T16:52:14.515Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 8734,
+        "distanceOutside": 3734,
+        "note": "Tourist crossed 5km perimeter. Outside by 3734m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-17T16:52:14.510Z",
+        "event": "ZONE_ENTERED",
+        "previousStatus": "APPROACHING",
+        "status": "ACTIVE",
+        "distanceMeters": 728,
+        "note": "Tourist entered designated 5km Safe Travel Zone (728m from Solang Valley)"
+      },
+      {
+        "timestamp": "2026-11-17T16:52:13.392Z",
+        "event": "ZONE_CREATED",
+        "status": "APPROACHING",
+        "distanceMeters": 14562,
+        "note": "Safe Travel Zone activated around Solang Valley (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 18,
+    "lastPingAt": "2026-11-17T16:52:20.113Z",
+    "supabaseTripId": "bd7e1521-9167-4fbd-84bb-36eb20637be9"
+  },
+  {
+    "id": "sz_trp_1794904544639",
+    "userId": "usr_test_k",
+    "userName": "Kailash Traveler",
+    "userPhone": "+91 98765 43210",
+    "destination": "Manali Mall Road",
+    "destinationName": "Manali Mall Road",
+    "destinationCoords": {
+      "lat": 32.2396,
+      "lng": 77.1887
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-17T08:35:44.639Z",
+    "currentLocation": {
+      "lat": 32.099,
+      "lng": 77.099,
+      "accuracy": 12,
+      "name": "GPS Fix (32.0990, 77.0990)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 17768,
+    "distanceOutsideBoundaryMeters": 12768,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 3,
+    "warningStartedAt": "2026-11-17T08:35:45.917Z",
+    "breachConfirmedAt": "2026-11-17T08:35:45.921Z",
+    "activeAlertId": "a647d175-2bcf-4757-9a0c-0d944451ca54",
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-17T08:35:44.639Z",
+    "updatedAt": "2026-11-17T08:35:50.079Z",
+    "history": [
+      {
+        "timestamp": "2026-11-17T08:35:45.921Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 12626m."
+      },
+      {
+        "timestamp": "2026-11-17T08:35:45.917Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Tourist crossed 5km perimeter. Outside by 12626m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-17T08:35:44.639Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Manali Mall Road (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 12,
+    "lastPingAt": "2026-11-17T08:35:50.079Z",
+    "supabaseTripId": "7cc861a5-58b0-4953-930b-302b357a56f3"
+  },
+  {
+    "id": "sz_trp_1794904537753",
+    "userId": "usr_test_1794904537750",
+    "userName": "Tenzing Norgay",
+    "userPhone": "+91 98765 43210",
+    "destination": "Solang Valley",
+    "destinationName": "Solang Valley",
+    "destinationCoords": {
+      "lat": 32.3166,
+      "lng": 77.1575
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "COMPLETED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-17T08:35:40.719Z",
+    "currentLocation": {
+      "lat": 32.3196,
+      "lng": 77.1605,
+      "accuracy": 18,
+      "name": "GPS Fix (32.3196, 77.1605)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 437,
+    "distanceOutsideBoundaryMeters": 0,
+    "batteryLevel": 84,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": "2026-11-17T08:35:40.729Z",
+    "activeAlertId": null,
+    "guardianName": "Emergency Contact",
+    "guardianPhone": "+91 98765 00001",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-17T08:35:37.753Z",
+    "updatedAt": "2026-11-17T08:35:44.638Z",
+    "history": [
+      {
+        "timestamp": "2026-11-17T08:35:44.638Z",
+        "event": "STATUS_COMPLETE",
+        "status": "COMPLETED",
+        "note": "Safe Travel Zone monitoring set to COMPLETED by User"
+      },
+      {
+        "timestamp": "2026-11-17T08:35:44.636Z",
+        "event": "STATUS_PAUSE",
+        "status": "PAUSED",
+        "note": "Safe Travel Zone monitoring set to PAUSED by User"
+      },
+      {
+        "timestamp": "2026-11-17T08:35:43.791Z",
+        "event": "SAFE_CONFIRMED",
+        "previousStatus": "BREACHED",
+        "status": "ACTIVE",
+        "note": "Stopped at viewpoints cafe, all secure."
+      },
+      {
+        "timestamp": "2026-11-17T08:35:40.729Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 9462,
+        "distanceOutside": 4462,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 4462m."
+      },
+      {
+        "timestamp": "2026-11-17T08:35:40.723Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 8734,
+        "distanceOutside": 3734,
+        "note": "Tourist crossed 5km perimeter. Outside by 3734m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-17T08:35:40.719Z",
+        "event": "ZONE_ENTERED",
+        "previousStatus": "APPROACHING",
+        "status": "ACTIVE",
+        "distanceMeters": 728,
+        "note": "Tourist entered designated 5km Safe Travel Zone (728m from Solang Valley)"
+      },
+      {
+        "timestamp": "2026-11-17T08:35:37.753Z",
+        "event": "ZONE_CREATED",
+        "status": "APPROACHING",
+        "distanceMeters": 14562,
+        "note": "Safe Travel Zone activated around Solang Valley (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 18,
+    "lastPingAt": "2026-11-17T08:35:44.634Z",
+    "supabaseTripId": "73f3eb20-badc-4bb0-b50f-b793294a97d7"
+  },
+  {
+    "id": "sz_trp_1794894386732",
+    "userId": "usr_102",
+    "userName": "Active Traveller",
+    "userPhone": "+91 98765 43210",
+    "destination": "Domino's",
+    "destinationName": "Domino's",
+    "destinationCoords": {
+      "lat": 28.5602219,
+      "lng": 77.2099226
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "APPROACHING",
+    "hasEnteredZone": false,
+    "enteredZoneAt": null,
+    "currentLocation": {
+      "lat": 24.4363846,
+      "lng": 77.1614114,
+      "accuracy": 41.71500015258789,
+      "name": "GPS Fix (24.4364, 77.1614)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 458575,
+    "distanceOutsideBoundaryMeters": 453575,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": null,
+    "activeAlertId": null,
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-17T05:46:26.732Z",
+    "updatedAt": "2026-11-17T17:42:24.562Z",
+    "history": [
+      {
+        "timestamp": "2026-11-17T05:46:26.732Z",
+        "event": "ZONE_CREATED",
+        "status": "APPROACHING",
+        "distanceMeters": 458559,
+        "note": "Safe Travel Zone activated around Domino's (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 41.71500015258789,
+    "lastPingAt": "2026-11-17T17:42:24.562Z"
+  },
+  {
+    "id": "sz_trp_1794852129259",
+    "userId": "usr_102",
+    "userName": "Active Traveller",
+    "userPhone": "+91 98765 43210",
+    "destination": "Rohtang Pass Summit",
+    "destinationName": "Rohtang Pass Summit",
+    "destinationCoords": {
+      "lat": 32.3716,
+      "lng": 77.2466
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "COMPLETED",
+    "hasEnteredZone": false,
+    "enteredZoneAt": null,
+    "currentLocation": {
+      "lat": 24.4365314,
+      "lng": 77.1610984,
+      "accuracy": 52.400001525878906,
+      "name": "GPS Fix (24.4365, 77.1611)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 882379,
+    "distanceOutsideBoundaryMeters": 877379,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": null,
+    "activeAlertId": null,
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-16T18:02:09.259Z",
+    "updatedAt": "2026-11-17T05:45:41.895Z",
+    "history": [
+      {
+        "timestamp": "2026-11-17T05:45:41.895Z",
+        "event": "STATUS_COMPLETE",
+        "status": "COMPLETED",
+        "note": "Safe Travel Zone monitoring set to COMPLETED by User"
+      },
+      {
+        "timestamp": "2026-11-16T18:02:09.259Z",
+        "event": "ZONE_CREATED",
+        "status": "APPROACHING",
+        "distanceMeters": 882377,
+        "note": "Safe Travel Zone activated around Rohtang Pass Summit (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 52.400001525878906,
+    "lastPingAt": "2026-11-17T05:45:39.881Z"
+  },
+  {
+    "id": "sz_trp_1794844069118",
+    "userId": "usr_test_k",
+    "userName": "Kailash Traveler",
+    "userPhone": "+91 98765 43210",
+    "destination": "Manali Mall Road",
+    "destinationName": "Manali Mall Road",
+    "destinationCoords": {
+      "lat": 32.2396,
+      "lng": 77.1887
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-16T15:47:49.118Z",
+    "currentLocation": {
+      "lat": 32.099,
+      "lng": 77.099,
+      "accuracy": 12,
+      "name": "GPS Fix (32.0990, 77.0990)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 17768,
+    "distanceOutsideBoundaryMeters": 12768,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 3,
+    "warningStartedAt": "2026-11-16T15:47:50.056Z",
+    "breachConfirmedAt": "2026-11-16T15:47:50.062Z",
+    "activeAlertId": "29f37137-1c5c-4151-9eee-9049d40fa7fd",
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-16T15:47:49.118Z",
+    "updatedAt": "2026-11-16T15:47:54.567Z",
+    "history": [
+      {
+        "timestamp": "2026-11-16T15:47:50.062Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 12626m."
+      },
+      {
+        "timestamp": "2026-11-16T15:47:50.056Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Tourist crossed 5km perimeter. Outside by 12626m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-16T15:47:49.118Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Manali Mall Road (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 12,
+    "lastPingAt": "2026-11-16T15:47:54.567Z",
+    "supabaseTripId": "9f6a9b34-4bf4-46f8-b4f2-49ebe4d3bec9"
+  },
+  {
+    "id": "sz_trp_1794844064006",
+    "userId": "usr_test_1794844063989",
+    "userName": "Tenzing Norgay",
+    "userPhone": "+91 98765 43210",
+    "destination": "Solang Valley",
+    "destinationName": "Solang Valley",
+    "destinationCoords": {
+      "lat": 32.3166,
+      "lng": 77.1575
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "COMPLETED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-16T15:47:45.298Z",
+    "currentLocation": {
+      "lat": 32.3196,
+      "lng": 77.1605,
+      "accuracy": 18,
+      "name": "GPS Fix (32.3196, 77.1605)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 437,
+    "distanceOutsideBoundaryMeters": 0,
+    "batteryLevel": 84,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": "2026-11-16T15:47:45.312Z",
+    "activeAlertId": null,
+    "guardianName": "Emergency Contact",
+    "guardianPhone": "+91 98765 00001",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-16T15:47:44.006Z",
+    "updatedAt": "2026-11-16T15:47:49.116Z",
+    "history": [
+      {
+        "timestamp": "2026-11-16T15:47:49.116Z",
+        "event": "STATUS_COMPLETE",
+        "status": "COMPLETED",
+        "note": "Safe Travel Zone monitoring set to COMPLETED by User"
+      },
+      {
+        "timestamp": "2026-11-16T15:47:49.114Z",
+        "event": "STATUS_PAUSE",
+        "status": "PAUSED",
+        "note": "Safe Travel Zone monitoring set to PAUSED by User"
+      },
+      {
+        "timestamp": "2026-11-16T15:47:48.149Z",
+        "event": "SAFE_CONFIRMED",
+        "previousStatus": "BREACHED",
+        "status": "ACTIVE",
+        "note": "Stopped at viewpoints cafe, all secure."
+      },
+      {
+        "timestamp": "2026-11-16T15:47:45.312Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 9462,
+        "distanceOutside": 4462,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 4462m."
+      },
+      {
+        "timestamp": "2026-11-16T15:47:45.303Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 8734,
+        "distanceOutside": 3734,
+        "note": "Tourist crossed 5km perimeter. Outside by 3734m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-16T15:47:45.298Z",
+        "event": "ZONE_ENTERED",
+        "previousStatus": "APPROACHING",
+        "status": "ACTIVE",
+        "distanceMeters": 728,
+        "note": "Tourist entered designated 5km Safe Travel Zone (728m from Solang Valley)"
+      },
+      {
+        "timestamp": "2026-11-16T15:47:44.006Z",
+        "event": "ZONE_CREATED",
+        "status": "APPROACHING",
+        "distanceMeters": 14562,
+        "note": "Safe Travel Zone activated around Solang Valley (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 18,
+    "lastPingAt": "2026-11-16T15:47:49.111Z",
+    "supabaseTripId": "27b1c581-f3ea-4005-a79c-5e16fc7f8ad5"
+  },
+  {
+    "id": "sz_trp_1794816315145",
+    "userId": "usr_test_k",
+    "userName": "Kailash Traveler",
+    "userPhone": "+91 98765 43210",
+    "destination": "Manali Mall Road",
+    "destinationName": "Manali Mall Road",
+    "destinationCoords": {
+      "lat": 32.2396,
+      "lng": 77.1887
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-16T08:05:15.145Z",
+    "currentLocation": {
+      "lat": 32.099,
+      "lng": 77.099,
+      "accuracy": 12,
+      "name": "GPS Fix (32.0990, 77.0990)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 17768,
+    "distanceOutsideBoundaryMeters": 12768,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 3,
+    "warningStartedAt": "2026-11-16T08:05:17.716Z",
+    "breachConfirmedAt": "2026-11-16T08:05:17.724Z",
+    "activeAlertId": "a40a8f99-a12c-43b7-928e-821d4d386660",
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-16T08:05:15.145Z",
+    "updatedAt": "2026-11-16T08:05:26.629Z",
+    "history": [
+      {
+        "timestamp": "2026-11-16T08:05:17.724Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 12626m."
+      },
+      {
+        "timestamp": "2026-11-16T08:05:17.716Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Tourist crossed 5km perimeter. Outside by 12626m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-16T08:05:15.145Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Manali Mall Road (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 12,
+    "lastPingAt": "2026-11-16T08:05:26.629Z",
+    "supabaseTripId": "3f4221ba-2c71-4525-bf7c-2f7764f6e8e0"
+  },
+  {
+    "id": "sz_trp_1794816299146",
+    "userId": "usr_test_1794816299132",
+    "userName": "Tenzing Norgay",
+    "userPhone": "+91 98765 43210",
+    "destination": "Solang Valley",
+    "destinationName": "Solang Valley",
+    "destinationCoords": {
+      "lat": 32.3166,
+      "lng": 77.1575
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "COMPLETED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-16T08:05:03.280Z",
+    "currentLocation": {
+      "lat": 32.3196,
+      "lng": 77.1605,
+      "accuracy": 18,
+      "name": "GPS Fix (32.3196, 77.1605)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 437,
+    "distanceOutsideBoundaryMeters": 0,
+    "batteryLevel": 84,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": "2026-11-16T08:05:03.292Z",
+    "activeAlertId": null,
+    "guardianName": "Emergency Contact",
+    "guardianPhone": "+91 98765 00001",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-16T08:04:59.146Z",
+    "updatedAt": "2026-11-16T08:05:15.143Z",
+    "history": [
+      {
+        "timestamp": "2026-11-16T08:05:15.143Z",
+        "event": "STATUS_COMPLETE",
+        "status": "COMPLETED",
+        "note": "Safe Travel Zone monitoring set to COMPLETED by User"
+      },
+      {
+        "timestamp": "2026-11-16T08:05:15.140Z",
+        "event": "STATUS_PAUSE",
+        "status": "PAUSED",
+        "note": "Safe Travel Zone monitoring set to PAUSED by User"
+      },
+      {
+        "timestamp": "2026-11-16T08:05:10.983Z",
+        "event": "SAFE_CONFIRMED",
+        "previousStatus": "BREACHED",
+        "status": "ACTIVE",
+        "note": "Stopped at viewpoints cafe, all secure."
+      },
+      {
+        "timestamp": "2026-11-16T08:05:03.292Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 9462,
+        "distanceOutside": 4462,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 4462m."
+      },
+      {
+        "timestamp": "2026-11-16T08:05:03.285Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 8734,
+        "distanceOutside": 3734,
+        "note": "Tourist crossed 5km perimeter. Outside by 3734m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-16T08:05:03.280Z",
+        "event": "ZONE_ENTERED",
+        "previousStatus": "APPROACHING",
+        "status": "ACTIVE",
+        "distanceMeters": 728,
+        "note": "Tourist entered designated 5km Safe Travel Zone (728m from Solang Valley)"
+      },
+      {
+        "timestamp": "2026-11-16T08:04:59.146Z",
+        "event": "ZONE_CREATED",
+        "status": "APPROACHING",
+        "distanceMeters": 14562,
+        "note": "Safe Travel Zone activated around Solang Valley (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 18,
+    "lastPingAt": "2026-11-16T08:05:15.137Z",
+    "supabaseTripId": "03d12f87-2a88-4f59-afdb-f146e7bc8f94"
+  },
+  {
+    "id": "sz_trp_1794816118377",
+    "userId": "usr_test_1794816118363",
+    "userName": "Tenzing Norgay",
+    "userPhone": "+91 98765 43210",
+    "destination": "Solang Valley",
+    "destinationName": "Solang Valley",
+    "destinationCoords": {
+      "lat": 32.3166,
+      "lng": 77.1575
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-16T08:02:02.134Z",
+    "currentLocation": {
+      "lat": 32.3816,
+      "lng": 77.2225,
+      "accuracy": 12,
+      "name": "GPS Fix (32.3816, 77.2225)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 9462,
+    "distanceOutsideBoundaryMeters": 4462,
+    "batteryLevel": 86,
+    "consecutiveOutsideCount": 3,
+    "warningStartedAt": "2026-11-16T08:02:02.140Z",
+    "breachConfirmedAt": "2026-11-16T08:02:02.147Z",
+    "activeAlertId": "607009c7-7077-4cc2-9e55-e31e6433a5ba",
+    "guardianName": "Emergency Contact",
+    "guardianPhone": "+91 98765 00001",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-16T08:01:58.377Z",
+    "updatedAt": "2026-11-16T08:02:02.147Z",
+    "history": [
+      {
+        "timestamp": "2026-11-16T08:02:02.147Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 9462,
+        "distanceOutside": 4462,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 4462m."
+      },
+      {
+        "timestamp": "2026-11-16T08:02:02.140Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 8734,
+        "distanceOutside": 3734,
+        "note": "Tourist crossed 5km perimeter. Outside by 3734m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-16T08:02:02.134Z",
+        "event": "ZONE_ENTERED",
+        "previousStatus": "APPROACHING",
+        "status": "ACTIVE",
+        "distanceMeters": 728,
+        "note": "Tourist entered designated 5km Safe Travel Zone (728m from Solang Valley)"
+      },
+      {
+        "timestamp": "2026-11-16T08:01:58.377Z",
+        "event": "ZONE_CREATED",
+        "status": "APPROACHING",
+        "distanceMeters": 14562,
+        "note": "Safe Travel Zone activated around Solang Valley (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 12,
+    "lastPingAt": "2026-11-16T08:02:02.147Z"
+  },
+  {
+    "id": "sz_trp_1794814850859",
+    "userId": "usr_test_k",
+    "userName": "Kailash Traveler",
+    "userPhone": "+91 98765 43210",
+    "destination": "Manali Mall Road",
+    "destinationName": "Manali Mall Road",
+    "destinationCoords": {
+      "lat": 32.2396,
+      "lng": 77.1887
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-16T07:40:50.859Z",
+    "currentLocation": {
+      "lat": 32.099,
+      "lng": 77.099,
+      "accuracy": 12,
+      "name": "GPS Fix (32.0990, 77.0990)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 17768,
+    "distanceOutsideBoundaryMeters": 12768,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 3,
+    "warningStartedAt": "2026-11-16T07:40:51.230Z",
+    "breachConfirmedAt": "2026-11-16T07:40:51.236Z",
+    "activeAlertId": "alt_geo_1794814851236",
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-16T07:40:50.859Z",
+    "updatedAt": "2026-11-16T07:40:53.642Z",
+    "history": [
+      {
+        "timestamp": "2026-11-16T07:40:51.236Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 12626m."
+      },
+      {
+        "timestamp": "2026-11-16T07:40:51.230Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 17626,
+        "distanceOutside": 12626,
+        "note": "Tourist crossed 5km perimeter. Outside by 12626m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-16T07:40:50.859Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Manali Mall Road (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 12,
+    "lastPingAt": "2026-11-16T07:40:53.642Z"
+  },
+  {
+    "id": "sz_trp_1794814845489",
+    "userId": "usr_test_1794814845482",
+    "userName": "Tenzing Norgay",
+    "userPhone": "+91 98765 43210",
+    "destination": "Solang Valley",
+    "destinationName": "Solang Valley",
+    "destinationCoords": {
+      "lat": 32.3166,
+      "lng": 77.1575
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "COMPLETED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-16T07:40:47.773Z",
+    "currentLocation": {
+      "lat": 32.3196,
+      "lng": 77.1605,
+      "accuracy": 18,
+      "name": "GPS Fix (32.3196, 77.1605)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 437,
+    "distanceOutsideBoundaryMeters": 0,
+    "batteryLevel": 84,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": "2026-11-16T07:40:47.786Z",
+    "activeAlertId": null,
+    "guardianName": "Emergency Contact",
+    "guardianPhone": "+91 98765 00001",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-16T07:40:45.489Z",
+    "updatedAt": "2026-11-16T07:40:50.858Z",
+    "history": [
+      {
+        "timestamp": "2026-11-16T07:40:50.858Z",
+        "event": "STATUS_COMPLETE",
+        "status": "COMPLETED",
+        "note": "Safe Travel Zone monitoring set to COMPLETED by User"
+      },
+      {
+        "timestamp": "2026-11-16T07:40:50.855Z",
+        "event": "STATUS_PAUSE",
+        "status": "PAUSED",
+        "note": "Safe Travel Zone monitoring set to PAUSED by User"
+      },
+      {
+        "timestamp": "2026-11-16T07:40:49.830Z",
+        "event": "SAFE_CONFIRMED",
+        "previousStatus": "BREACHED",
+        "status": "ACTIVE",
+        "note": "Stopped at viewpoints cafe, all secure."
+      },
+      {
+        "timestamp": "2026-11-16T07:40:47.786Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 9462,
+        "distanceOutside": 4462,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 4462m."
+      },
+      {
+        "timestamp": "2026-11-16T07:40:47.779Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 8734,
+        "distanceOutside": 3734,
+        "note": "Tourist crossed 5km perimeter. Outside by 3734m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-16T07:40:47.773Z",
+        "event": "ZONE_ENTERED",
+        "previousStatus": "APPROACHING",
+        "status": "ACTIVE",
+        "distanceMeters": 728,
+        "note": "Tourist entered designated 5km Safe Travel Zone (728m from Solang Valley)"
+      },
+      {
+        "timestamp": "2026-11-16T07:40:45.489Z",
+        "event": "ZONE_CREATED",
+        "status": "APPROACHING",
+        "distanceMeters": 14562,
+        "note": "Safe Travel Zone activated around Solang Valley (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 18,
+    "lastPingAt": "2026-11-16T07:40:50.852Z"
+  },
+  {
+    "id": "sz_trp_1794813130795",
+    "userId": "usr_test_01",
+    "userName": "Aarav Sharma",
+    "userPhone": "+91 98765 43210",
+    "destination": "Rohtang Pass Summit",
+    "destinationName": "Rohtang Pass Summit",
+    "destinationCoords": {
+      "lat": 32.3716,
+      "lng": 77.2466
+    },
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "ACTIVE",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-16T07:13:25.043Z",
+    "currentLocation": {
+      "lat": 32.297,
+      "lng": 77.197,
+      "accuracy": 12,
+      "name": "GPS Fix (32.2970, 77.1970)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 9515,
+    "distanceOutsideBoundaryMeters": 4515,
+    "batteryLevel": 79,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": "2026-11-16T07:16:01.881Z",
+    "activeAlertId": null,
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-16T07:12:10.795Z",
+    "updatedAt": "2026-11-16T07:21:43.594Z",
+    "history": [
+      {
+        "timestamp": "2026-11-16T07:21:43.594Z",
+        "event": "SAFE_CONFIRMED",
+        "previousStatus": "BREACHED",
+        "status": "ACTIVE",
+        "note": "Stopped at roadside café right outside boundary, fully safe."
+      },
+      {
+        "timestamp": "2026-11-16T07:16:01.881Z",
+        "event": "BREACH_CONFIRMED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "distanceMeters": 9372,
+        "distanceOutside": 4372,
+        "note": "Confirmed 5km boundary breach after 3 consecutive verified GNSS readings. Outside by 4372m."
+      },
+      {
+        "timestamp": "2026-11-16T07:14:28.107Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 9086,
+        "distanceOutside": 4086,
+        "note": "Tourist crossed 5km perimeter. Outside by 4086m. Awaiting verification confirmation."
+      },
+      {
+        "timestamp": "2026-11-16T07:13:25.043Z",
+        "event": "ZONE_ENTERED",
+        "previousStatus": "APPROACHING",
+        "status": "ACTIVE",
+        "distanceMeters": 495,
+        "note": "Tourist entered designated 5km Safe Travel Zone (495m from Rohtang Pass Summit)"
+      },
+      {
+        "timestamp": "2026-11-16T07:12:10.795Z",
+        "event": "ZONE_CREATED",
+        "status": "APPROACHING",
+        "distanceMeters": 14900,
+        "note": "Safe Travel Zone activated around Rohtang Pass Summit (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 12,
+    "lastPingAt": "2026-11-16T07:20:14.154Z"
+  },
+  {
+    "id": "trip_manali_01",
+    "userId": "usr_john_01",
+    "userName": "John Doe",
+    "destination": "Manali High Pass",
+    "route": "Solang Valley to Rohtang Pass Route",
+    "status": "Active",
+    "boundaryRadiusKm": 8,
+    "groupSize": 5,
+    "expectedArrival": "2026-10-27T22:00:00.000Z",
+    "geofenceViolated": false,
+    "checkpoints": [
+      {
+        "name": "Solang Base Camp",
+        "passed": true,
+        "timestamp": "2026-10-27T04:15:00.000Z"
+      },
+      {
+        "name": "Marhi Ridge Point",
+        "passed": true,
+        "timestamp": "2026-10-27T06:30:00.000Z"
+      },
+      {
+        "name": "Manali High Summit",
+        "passed": false,
+        "timestamp": null
+      }
+    ]
+  },
+  {
+    "id": "trip_rohtang_02",
+    "userId": "usr_martin_02",
+    "userName": "Martin Loiness",
+    "destination": "Rohtang Valley Trail",
+    "route": "Chandra River Gorge Corridor",
+    "status": "Active",
+    "boundaryRadiusKm": 6,
+    "groupSize": 2,
+    "expectedArrival": "2026-10-27T20:30:00.000Z",
+    "geofenceViolated": false,
+    "checkpoints": [
+      {
+        "name": "Gulaba Checkpoint",
+        "passed": true,
+        "timestamp": "2026-10-27T05:00:00.000Z"
+      },
+      {
+        "name": "Gramphu Pass Junction",
+        "passed": false,
+        "timestamp": null
+      }
+    ]
+  },
+  {
+    "id": "trip_guna_01",
+    "userId": "usr_1792995231631",
+    "userName": "Champak chacha",
+    "destination": "Mohanpur Safety Corridor",
+    "route": "Guna Old Fort Trail & Forest Ridge",
+    "status": "Active",
+    "boundaryRadiusKm": 5,
+    "groupSize": 4,
+    "expectedArrival": "2026-10-27T20:00:00.000Z",
+    "geofenceViolated": false,
+    "checkpoints": [
+      {
+        "name": "Mohanpur Base Camp",
+        "passed": true,
+        "timestamp": "2026-10-26T06:18:52.000Z"
+      },
+      {
+        "name": "Guna Old Fort Ruins",
+        "passed": false,
+        "timestamp": null
+      }
+    ]
+  },
+  {
+    "id": "trip_guna_02",
+    "userId": "usr_vansh_04",
+    "userName": "Vansh Yadav",
+    "destination": "Guna Old Fort Trail & Forest Ridge",
+    "route": "South Parbati River Incline Corridor",
+    "status": "Active",
+    "boundaryRadiusKm": 5,
+    "groupSize": 3,
+    "expectedArrival": "2026-10-27T21:00:00.000Z",
+    "geofenceViolated": false,
+    "checkpoints": [
+      {
+        "name": "South Gate Checkpoint",
+        "passed": true,
+        "timestamp": "2026-10-27T05:45:00.000Z"
+      },
+      {
+        "name": "Fort Ridge Lookout",
+        "passed": false,
+        "timestamp": null
+      }
+    ]
+  }
+]
+]

@@ -61,9 +61,20 @@ export const mapAlertFromDb = (row) => {
   else if (row.status === 'false_alarm') status = 'False Alarm';
 
   // State mapping: normal | warning | deviation | unresponsive | sos
-  const isSos = row.state === 'sos';
-  const type = isSos ? 'MANUAL_SOS' : (row.state ? row.state.toUpperCase() : 'MANUAL_SOS');
-  const priority = isSos ? 'CRITICAL' : (row.state === 'warning' ? 'HIGH' : 'MEDIUM');
+  const isGeofence = row.state === 'geofence_breach' || 
+    row.state === 'deviation' || 
+    (row.message && row.message.includes('GEOFENCE_BREACH'));
+
+  let type = 'MANUAL_SOS';
+  if (isGeofence) {
+    type = 'GEOFENCE_BREACH';
+  } else if (row.state === 'sos') {
+    type = 'MANUAL_SOS';
+  } else if (row.state) {
+    type = row.state.toUpperCase();
+  }
+
+  const priority = (row.state === 'sos' || isGeofence) ? 'CRITICAL' : (row.state === 'warning' ? 'HIGH' : 'MEDIUM');
 
   // Location: lat and lon are generated columns in user schema
   let location = null;
@@ -132,15 +143,26 @@ export const mapAlertToDb = (payload, defaultUserId, defaultTripId) => {
   else if (payload.status === 'False Alarm') dbStatus = 'false_alarm';
 
   // State mapping
-  const state = payload.priority === 'CRITICAL' || payload.type === 'MANUAL_SOS' ? 'sos' : 'warning';
+  let state = 'sos';
+  if (payload.type === 'GEOFENCE_BREACH') {
+    state = 'sos'; // Or 'deviation'
+  } else if (payload.priority === 'CRITICAL' || payload.type === 'MANUAL_SOS') {
+    state = 'sos';
+  } else {
+    state = 'warning';
+  }
+
+  const defaultMsg = payload.type === 'GEOFENCE_BREACH'
+    ? `🚨 [GEOFENCE_BREACH] Automatic boundary breach detected for ${payload.userName || 'Traveller'}! Exited designated 5km safe zone.`
+    : `🚨 MANUAL SOS triggered by ${payload.userName || 'Traveller'}!`;
 
   const row = {
     user_id: userId,
     trip_id: tripId,
     state,
     status: dbStatus,
-    source: 'app',
-    message: payload.message || `🚨 MANUAL SOS triggered by ${payload.userName || 'Traveller'}!`,
+    source: payload.source || 'app',
+    message: payload.message || defaultMsg,
     battery: payload.batteryLevel != null ? parseInt(payload.batteryLevel, 10) : null
   };
 

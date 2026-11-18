@@ -61,8 +61,14 @@ export const AuthProvider = ({ children }) => {
     await storage.removeItem('stsms_mobile_user');
   };
 
+  const updateUser = async (updatedData) => {
+    const merged = { ...user, ...updatedData };
+    setUser(merged);
+    await storage.setItem('stsms_mobile_user', JSON.stringify(merged));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, isAuthenticated: !!token, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, isAuthenticated: !!token, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

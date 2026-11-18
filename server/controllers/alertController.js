@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { 
   isSupabaseConfigured, 
   getSupabaseClient, 
@@ -262,16 +263,9 @@ export const notifyGuardian = async (req, res, next) => {
   }
 };
 
-// Create real mobile SOS emergency alert in Supabase (NO fabricated coordinates or telemetry)
+// Create real mobile SOS emergency alert in Supabase & fallback JSON (NO fabricated coordinates or telemetry)
 export const createSosAlert = async (req, res, next) => {
   try {
-    if (!isSupabaseConfigured()) {
-      return res.status(503).json({
-        success: false,
-        message: 'Supabase database is not configured. Please configure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.'
-      });
-    }
-
     const { 
       userId, 
       userName, 
@@ -282,9 +276,6 @@ export const createSosAlert = async (req, res, next) => {
       batteryLevel, 
       tripId 
     } = req.body || {};
-
-    const supabase = getSupabaseClient();
-    const { defaultProfileId, defaultTripId } = await getDatabaseDefaults(supabase);
 
     // Parse valid location or set to null (never fabricate)
     let validatedLocation = null;
@@ -317,105 +308,204 @@ export const createSosAlert = async (req, res, next) => {
       status: 'Pending'
     };
 
-    const dbRow = mapAlertToDb(alertPayload, defaultProfileId, defaultTripId);
-
-    // 1. Check if an active/live alert already exists on this trip to satisfy "one_live_alert_per_trip"
-    let targetAlertRow = null;
-    let isUpdate = false;
-
-    try {
-      const { data: activeAlerts } = await supabase
-        .from('alerts')
-        .select('*, profiles(full_name, phone), trips(title)')
-        .eq('trip_id', dbRow.trip_id)
-        .in('status', ['open', 'acknowledged', 'dispatched'])
-        .order('raised_at', { ascending: false })
-        .limit(1);
-
-      if (activeAlerts && activeAlerts.length > 0) {
-        // Existing live alert found on this trip! Update with freshest telemetry instead of violating unique constraint
-        const liveAlert = activeAlerts[0];
-        const updateFields = {
-          state: 'sos',
-          message: alertPayload.message,
-          battery: validatedBattery != null ? validatedBattery : liveAlert.battery,
-          updated_at: new Date().toISOString()
-        };
-        if (dbRow.location) {
-          updateFields.location = dbRow.location;
+    // Resolve active trip for user if not explicitly passed
+    let effectiveTripId = alertPayload.tripId;
+    if (!effectiveTripId && alertPayload.userId) {
+      try {
+        const trips = await readJson('trips');
+        const activeT = trips.find(t => 
+          (t.userId === alertPayload.userId || t.userName === alertPayload.userName) &&
+          ['ACTIVE', 'APPROACHING', 'WARNING', 'BREACHED', 'Active', 'normal', 'sos'].includes(t.status)
+        );
+        if (activeT) {
+          effectiveTripId = activeT.supabaseTripId || activeT.id;
+          alertPayload.tripId = effectiveTripId;
         }
-
-        const { data: updatedRow, error: updateErr } = await supabase
-          .from('alerts')
-          .update(updateFields)
-          .eq('id', liveAlert.id)
-          .select('*, profiles(full_name, phone), trips(title)')
-          .single();
-
-        if (!updateErr && updatedRow) {
-          targetAlertRow = updatedRow;
-          isUpdate = true;
-        }
-      }
-    } catch (err) {
-      console.warn('[CHECK ACTIVE ALERTS NOTE]', err.message);
+      } catch (e) {}
     }
 
-    // 2. If no existing active alert, insert new alert record
-    if (!targetAlertRow) {
-      const { data: insertedRow, error: insertError } = await supabase
-        .from('alerts')
-        .insert(dbRow)
-        .select('*, profiles(full_name, phone), trips(title)')
-        .single();
+    let targetAlertRow = null;
+    let isUpdate = false;
+    let createdAlert = null;
 
-      if (insertError) {
-        // If unique constraint "one_live_alert_per_trip" triggered (race condition), update the existing live alert
-        if (insertError.code === '23505' || insertError.message?.includes('one_live_alert_per_trip')) {
-          console.warn('[SUPABASE 23505] Constraint one_live_alert_per_trip caught. Updating existing active alert with freshest telemetry...');
-          const { data: conflictAlert } = await supabase
+    // 1. Supabase persistence if configured
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = getSupabaseClient();
+        const { defaultProfileId, defaultTripId } = await getDatabaseDefaults(supabase);
+        const dbRow = mapAlertToDb(alertPayload, defaultProfileId, defaultTripId);
+
+        // Ensure multi-user isolation by assigning a dedicated trip for each tourist in Supabase
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!alertPayload.tripId || !uuidRegex.test(alertPayload.tripId)) {
+          try {
+            const { data: userTrips } = await supabase
+              .from('trips')
+              .select('id, user_id, title')
+              .ilike('title', `%Emergency: ${alertPayload.userId}%`)
+              .limit(1);
+
+            if (userTrips && userTrips.length > 0) {
+              dbRow.trip_id = userTrips[0].id;
+              alertPayload.tripId = userTrips[0].id;
+            } else {
+              const newTripId = crypto.randomUUID();
+              const { data: createdTrip } = await supabase.from('trips').insert({
+                id: newTripId,
+                user_id: defaultProfileId,
+                title: `Emergency: ${alertPayload.userId} (${alertPayload.userName})`,
+                status: 'active',
+                start_at: new Date().toISOString(),
+                end_at: new Date(Date.now() + 86400000).toISOString(),
+                buffer_m: 500,
+                current_state: 'sos'
+              }).select('id').single();
+
+              if (createdTrip) {
+                dbRow.trip_id = createdTrip.id;
+                alertPayload.tripId = createdTrip.id;
+              }
+            }
+          } catch (tErr) {}
+        }
+
+        // Check if an active/live alert already exists on this trip for this user
+        const { data: activeAlerts } = await supabase
+          .from('alerts')
+          .select('*, profiles(full_name, phone), trips(title)')
+          .eq('trip_id', dbRow.trip_id)
+          .in('status', ['open', 'acknowledged', 'dispatched'])
+          .order('raised_at', { ascending: false })
+          .limit(1);
+
+        if (activeAlerts && activeAlerts.length > 0) {
+          const liveAlert = activeAlerts[0];
+          const updateFields = {
+            state: 'sos',
+            message: alertPayload.message,
+            battery: validatedBattery != null ? validatedBattery : liveAlert.battery,
+            updated_at: new Date().toISOString()
+          };
+          if (dbRow.location) updateFields.location = dbRow.location;
+
+          const { data: updatedRow, error: updateErr } = await supabase
             .from('alerts')
+            .update(updateFields)
+            .eq('id', liveAlert.id)
             .select('*, profiles(full_name, phone), trips(title)')
-            .eq('trip_id', dbRow.trip_id)
-            .in('status', ['open', 'acknowledged', 'dispatched'])
-            .order('raised_at', { ascending: false })
-            .limit(1)
             .single();
 
-          if (conflictAlert) {
-            const updateFields = {
-              state: 'sos',
-              message: alertPayload.message,
-              battery: validatedBattery != null ? validatedBattery : conflictAlert.battery,
-              updated_at: new Date().toISOString()
-            };
-            if (dbRow.location) updateFields.location = dbRow.location;
-
-            const { data: fallbackUpdated } = await supabase
-              .from('alerts')
-              .update(updateFields)
-              .eq('id', conflictAlert.id)
-              .select('*, profiles(full_name, phone), trips(title)')
-              .single();
-
-            targetAlertRow = fallbackUpdated || conflictAlert;
+          if (!updateErr && updatedRow) {
+            targetAlertRow = updatedRow;
             isUpdate = true;
           }
         }
 
         if (!targetAlertRow) {
-          console.error('[SUPABASE INSERT FAILED]', insertError.message);
-          return res.status(500).json({
-            success: false,
-            message: `Database error creating emergency record in Supabase: ${insertError.message}`
-          });
+          const { data: insertedRow, error: insertError } = await supabase
+            .from('alerts')
+            .insert(dbRow)
+            .select('*, profiles(full_name, phone), trips(title)')
+            .single();
+
+          if (!insertError && insertedRow) {
+            targetAlertRow = insertedRow;
+          } else if (insertError && (insertError.code === '23505' || insertError.message?.includes('one_live_alert_per_trip'))) {
+            const { data: conflictAlert } = await supabase
+              .from('alerts')
+              .select('*, profiles(full_name, phone), trips(title)')
+              .eq('trip_id', dbRow.trip_id)
+              .in('status', ['open', 'acknowledged', 'dispatched'])
+              .order('raised_at', { ascending: false })
+              .limit(1)
+              .single();
+
+            if (conflictAlert) {
+              const updateFields = {
+                state: 'sos',
+                message: alertPayload.message,
+                battery: validatedBattery != null ? validatedBattery : conflictAlert.battery,
+                updated_at: new Date().toISOString()
+              };
+              if (dbRow.location) updateFields.location = dbRow.location;
+
+              const { data: fallbackUpdated } = await supabase
+                .from('alerts')
+                .update(updateFields)
+                .eq('id', conflictAlert.id)
+                .select('*, profiles(full_name, phone), trips(title)')
+                .single();
+
+              targetAlertRow = fallbackUpdated || conflictAlert;
+              isUpdate = true;
+            }
+          }
         }
-      } else {
-        targetAlertRow = insertedRow;
+
+        // Log audit event to alert_events
+        if (targetAlertRow) {
+          try {
+            await supabase.from('alert_events').insert({
+              alert_id: targetAlertRow.id,
+              kind: isUpdate ? 'sos_location_update' : 'sos_raised',
+              payload: {
+                battery: validatedBattery,
+                hasGps: Boolean(validatedLocation),
+                lat: validatedLocation?.lat || null,
+                lng: validatedLocation?.lng || null,
+                isUpdate
+              },
+              actor: 'mobile_app'
+            });
+          } catch (e) {}
+
+          createdAlert = mapAlertFromDb(targetAlertRow);
+        }
+      } catch (sbError) {
+        console.warn('[SUPABASE SOS DISPATCH WARNING]', sbError.message);
       }
     }
 
-    // 3. Also update users.json with real emergency telemetry & status
+    // 2. Synchronize to local alerts.json (offline fallback & zero silent divergence)
+    const fallbackAlertId = targetAlertRow ? targetAlertRow.id : `alt_sos_${Date.now()}`;
+    const jsonAlert = {
+      id: fallbackAlertId,
+      userId: alertPayload.userId,
+      userName: alertPayload.userName,
+      tripId: alertPayload.tripId,
+      type: alertPayload.type,
+      priority: alertPayload.priority,
+      message: alertPayload.message,
+      location: alertPayload.location,
+      batteryLevel: alertPayload.batteryLevel,
+      status: 'Pending',
+      source: 'mobile_app',
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      const alerts = await readJson('alerts');
+      const existingIdx = alerts.findIndex(a => 
+        a.id === fallbackAlertId || 
+        ((alertPayload.userId ? a.userId === alertPayload.userId : (alertPayload.tripId && a.tripId === alertPayload.tripId)) && 
+         (a.status === 'Pending' || a.status === 'open'))
+      );
+      if (existingIdx !== -1) {
+        alerts[existingIdx] = { ...alerts[existingIdx], ...jsonAlert, updatedAt: new Date().toISOString() };
+        isUpdate = true;
+      } else {
+        alerts.unshift(jsonAlert);
+      }
+      await writeJson('alerts', alerts);
+    } catch (e) {
+      console.warn('[ALERTS JSON SYNC NOTE]', e.message);
+    }
+
+    if (!createdAlert) {
+      createdAlert = jsonAlert;
+    }
+
+    // 3. Update users.json with emergency telemetry & status
     try {
       const users = await readJson('users');
       const uIdx = users.findIndex(u => 
@@ -471,24 +561,7 @@ export const createSosAlert = async (req, res, next) => {
       console.log('[USERS JSON SYNC ON SOS NOTE]', e.message);
     }
 
-    // 4. Log audit event to alert_events
-    try {
-      await supabase.from('alert_events').insert({
-        alert_id: targetAlertRow.id,
-        kind: isUpdate ? 'sos_location_update' : 'sos_raised',
-        payload: {
-          battery: validatedBattery,
-          hasGps: Boolean(validatedLocation),
-          lat: validatedLocation?.lat || null,
-          lng: validatedLocation?.lng || null,
-          isUpdate
-        },
-        actor: 'mobile_app'
-      });
-    } catch (e) {}
-
-    const createdAlert = mapAlertFromDb(targetAlertRow);
-    console.log(`[SUPABASE SOS ${isUpdate ? 'UPDATED' : 'CREATED'}] ID: ${createdAlert.id} | User: ${createdAlert.userName} | Bat: ${validatedBattery}% | Lat: ${validatedLocation?.lat}, Lng: ${validatedLocation?.lng}`);
+    console.log(`[EMERGENCY SOS ${isUpdate ? 'UPDATED' : 'DISPATCHED'}] ID: ${createdAlert.id} | User: ${createdAlert.userName} | Bat: ${validatedBattery}% | Lat: ${validatedLocation?.lat}, Lng: ${validatedLocation?.lng}`);
 
     res.status(isUpdate ? 200 : 201).json({
       success: true,

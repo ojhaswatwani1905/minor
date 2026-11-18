@@ -74,12 +74,12 @@ export const TripFormModal = ({ isOpen, onClose, onSubmit, initialData, tourists
             Assign Tourist *
           </label>
           <div className="relative">
-            <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
             <select
               name="userId"
               value={formData.userId}
               onChange={handleTouristChange}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-medium"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-white font-medium focus:outline-none focus:ring-2 focus:ring-honey"
               required
             >
               {tourists?.map((t) => (
@@ -93,36 +93,36 @@ export const TripFormModal = ({ isOpen, onClose, onSubmit, initialData, tourists
 
         {/* Destination & Route */}
         <div>
-          <label className="block font-bold text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block font-bold text-white/80 uppercase tracking-wider mb-1">
             Expedition Destination Name *
           </label>
           <div className="relative">
-            <Compass className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Compass className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
             <input
               type="text"
               name="destination"
               value={formData.destination}
               onChange={handleChange}
               placeholder="e.g. Rohtang High Expedition, Valley of Flowers"
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-honey"
               required
             />
           </div>
         </div>
 
         <div>
-          <label className="block font-bold text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block font-bold text-white/80 uppercase tracking-wider mb-1">
             Planned Expedition Route / Checkpoint Trail *
           </label>
           <div className="relative">
-            <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
             <input
               type="text"
               name="route"
               value={formData.route}
               onChange={handleChange}
               placeholder="e.g. Manali Base -> Solang -> Rohtang Pass -> Keylong"
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-honey"
               required
             />
           </div>
@@ -131,34 +131,34 @@ export const TripFormModal = ({ isOpen, onClose, onSubmit, initialData, tourists
         {/* Start Date & Expected Arrival */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block font-bold text-white/80 uppercase tracking-wider mb-1">
               Start Date
             </label>
             <div className="relative">
-              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
               <input
                 type="date"
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white"
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-white"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block font-bold text-white/80 uppercase tracking-wider mb-1">
               Expected Arrival Date
             </label>
             <div className="relative">
-              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
               <input
                 type="date"
                 name="expectedArrival"
                 value={formData.expectedArrival}
                 onChange={handleChange}
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white"
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-white"
                 required
               />
             </div>
@@ -168,16 +168,16 @@ export const TripFormModal = ({ isOpen, onClose, onSubmit, initialData, tourists
         {/* Boundary Radius (Geofence) & Status */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block font-bold text-white/80 uppercase tracking-wider mb-1">
               Safety Boundary Radius (Geofence Km)
             </label>
             <div className="relative">
-              <Shield className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Shield className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-honey" />
               <select
                 name="boundaryRadiusKm"
                 value={formData.boundaryRadiusKm}
                 onChange={handleChange}
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold"
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-white font-bold"
               >
                 <option value="1.0">1.0 km Buffer</option>
                 <option value="2.5">2.5 km Buffer</option>
@@ -188,14 +188,14 @@ export const TripFormModal = ({ isOpen, onClose, onSubmit, initialData, tourists
           </div>
 
           <div>
-            <label className="block font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block font-bold text-white/80 uppercase tracking-wider mb-1">
               Expedition Status
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold"
+              className="w-full px-4 py-2.5 rounded-xl bg-[#1E3732] border border-white/10 text-white font-bold"
             >
               <option value="Active">Active</option>
               <option value="Completed">Completed</option>
@@ -206,17 +206,17 @@ export const TripFormModal = ({ isOpen, onClose, onSubmit, initialData, tourists
         </div>
 
         {/* Form Actions */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold hover:bg-slate-700"
+            className="px-4 py-2 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-400 hover:to-sky-400 text-white font-bold shadow-lg shadow-cyan-500/20"
+            className="px-5 py-2.5 rounded-xl bg-honey hover:brightness-105 text-[#25433E] font-black shadow-lg transition-all active:scale-95"
           >
             {initialData ? "Save Trip Changes" : "Initialize Expedition"}
           </button>

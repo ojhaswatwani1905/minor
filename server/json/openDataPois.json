@@ -1,6 +1,6 @@
 {
   "route": "Full-India Spatial Route Corridor",
-  "importedAt": "2026-10-26T08:04:29.354Z",
+  "importedAt": "2026-11-17T23:16:28.894Z",
   "bufferKm": 5,
   "sources": [
     "India OSM GeoJSON (india-pois.geojson / Overpass API)",
@@ -10,7 +10,7 @@
   "pois": [],
   "osmHazardNodes": [
     {
-      "id": "osm-nkoc68q",
+      "id": "osm-3ok9cio",
       "name": "Guna Old Fort Trail & Ruins",
       "lat": 24.6412,
       "lon": 77.315,

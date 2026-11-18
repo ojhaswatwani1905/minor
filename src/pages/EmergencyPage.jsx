@@ -140,18 +140,18 @@ export const EmergencyPage = () => {
   const resolvedCount = alerts.filter(a => a?.status === 'Resolved').length;
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 select-none">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <h1 className="text-2xl font-black tracking-tight text-[#192E2A] flex items-center gap-2.5 font-sans">
             Emergency SOS Response Center
-            <span className="flex h-2.5 w-2.5 relative">
+            <span className="flex h-3 w-3 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
             </span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1 font-sans">
             Real-time manual SOS distress intake, live GPS telemetry verification, and incident triage
           </p>
         </div>
@@ -159,7 +159,7 @@ export const EmergencyPage = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={handleSimulateSos}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-xs shadow-lg transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-md transition-all active:scale-95"
           >
             <Zap className="w-4 h-4 animate-bounce" />
             <span>Simulate Mobile SOS</span>
@@ -219,10 +219,10 @@ export const EmergencyPage = () => {
       {loading && alerts.length === 0 ? (
         <Loader message="Scanning Emergency Broadcast Frequency..." />
       ) : alerts.length === 0 ? (
-        <div className="p-12 text-center bg-slate-900/40 rounded-3xl border border-slate-800 text-slate-400 space-y-3">
-          <CheckCircle className="w-10 h-10 text-emerald-400 mx-auto" />
+        <div className="p-12 text-center bg-[#25433E] rounded-3xl border border-white/10 text-white space-y-3 shadow-xl">
+          <CheckCircle className="w-10 h-10 text-honey mx-auto" />
           <h4 className="text-base font-bold text-white">All Clear — No Active Emergency Incidents</h4>
-          <p className="text-xs">No emergency SOS or telemetry alerts match your current filter criteria.</p>
+          <p className="text-xs text-white/70">No emergency SOS or telemetry alerts match your current filter criteria.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

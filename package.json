@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "server": "node --watch server/server.js",
+    "start:server": "node server/server.js",
     "start": "concurrently \"npm run server\" \"npm run dev\"",
     "setup:osm-india": "bash server/scripts/setup-india-osm.sh",
     "import:morth": "node server/scripts/fetchMorthFromDataGovIn.js && node server/scripts/importMorthBlackspots.js"
