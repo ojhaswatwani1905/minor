@@ -71,22 +71,33 @@ export const getLiveLocations = async (req, res, next) => {
       const isOpen = a.status === 'open' || a.status === 'acknowledged' || a.status === 'dispatched';
       
       // Determine tourist name from profile, alert message or matching admin
-      let extractedName = a.profiles?.full_name;
+      let extractedName = (a.profiles?.full_name && a.profiles.full_name !== 'Active Traveller') ? a.profiles.full_name : null;
       if (!extractedName && a.message) {
-        const match = a.message.match(/by\s+([^!]+)/i);
-        if (match && match[1]) {
-          extractedName = match[1].trim();
-        }
+        const sosMatch = a.message.match(/triggered by\s+([^!]+)/i);
+        const breachMatch = a.message.match(/confirmed for\s+([^!]+)/i);
+        const byMatch = a.message.match(/by\s+([^!]+)/i);
+        const forMatch = a.message.match(/for\s+([^!]+)/i);
+        if (sosMatch) extractedName = sosMatch[1].trim();
+        else if (breachMatch) extractedName = breachMatch[1].trim();
+        else if (byMatch) extractedName = byMatch[1].trim();
+        else if (forMatch) extractedName = forMatch[1].trim();
+      }
+      if (!extractedName && a.trips?.title) {
+        const tripMatch = a.trips.title.match(/\(([^)]+)\)/);
+        if (tripMatch) extractedName = tripMatch[1].trim();
       }
       if (!extractedName) {
         extractedName = 'Active Traveller';
       }
 
-      // Find matching user record
-      let matchedIdx = combinedUsers.findIndex((u) => 
-        (a.user_id && u.id === a.user_id) ||
-        (extractedName && u.fullName && u.fullName.toLowerCase() === extractedName.toLowerCase())
-      );
+      // Find matching user record by exact name first to prevent multi-user collision
+      let matchedIdx = -1;
+      if (extractedName && extractedName !== 'Active Traveller') {
+        matchedIdx = combinedUsers.findIndex((u) => u.fullName && u.fullName.toLowerCase().trim() === extractedName.toLowerCase().trim());
+      }
+      if (matchedIdx === -1 && a.user_id) {
+        matchedIdx = combinedUsers.findIndex((u) => u.id === a.user_id && (!u.fullName || u.fullName === 'Active Traveller'));
+      }
 
       // Also check admins list for email or phone details
       const matchedAdmin = admins.find((adm) => 
@@ -233,6 +244,15 @@ export const getLiveLocations = async (req, res, next) => {
         activeAlert: user.activeAlert || null,
         lastPing: user.lastPing || null
       };
+    });
+
+    // Sort live tourists: Emergency and active alerts first, then active GPS
+    liveData.sort((a, b) => {
+      const aIsEm = a.status === 'EMERGENCY' || a.activeAlertsCount > 0;
+      const bIsEm = b.status === 'EMERGENCY' || b.activeAlertsCount > 0;
+      if (aIsEm && !bIsEm) return -1;
+      if (!aIsEm && bIsEm) return 1;
+      return 0;
     });
 
     res.json({

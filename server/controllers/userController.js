@@ -56,38 +56,82 @@ export const getUsers = async (req, res, next) => {
 
           let extractedName = null;
           if (a.message) {
-            const m = a.message.match(/by\s+([^!]+)/i);
-            if (m) extractedName = m[1].trim();
+            const sosMatch = a.message.match(/triggered by\s+([^!]+)/i);
+            const breachMatch = a.message.match(/confirmed for\s+([^!]+)/i);
+            const byMatch = a.message.match(/by\s+([^!]+)/i);
+            const forMatch = a.message.match(/for\s+([^!]+)/i);
+            if (sosMatch) extractedName = sosMatch[1].trim();
+            else if (breachMatch) extractedName = breachMatch[1].trim();
+            else if (byMatch) extractedName = byMatch[1].trim();
+            else if (forMatch) extractedName = forMatch[1].trim();
           }
 
-          const matchedAdmin = admins.find(adm => adm.name && extractedName && adm.name.toLowerCase() === extractedName.toLowerCase());
+          const matchedAdmin = admins.find(adm => adm.name && extractedName && adm.name.toLowerCase().trim() === extractedName.toLowerCase().trim());
 
-          const uIdx = users.findIndex(u => 
-            u.id === a.user_id || 
-            (extractedName && u.fullName && u.fullName.toLowerCase() === extractedName.toLowerCase())
-          );
+          // Match by extracted name first, or fallback to user_id if name is Active Traveller
+          let uIdx = -1;
+          if (extractedName) {
+            uIdx = users.findIndex(u => u.fullName && u.fullName.toLowerCase().trim() === extractedName.toLowerCase().trim());
+          }
+          if (uIdx === -1 && a.user_id) {
+            uIdx = users.findIndex(u => u.id === a.user_id && (!u.fullName || u.fullName === 'Active Traveller'));
+          }
 
           const isOpen = a.status === 'open' || a.status === 'acknowledged' || a.status === 'dispatched';
 
-          if (uIdx !== -1) {
-            if (extractedName && users[uIdx].fullName === 'Active Traveller') {
+          if (uIdx === -1 && extractedName) {
+            const newTourist = {
+              id: a.user_id || `usr_${extractedName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`,
+              fullName: extractedName,
+              email: matchedAdmin?.email || `${extractedName.toLowerCase().replace(/\s+/g, '')}@gmail.com`,
+              phone: matchedAdmin?.phone || 'Mobile GPS Fix',
+              emergencyContact: 'Mobile GPS Fix',
+              status: isOpen ? 'EMERGENCY' : 'Online',
+              currentLocation: (lat != null && lng != null) ? {
+                name: isOpen ? `🚨 SOS Distress (${lat.toFixed(4)}, ${lng.toFixed(4)})` : `GPS Fix (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
+                lat,
+                lng
+              } : null,
+              batteryLevel: a.battery != null ? a.battery : null,
+              networkSignal: 'Mobile GNSS (Distress Beacon)',
+              offlineDurationMinutes: 0,
+              guardians: [],
+              documents: [],
+              activeTripId: a.trip_id || null,
+              lastAlertTimestamp: a.raised_at,
+              lastPing: a.raised_at,
+              source: 'Supabase'
+            };
+            users.unshift(newTourist);
+            uIdx = 0;
+          } else if (uIdx !== -1) {
+            if (extractedName && (!users[uIdx].fullName || users[uIdx].fullName === 'Active Traveller')) {
               users[uIdx].fullName = extractedName;
             }
             if (matchedAdmin && (!users[uIdx].email || users[uIdx].email === 'N/A')) {
               users[uIdx].email = matchedAdmin.email;
             }
-            if (isOpen) {
-              users[uIdx].status = 'EMERGENCY';
-            }
-            if (a.battery != null) {
-              users[uIdx].batteryLevel = a.battery;
-            }
-            if (lat != null && lng != null) {
-              users[uIdx].currentLocation = {
-                name: isOpen ? `🚨 SOS Distress (${lat.toFixed(4)}, ${lng.toFixed(4)})` : `GPS Fix (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
-                lat,
-                lng
-              };
+
+            const alertTime = new Date(a.raised_at || 0).getTime();
+            const userAlertTime = new Date(users[uIdx].lastAlertTimestamp || 0).getTime();
+            if (alertTime >= userAlertTime) {
+              users[uIdx].lastAlertTimestamp = a.raised_at;
+              if (isOpen) {
+                users[uIdx].status = 'EMERGENCY';
+              }
+              if (a.battery != null) {
+                users[uIdx].batteryLevel = a.battery;
+              }
+              if (lat != null && lng != null) {
+                users[uIdx].currentLocation = {
+                  name: isOpen ? `🚨 SOS Distress (${lat.toFixed(4)}, ${lng.toFixed(4)})` : `GPS Fix (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
+                  lat,
+                  lng
+                };
+              }
+              if (a.trip_id) {
+                users[uIdx].activeTripId = a.trip_id;
+              }
             }
           }
         });
@@ -96,7 +140,7 @@ export const getUsers = async (req, res, next) => {
       }
     }
 
-    // Active status evaluation: If user is not getting GPS location (missing coords or ping timed out), mark as Offline
+    // Active status evaluation: Only keep EMERGENCY if user has an active/open SOS alert
     const now = Date.now();
     const GPS_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes inactivity threshold
 
@@ -110,14 +154,23 @@ export const getUsers = async (req, res, next) => {
       );
 
       const lastPingTime = u.lastPing ? new Date(u.lastPing).getTime() : 0;
-      // Allow up to 24 hours window for active demo & real tourist field tracking
       const isFresh = lastPingTime > 0 && (now - lastPingTime) <= (24 * 60 * 60 * 1000);
 
-      // Active SOS emergencies stay as EMERGENCY
+      // Active SOS emergencies stay as EMERGENCY only if fresh (within 24 hours) or have recent alert
       if (u.status === 'EMERGENCY') {
+        const alertTime = u.lastAlertTimestamp ? new Date(u.lastAlertTimestamp).getTime() : 0;
+        const isAlertFresh = alertTime > 0 && (now - alertTime) <= (24 * 60 * 60 * 1000);
+        if (isAlertFresh || isFresh) {
+          return {
+            ...u,
+            offlineDurationMinutes: 0
+          };
+        }
+        // Older stale emergency records transition to Monitored or Verified
         return {
           ...u,
-          offlineDurationMinutes: 0
+          status: hasGps ? 'Monitored' : 'Offline',
+          offlineDurationMinutes: hasGps ? 0 : (u.offlineDurationMinutes || 15)
         };
       }
 
@@ -142,6 +195,20 @@ export const getUsers = async (req, res, next) => {
         networkSignal: hasGps ? 'GPS Signal Stale' : 'No GPS Fix (Offline)',
         offlineDurationMinutes: offlineMins
       };
+    });
+
+    // Sort users: Critical emergency SOS distress beacons FIRST, sorted by latest alert time descending
+    users.sort((a, b) => {
+      const aIsEm = a.status === 'EMERGENCY' || a.status === 'SOS DISTRESS' || a.status === 'Critical';
+      const bIsEm = b.status === 'EMERGENCY' || b.status === 'SOS DISTRESS' || b.status === 'Critical';
+      if (aIsEm && !bIsEm) return -1;
+      if (!aIsEm && bIsEm) return 1;
+
+      const aTime = new Date(a.lastAlertTimestamp || a.lastPing || a.updatedAt || a.createdAt || 0).getTime();
+      const bTime = new Date(b.lastAlertTimestamp || b.lastPing || b.updatedAt || b.createdAt || 0).getTime();
+      if (aTime !== bTime) return bTime - aTime;
+
+      return 0;
     });
 
     const { search, status, battery } = req.query;

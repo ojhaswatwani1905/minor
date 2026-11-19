@@ -335,6 +335,15 @@ export const createSosAlert = async (req, res, next) => {
         const { defaultProfileId, defaultTripId } = await getDatabaseDefaults(supabase);
         const dbRow = mapAlertToDb(alertPayload, defaultProfileId, defaultTripId);
 
+        // Keep Supabase profiles full_name updated with real tourist name
+        if (dbRow.user_id && alertPayload.userName && alertPayload.userName !== 'Active Traveller') {
+          try {
+            await supabase.from('profiles').update({
+              full_name: alertPayload.userName
+            }).eq('id', dbRow.user_id);
+          } catch (pUpErr) {}
+        }
+
         // Ensure multi-user isolation by assigning a dedicated trip for each tourist in Supabase
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         if (!alertPayload.tripId || !uuidRegex.test(alertPayload.tripId)) {
@@ -460,6 +469,9 @@ export const createSosAlert = async (req, res, next) => {
           } catch (e) {}
 
           createdAlert = mapAlertFromDb(targetAlertRow);
+          if (createdAlert && (!createdAlert.userName || createdAlert.userName === 'Active Traveller') && alertPayload.userName) {
+            createdAlert.userName = alertPayload.userName;
+          }
         }
       } catch (sbError) {
         console.warn('[SUPABASE SOS DISPATCH WARNING]', sbError.message);

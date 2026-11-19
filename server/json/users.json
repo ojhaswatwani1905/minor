@@ -1,11 +1,46 @@
 [
   {
+    "id": "usr_bhoot_live",
+    "fullName": "bhoot",
+    "email": "bhoot@gmail.com",
+    "phone": "+91 98765 43210",
+    "emergencyContact": "+91 98765 43210",
+    "status": "EMERGENCY",
+    "currentLocation": {
+      "name": "Emergency GPS Fix (24.4346, 77.1619)",
+      "lat": 24.4346,
+      "lng": 77.1619
+    },
+    "batteryLevel": 62,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of bhoot",
+        "relation": "Family",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-BHOOT-001"
+      }
+    ],
+    "activeTripId": "e365a2d6-ac2c-42f1-bdc4-a1c31b05d81c",
+    "lastAlertTimestamp": "2026-11-19T09:46:09.146Z",
+    "lastPing": "2026-11-19T10:11:27.087Z",
+    "source": "Supabase"
+  },
+  {
     "id": "usr_1794942568604",
     "fullName": "yash randi ",
     "email": "yash randi ",
     "phone": "+91 98765 43210",
     "emergencyContact": "+91 98765 43210",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "GPS Fix (24.4365, 77.1611)",
       "lat": 24.4365307,
@@ -39,7 +74,7 @@
     "email": "tourist_b_1794933686836@stsms.gov",
     "phone": "+910000000000",
     "emergencyContact": "+919876500003",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "Emergency GPS Fix (23.1995, 77.4332)",
       "lat": 23.1995,
@@ -74,7 +109,7 @@
     "email": "tourist_a_1794933686756@stsms.gov",
     "phone": "+919876599999",
     "emergencyContact": "+919876588888",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "Emergency GPS Fix (23.4900, 77.7400)",
       "lat": 23.49,
@@ -110,7 +145,7 @@
     "email": "tourist_b_1794907506240@stsms.gov",
     "phone": "+910000000000",
     "emergencyContact": "+919876500003",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "Emergency GPS Fix (23.1995, 77.4332)",
       "lat": 23.1995,
@@ -145,7 +180,7 @@
     "email": "tourist_a_1794907506159@stsms.gov",
     "phone": "+919876599999",
     "emergencyContact": "+919876588888",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "Emergency GPS Fix (23.4900, 77.7400)",
       "lat": 23.49,
@@ -182,7 +217,7 @@
     "phone": "+91 91234 56789",
     "bloodGroup": "O+",
     "emergencyContact": "+91 99887 76655",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "guardians": [
       {
         "name": "Anita Sharma (Mother)",
@@ -243,7 +278,7 @@
     "email": "oiu@gmail.com",
     "phone": "1245789630",
     "emergencyContact": "1245789630",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "GPS Fix (24.4365, 77.1611)",
       "lat": 24.4365315,
@@ -278,7 +313,7 @@
     "email": "ojhaswat@gmail",
     "phone": "898978747",
     "emergencyContact": "898978747",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "C5P5+PH6, Mohanpur, Madhya Pradesh",
       "lat": 24.4367867,
@@ -312,7 +347,7 @@
     "email": "idjsh@gmail.com",
     "phone": "0909089776",
     "emergencyContact": "0909089776",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "Emergency GPS Fix (24.4355, 77.1604)",
       "lat": 24.4355451,
@@ -346,7 +381,7 @@
     "email": "yash@gmail.com",
     "phone": "7067481890",
     "emergencyContact": "7067481890",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "23, Mohanpur, Madhya Pradesh",
       "lat": 24.4352659,
@@ -380,7 +415,7 @@
     "email": "qwqw@gmail.com",
     "phone": "1209120912",
     "emergencyContact": "1209120912",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "23, Mohanpur, Madhya Pradesh",
       "lat": 24.4352647,
@@ -414,7 +449,7 @@
     "email": "okay@gmail.com",
     "phone": "N/A",
     "emergencyContact": "N/A",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "name": "23, Mohanpur, Madhya Pradesh",
       "lat": 24.4364932,

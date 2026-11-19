@@ -1,5 +1,14 @@
 [
   {
+    "id": "usr_bhoot_live",
+    "name": "bhoot",
+    "email": "bhoot@gmail.com",
+    "role": "Explorer User",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bhoot",
+    "department": "Tourist Explorer",
+    "phone": "+91 98765 43210"
+  },
+  {
     "id": "adm_01",
     "name": "Priya Sharma (Verified)",
     "email": "admin@stsms.gov",

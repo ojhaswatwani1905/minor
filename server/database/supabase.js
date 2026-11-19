@@ -98,8 +98,30 @@ export const mapAlertFromDb = (row) => {
     });
   }
 
-  // Extract traveller name from joined profile or fallback
-  const userName = row.profiles?.full_name || row.userName || 'Active Traveller';
+  // Extract traveller name from joined profile, alert message, or trip title fallback
+  let userName = (row.profiles?.full_name && row.profiles.full_name !== 'Active Traveller') 
+    ? row.profiles.full_name 
+    : null;
+
+  if (!userName && row.message) {
+    const sosMatch = row.message.match(/triggered by\s+([^!]+)/i);
+    const breachMatch = row.message.match(/confirmed for\s+([^!]+)/i);
+    const byMatch = row.message.match(/by\s+([^!]+)/i);
+    const forMatch = row.message.match(/for\s+([^!]+)/i);
+    if (sosMatch) userName = sosMatch[1].trim();
+    else if (breachMatch) userName = breachMatch[1].trim();
+    else if (byMatch) userName = byMatch[1].trim();
+    else if (forMatch) userName = forMatch[1].trim();
+  }
+
+  if (!userName && row.trips?.title) {
+    const tripMatch = row.trips.title.match(/\(([^)]+)\)/);
+    if (tripMatch) userName = tripMatch[1].trim();
+  }
+
+  if (!userName) {
+    userName = row.userName || 'Active Traveller';
+  }
 
   return {
     id: row.id,

@@ -1,9 +1,49 @@
 import { readJson, writeJson } from '../utils/jsonDb.js';
+import { isSupabaseConfigured, getSupabaseClient } from '../database/supabase.js';
 
 // Get all trips with search and status/geofence filtering
 export const getTrips = async (req, res, next) => {
   try {
     let trips = await readJson('trips');
+
+    // Enrich with live trips from Supabase if connected
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = getSupabaseClient();
+        const { data: dbTrips } = await supabase.from('trips').select('*').order('created_at', { ascending: false });
+        if (dbTrips) {
+          dbTrips.forEach(dt => {
+            const exists = trips.some(t => t.id === dt.id || t.supabaseTripId === dt.id);
+            if (!exists) {
+              let extractedUserName = 'Active Traveller';
+              if (dt.title) {
+                const match = dt.title.match(/\(([^)]+)\)/);
+                if (match) extractedUserName = match[1].trim();
+              }
+              trips.unshift({
+                id: dt.id,
+                supabaseTripId: dt.id,
+                userId: dt.user_id,
+                userName: extractedUserName,
+                destination: dt.title || 'Emergency Safe Corridor',
+                route: dt.title || 'Designated Corridors',
+                startDate: dt.start_at || new Date().toISOString(),
+                expectedArrival: 'Active Corridor',
+                expectedArrivalDeadline: dt.end_at || new Date().toISOString(),
+                boundaryRadiusKm: (dt.buffer_m || 500) / 1000,
+                status: dt.current_state === 'sos' ? 'Emergency' : (dt.status || 'Active'),
+                deadManSwitchTriggered: false,
+                geofenceViolated: dt.current_state === 'sos',
+                guardianPhone: '+91 98765 43210',
+                groupSize: 1
+              });
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('[SUPABASE GET TRIPS NOTE]', e.message);
+      }
+    }
     const { search, status, geofence } = req.query;
 
     if (search) {
