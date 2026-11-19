@@ -1,5 +1,40 @@
 [
   {
+    "id": "3614e1d0-f867-4734-a245-412e8d1f866f",
+    "fullName": "chotu",
+    "email": "chotu@gmail.com",
+    "phone": "+91 98765 43210",
+    "emergencyContact": "+91 98765 43210",
+    "status": "EMERGENCY",
+    "currentLocation": {
+      "name": "🚨 SOS Distress (24.4346, 77.1619)",
+      "lat": 24.4345865,
+      "lng": 77.1618923,
+      "elevation": null
+    },
+    "batteryLevel": 57,
+    "networkSignal": "No GPS Fix (Offline)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of chotu",
+        "relation": "Family Emergency Contact",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-CHO-9044"
+      }
+    ],
+    "activeTripId": "921898a9-a5f6-4693-9d13-ed61aa26a8cf",
+    "source": "Supabase",
+    "lastAlertTimestamp": "2026-11-19T10:21:30.879722+00:00"
+  },
+  {
     "id": "usr_bhoot_live",
     "fullName": "bhoot",
     "email": "bhoot@gmail.com",
@@ -7,11 +42,12 @@
     "emergencyContact": "+91 98765 43210",
     "status": "EMERGENCY",
     "currentLocation": {
-      "name": "Emergency GPS Fix (24.4346, 77.1619)",
-      "lat": 24.4346,
-      "lng": 77.1619
+      "name": "🚨 SOS Distress (24.4346, 77.1619)",
+      "lat": 24.4345865,
+      "lng": 77.1618923,
+      "elevation": null
     },
-    "batteryLevel": 62,
+    "batteryLevel": 57,
     "networkSignal": "Mobile GNSS (Distress Beacon)",
     "offlineDurationMinutes": 0,
     "guardians": [
@@ -30,7 +66,7 @@
       }
     ],
     "activeTripId": "e365a2d6-ac2c-42f1-bdc4-a1c31b05d81c",
-    "lastAlertTimestamp": "2026-11-19T09:46:09.146Z",
+    "lastAlertTimestamp": "2026-11-19T09:54:43.458283+00:00",
     "lastPing": "2026-11-19T10:11:27.087Z",
     "source": "Supabase"
   },
@@ -43,9 +79,9 @@
     "status": "Monitored",
     "currentLocation": {
       "name": "GPS Fix (24.4365, 77.1611)",
-      "lat": 24.4365307,
-      "lng": 77.1610992,
-      "elevation": "387 m"
+      "lat": 24.4365214,
+      "lng": 77.161118,
+      "elevation": null
     },
     "batteryLevel": 20,
     "networkSignal": "Mobile GNSS (Online)",
@@ -65,8 +101,111 @@
         "number": "SP-737323"
       }
     ],
-    "activeTripId": null,
-    "lastPing": "2026-11-17T19:10:28.506Z"
+    "activeTripId": "f0c11a23-4202-48a9-8ba5-51874a05a1d0",
+    "lastPing": "2026-11-17T19:10:28.506Z",
+    "lastAlertTimestamp": "2026-11-17T19:10:18.074724+00:00"
+  },
+  {
+    "id": "usr_kailash_traveler",
+    "fullName": "Kailash Traveler",
+    "email": "kailashtraveler@gmail.com",
+    "phone": "+91 98765 43210",
+    "emergencyContact": "+91 98765 43210",
+    "status": "Online",
+    "currentLocation": {
+      "name": "GPS Fix (32.1000, 77.1000)",
+      "lat": 32.1,
+      "lng": 77.1,
+      "elevation": null
+    },
+    "batteryLevel": null,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of Kailash Traveler",
+        "relation": "Family Emergency Contact",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-KAI-8637"
+      }
+    ],
+    "activeTripId": "8c4a54b5-3e39-4a68-9cee-d74d2098410e",
+    "lastAlertTimestamp": "2026-11-17T16:52:22.30182+00:00",
+    "lastPing": "2026-11-17T16:52:22.30182+00:00",
+    "source": "Supabase"
+  },
+  {
+    "id": "usr_tenzing_norgay",
+    "fullName": "Tenzing Norgay",
+    "email": "tenzingnorgay@gmail.com",
+    "phone": "+91 98765 43210",
+    "emergencyContact": "+91 98765 43210",
+    "status": "Online",
+    "currentLocation": {
+      "name": "GPS Fix (32.3816, 77.2225)",
+      "lat": 32.3816,
+      "lng": 77.2225,
+      "elevation": null
+    },
+    "batteryLevel": 86,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of Tenzing Norgay",
+        "relation": "Family Emergency Contact",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-TEN-1653"
+      }
+    ],
+    "activeTripId": "bd7e1521-9167-4fbd-84bb-36eb20637be9",
+    "lastAlertTimestamp": "2026-11-17T16:52:16.509374+00:00",
+    "lastPing": "2026-11-17T16:52:16.509374+00:00",
+    "source": "Supabase"
+  },
+  {
+    "id": "adm_01",
+    "fullName": "Priya Sharma (Verified)",
+    "email": "admin@stsms.gov",
+    "phone": "+91 91234 56789",
+    "bloodGroup": "O+",
+    "emergencyContact": "+91 99887 76655",
+    "status": "Monitored",
+    "guardians": [
+      {
+        "name": "Anita Sharma (Mother)",
+        "phone": "+91 99887 76655",
+        "relation": "Family",
+        "verified": true
+      }
+    ],
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Priya%20Sharma%20(Verified)",
+    "createdAt": "2026-11-17T08:36:27.743Z",
+    "updatedAt": "2026-11-17T16:48:57.123Z",
+    "currentLocation": {
+      "name": "Emergency GPS Fix (32.2410, 77.1895)",
+      "lat": 32.241,
+      "lng": 77.1895,
+      "elevation": null
+    },
+    "batteryLevel": 93,
+    "lastPing": "2026-11-17T16:49:04.621Z",
+    "networkSignal": "Connected (GNSS Active)",
+    "offlineDurationMinutes": 0
   },
   {
     "id": "usr_1794933686909",
@@ -211,34 +350,6 @@
     "updatedAt": "2026-11-17T09:25:20.774Z"
   },
   {
-    "id": "adm_01",
-    "fullName": "Priya Sharma (Verified)",
-    "email": "admin@stsms.gov",
-    "phone": "+91 91234 56789",
-    "bloodGroup": "O+",
-    "emergencyContact": "+91 99887 76655",
-    "status": "Monitored",
-    "guardians": [
-      {
-        "name": "Anita Sharma (Mother)",
-        "phone": "+91 99887 76655",
-        "relation": "Family",
-        "verified": true
-      }
-    ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Priya%20Sharma%20(Verified)",
-    "createdAt": "2026-11-17T08:36:27.743Z",
-    "updatedAt": "2026-11-17T16:48:57.123Z",
-    "currentLocation": {
-      "name": "Emergency GPS Fix (32.2410, 77.1895)",
-      "lat": 32.241,
-      "lng": 77.1895,
-      "elevation": null
-    },
-    "batteryLevel": 93,
-    "lastPing": "2026-11-17T16:49:04.621Z"
-  },
-  {
     "id": "usr_1794894334386",
     "fullName": "arnav",
     "email": "arnav@gmail.com",
@@ -306,6 +417,42 @@
     "activeTripId": null,
     "lastPing": "2026-11-17T05:45:10.057Z",
     "speedKmH": 0
+  },
+  {
+    "id": "usr_audit_verification_peak",
+    "fullName": "Audit Verification Peak",
+    "email": "auditverificationpeak@gmail.com",
+    "phone": "+91 98765 43210",
+    "emergencyContact": "+91 98765 43210",
+    "status": "Online",
+    "currentLocation": {
+      "name": "GPS Fix (32.2980, 77.1980)",
+      "lat": 32.298,
+      "lng": 77.198,
+      "elevation": null
+    },
+    "batteryLevel": 85,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of Audit Verification Peak",
+        "relation": "Family Emergency Contact",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-AUD-6192"
+      }
+    ],
+    "activeTripId": "cc859703-c9ee-4b99-95c2-7a12ef52628f",
+    "lastAlertTimestamp": "2026-11-16T07:56:56.618366+00:00",
+    "lastPing": "2026-11-16T07:56:56.618366+00:00",
+    "source": "Supabase"
   },
   {
     "id": "usr_1793704367014",
@@ -463,5 +610,77 @@
     "documents": [],
     "activeTripId": null,
     "lastPing": "2026-10-27T08:01:03.070Z"
+  },
+  {
+    "id": "usr_champak_chacha",
+    "fullName": "Champak chacha",
+    "email": "qwerty@gmail.com",
+    "phone": "+91 98765 43210",
+    "emergencyContact": "+91 98765 43210",
+    "status": "Online",
+    "currentLocation": {
+      "name": "GPS Fix (24.4365, 77.1611)",
+      "lat": 24.4365117,
+      "lng": 77.1610799,
+      "elevation": null
+    },
+    "batteryLevel": 89,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of Champak chacha",
+        "relation": "Family Emergency Contact",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-CHA-7141"
+      }
+    ],
+    "activeTripId": "682e0ada-8152-4524-a0e8-df233a6164c9",
+    "lastAlertTimestamp": "2026-10-25T19:06:37.863685+00:00",
+    "lastPing": "2026-10-25T19:06:37.863685+00:00",
+    "source": "Supabase"
+  },
+  {
+    "id": "usr_vansh_yadav",
+    "fullName": "vansh yadav",
+    "email": "vanshyadav@gmail.con",
+    "phone": "+91 98765 43210",
+    "emergencyContact": "+91 98765 43210",
+    "status": "Online",
+    "currentLocation": {
+      "name": "GPS Fix (24.4365, 77.1611)",
+      "lat": 24.4365162,
+      "lng": 77.1610745,
+      "elevation": null
+    },
+    "batteryLevel": 27,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of vansh yadav",
+        "relation": "Family Emergency Contact",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-VAN-8883"
+      }
+    ],
+    "activeTripId": "682e0ada-8152-4524-a0e8-df233a6164c9",
+    "lastAlertTimestamp": "2026-10-25T19:03:55.557568+00:00",
+    "lastPing": "2026-10-25T19:03:55.557568+00:00",
+    "source": "Supabase"
   }
 ]
