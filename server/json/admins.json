@@ -14,7 +14,7 @@
     "email": "admin@stsms.gov",
     "password": "$2a$10$pfedtxwPkvmGFN13IoTARefOPqv46L8I.tC/Gk31kKIXmQlliaULu",
     "role": "Super Admin",
-    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80",
     "department": "National Tourist Emergency Response",
     "createdAt": "2026-01-15T08:30:00.000Z",
     "phone": "+91 91234 56789"

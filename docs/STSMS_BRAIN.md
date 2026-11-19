@@ -566,7 +566,107 @@ The root causes of request cancellations observed during device registration wer
 
 ---
 
-## 13. Brain Maintenance Rules
+## 13. Phase 6 — Emergency Escalation, Device Intelligence & Mobile-Admin Data Synchronization
+
+### 13.1 Automatic Safe Travel Zone Breach Escalation Workflow
+Phase 6 implements a robust, idempotent, and fault-tolerant 10-second automatic escalation workflow for Safe Travel Zone boundary departures:
+1. **Genuine Boundary Breach Detection:**
+   - Evaluated by `useSafeZoneGeofence.js` (mobile foreground/background tracking) and `updateSafeZoneLocation` (server-side FSM).
+   - Rejects stale GPS readings (>180s old) and readings with poor accuracy (>80m).
+   - Requires consecutive outside-location confirmation (>= 2 verified readings beyond the 5 km circular geofence boundary).
+   - Confirms that the tourist was previously in the active zone (`hasEnteredZone === true`).
+2. **Prominent Mobile Warning:**
+   - Immediately presents warning view in `SafeZoneStatusCard.jsx`:
+     - Heading: `"YOU HAVE LEFT YOUR SAFE TRAVEL ZONE!"`
+     - Subtext: `"Please return inside your 5 km safety boundary. If you are safe, confirm below."`
+     - Displays Destination name, Distance from destination, Current GPS coordinates, and 10-second countdown indicator.
+     - Visible prominent action: `"I AM SAFE"`.
+     - Backgrounded notifications enabled via Android notifications.
+3. **10-Second Response Window & Persistence:**
+   - Incident expiration timestamp (`stsms_breach_warning_expires_at`) persisted to `AsyncStorage` to ensure app restarts do not reset or cancel the timer.
+4. **Tourist Confirms Safety ("I AM SAFE"):**
+   - Dispatches `POST /api/safe-zones/:id/acknowledge-warning` with GPS fix and timestamp.
+   - Halts countdown, clears storage, resets trip state to `ACTIVE`, logs `WARNING_ACKNOWLEDGED_SAFE` audit trail entry in trip history.
+   - **Crucial Rule:** NO emergency SOS alert is generated in Supabase or `alerts.json`. Monitoring continues without terminating the trip.
+5. **10 Seconds Expire Without Response:**
+   - Dispatches `POST /api/safe-zones/:id/escalate-breach`.
+   - Creates a genuine emergency incident associated with the authenticated tourist, active trip, latest GPS coordinates, battery level, network status, and hardware device telemetry.
+   - Sets exact required incident description: `"AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds."`
+   - Real-time Admin Command Center notification via existing feed and 3s polling mechanism.
+6. **Strict Idempotency:**
+   - Server-side FSM validates active incident IDs (`trip.activeAlertId`). Repeated breach pings or network retries update the active alert telemetry instead of spawning duplicate cards.
+
+### 13.2 Hardware Device Intelligence Telemetry
+The mobile application collects 11 hardware telemetry points via Expo and React Native hardware APIs (`stsms-mobile/app/utils/deviceInfo.js`):
+1. `manufacturer` (e.g. `Google`, `Samsung`, `Apple`)
+2. `model` (e.g. `Pixel 7`, `Galaxy S23`, `iPhone 15`)
+3. `platform` (`Android` / `iOS`)
+4. `androidVersion` (e.g. `14`, `15`)
+5. `osVersion` (API Level / Build release)
+6. `appVersion` (e.g. `1.0.0`)
+7. `appBuildNumber` (e.g. `1`)
+8. `batteryPercentage` (e.g. `62%`)
+9. `batteryChargingStatus` (`Charging`, `Discharging`, `Full`, `Not Charging`)
+10. `networkConnectionType` (`Mobile App (Cellular/Wi-Fi)`, `Offline GNSS`)
+11. `lastTelemetryUpdate` (ISO 8601 timestamp)
+
+When telemetry is not transmitted (e.g. legacy alerts or offline beacons), the Admin Command Center displays `"Unavailable"` for individual missing fields rather than crashing or showing blank values.
+
+### 13.3 Tourist Identity Resolution & Profile Picture Integration
+1. **Multi-Tenant Identity Parsing:**
+   - Addressed root cause where shared Supabase authentication ID (`3614e1d0-...`) erroneously mapped alerts to `chotu` instead of the actual author (`bhoot`).
+   - `alertController.js` prioritizes specific author extraction from the alert message and trip title (`"🚨 MANUAL SOS triggered by bhoot!"` -> author: `bhoot`), searching the user registry by name before falling back to auth ID.
+2. **Supabase Storage `avatars` Bucket:**
+   - Created public `avatars` storage bucket with direct upload endpoint `POST /api/profile/avatar`.
+   - Persists avatar URLs across `users.json`, `admins.json`, and Supabase `profiles.medical_info.avatar_url`.
+3. **Initials Fallback Badge (Zero Blank Profiles):**
+   - Everywhere avatars are rendered (`AlertDetailModal.jsx`, `AlertCard.jsx`, `UserTable.jsx`, `UserDetailModal.jsx`, `ExpeditionPermitCard.jsx`, `HomeScreen.jsx`, `ProfileScreen.jsx`), missing or failing image URLs fall back gracefully to a high-contrast circular badge displaying the tourist's initials.
+   - Eliminates generic blank silhouettes and prevents displaying photos of other tourists.
+
+### 13.4 Destination-Specific Verified Image Mapping
+Resolved issue where destinations like Agra Airport defaulted to an unrelated monument (Sanchi Stupa):
+- Created centralized image registry `server/utils/destinationImages.js` and `stsms-mobile/app/utils/destinationImages.js`.
+- Keyword-based resolution maps destinations to verified Unsplash imagery:
+  - `Agra Airport` -> Verified modern airport terminal & tarmac (`photo-1542296332-2e4473faf563`)
+  - `Sanchi Stupa` -> Verified Buddhist Great Stupa complex (`photo-1590050752117-238cb0fb12b1`)
+  - `Rohtang Pass` -> Verified high-altitude Himalayan mountain pass (`photo-1544735716-392fe2489ffa`)
+  - `Solang Valley` -> Verified green alpine valley & stream (`photo-1506744038136-46273834b3fb`)
+  - Unlisted / New Destinations -> Verified neutral topography mountain trail placeholder (`photo-1508873696983-2df5293cb395`)
+- Safe zone trips persist `imageUrl` directly upon creation.
+
+### 13.5 Removal of Direct 112 Helpline Buttons
+- Removed `"Call Police / Ambulance (112)"` and `"Call Helpline (112)"` from `EmergencyModal.jsx` and `SafeZoneStatusCard.jsx`.
+- Preserved all surrounding warning banners, 10-second and 5-second countdown rings, "Cancel SOS", "I AM SAFE", and "Send SOS Now" actions.
+
+### 13.6 Dashboard Expeditions & User Registry Fixes
+1. **Fix for "Failed to load tourist details":**
+   - Corrected duplicate syntax closing block in `server/controllers/profileController.js` that previously halted the Express server process.
+   - Added null-safe guards in `userController.js` `getUserById` for tourists with undefined names or missing document prefixes.
+2. **Dashboard "Active Expeditions & Checkpoints":**
+   - Sorted `ExpeditionPermitCard.jsx` members to prioritize tourists currently in `EMERGENCY` / `SOS DISTRESS` or with active corridor trips at the very top of the list.
+
+### 13.7 Phase 6 Verification Test Results (13/13 PASSED)
+Verified via automated end-to-end integration test suite `server/scripts/testPhase6Verification.js`:
+
+| Scenario | Test Scope | Result | Details |
+|---|---|---|---|
+| **1** | Agra Airport Image Resolution | **PASS** | Resolves to verified airport terminal image (`photo-1542296332-2e4473faf563`). |
+| **2** | Sanchi Stupa Image Resolution | **PASS** | Resolves to verified stupa monument image (`photo-1590050752117-238cb0fb12b1`). |
+| **3** | Rohtang Pass Image Resolution | **PASS** | Resolves to verified high-altitude pass image (`photo-1544735716-392fe2489ffa`). |
+| **4** | Unlisted Destination Fallback | **PASS** | Resolves to neutral topography/trail image (`photo-1508873696983-2df5293cb395`). |
+| **5** | Safe Zone Trip Creation | **PASS** | Trip created with 5 km radius boundary and verified `imageUrl`. |
+| **6** | Inside Boundary Location Ping | **PASS** | GPS at 45m distance maintains `ACTIVE` status. |
+| **7** | Boundary Breach Detection | **PASS** | GPS at 20,838m triggers `WARNING` state with 10-second countdown. |
+| **8** | "I AM SAFE" Warning Acknowledgment | **PASS** | Acknowledges warning, cancels timer, resets to `ACTIVE`, creates zero SOS alerts. |
+| **9** | Unacknowledged Breach Escalation | **PASS** | Creates `AUTOMATIC_SAFEZONE_BREACH` alert with required description and full device telemetry. |
+| **10** | Breach Lifecycle Idempotency | **PASS** | Duplicate escalation calls update active alert telemetry without creating duplicate alerts. |
+| **11** | Profile Avatar Persistence | **PASS** | Uploads avatar to Supabase storage bucket `avatars` and persists URL across profiles. |
+| **12** | Tourist Dossier Inspection | **PASS** | `/api/users/:id` loads complete identity, guardians, documents & trips without errors. |
+| **13** | Admin Incident Telemetry Inspection | **PASS** | `/api/alerts/:id` returns tourist identity (`bhoot`, email, phone) and 11 device telemetry attributes. |
+
+---
+
+## 14. Brain Maintenance Rules
 
 Every future task and engineer MUST follow this workflow:
 1. **Read `docs/STSMS_BRAIN.md` first.**
@@ -575,4 +675,5 @@ Every future task and engineer MUST follow this workflow:
 4. After implementation, update the relevant Brain sections.
 5. Record modified files, API contracts, and schema changes.
 6. Record test results and update the Verification Status table.
+
 

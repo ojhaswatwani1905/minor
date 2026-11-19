@@ -5,8 +5,10 @@ import * as TaskManager from 'expo-task-manager';
 import { safeZoneService } from '../services/safeZoneService';
 import { emergencyService } from '../services/emergencyService';
 import { storage } from '../utils/storage';
+import { getDeviceTelemetry } from '../utils/deviceInfo';
 
 export const SAFEZONE_BACKGROUND_TASK_NAME = 'STSMS_BACKGROUND_SAFEZONE_TASK';
+const WARNING_EXPIRY_STORAGE_KEY = 'stsms_breach_warning_expires_at';
 
 // Module-level task definition (Required by Expo TaskManager)
 try {
@@ -33,16 +35,16 @@ try {
           }
         }
       } catch (err) {
-        console.warn('[BACKGROUND TASK PROCESSING NOTE]', err.message);
+        console.warn('[BACKGROUND SYNC NOTE]', err.message);
       }
     }
   });
-} catch (defErr) {
-  console.log('[TASKMANAGER DEFINITION NOTE]', defErr.message);
+} catch (taskDefErr) {
+  console.log('[TASK MANAGER DEFINE NOTE]:', taskDefErr.message);
 }
 
-// Haversine formula to compute distance in meters between two lat/lon points
-export const calculateDistanceMeters = (lat1, lon1, lat2, lon2) => {
+// Haversine distance calculator helper
+const calculateDistanceMeters = (lat1, lon1, lat2, lon2) => {
   const R = 6371000;
   const toRad = (x) => (x * Math.PI) / 180;
   const dLat = toRad(lat2 - lat1);
@@ -61,7 +63,7 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
   const [distanceOutsideMeters, setDistanceOutsideMeters] = useState(0);
   const [status, setStatus] = useState(initialTrip?.status || 'APPROACHING');
   const [warningActive, setWarningActive] = useState(false);
-  const [warningCountdown, setWarningCountdown] = useState(30);
+  const [warningCountdown, setWarningCountdown] = useState(10);
   const [hasEnteredZone, setHasEnteredZone] = useState(Boolean(initialTrip?.hasEnteredZone));
   const [consecutiveOutsideCount, setConsecutiveOutsideCount] = useState(0);
   const [batteryLevel, setBatteryLevel] = useState(null);
@@ -74,6 +76,7 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
   const countdownIntervalRef = useRef(null);
   const consecutiveOutsideRef = useRef(0);
   const isBreachingRef = useRef(false);
+  const latestCoordsRef = useRef(null);
 
   // Sync internal state when initialTrip changes
   useEffect(() => {
@@ -97,21 +100,43 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
     })();
   }, []);
 
-  // Request foreground & background permissions with explanations
+  // Check persisted incident state across app restarts
+  useEffect(() => {
+    if (!activeZone?.id) return;
+    (async () => {
+      try {
+        const storedExpiry = await storage.getItem(WARNING_EXPIRY_STORAGE_KEY);
+        if (storedExpiry) {
+          const expTime = parseInt(storedExpiry, 10);
+          const remainingSec = Math.ceil((expTime - Date.now()) / 1000);
+          if (remainingSec > 0) {
+            setWarningActive(true);
+            setStatus('WARNING');
+            startCountdown(remainingSec);
+          } else if (status !== 'BREACHED') {
+            // Expired while app was backgrounded or terminated
+            await storage.removeItem(WARNING_EXPIRY_STORAGE_KEY);
+            handleEscalateBreach();
+          }
+        }
+      } catch (e) {}
+    })();
+  }, [activeZone?.id]);
+
+  // Request foreground & background permissions
   useEffect(() => {
     (async () => {
       try {
         const { status: fgStatus } = await Location.requestForegroundPermissionsAsync();
         if (fgStatus === 'granted') {
           setPermissionGranted(true);
-
           try {
             const { status: bgStatus } = await Location.requestBackgroundPermissionsAsync();
             if (bgStatus === 'granted') {
               setBackgroundPermissionGranted(true);
             }
           } catch (bgErr) {
-            console.log('Background location permission note (may require Dev Build):', bgErr.message);
+            console.log('Background location permission note:', bgErr.message);
           }
         }
       } catch (err) {
@@ -132,23 +157,22 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
               timeInterval: 15000,
               distanceInterval: 50,
               foregroundService: {
-                notificationTitle: 'STSMS 5km Safe Travel Zone Active',
-                notificationBody: 'Automated geofence emergency monitoring is active in the background.',
-                notificationColor: '#06b6d4'
+                notificationTitle: warningActive ? 'YOU HAVE LEFT YOUR SAFE TRAVEL ZONE!' : 'STSMS 5km Safe Travel Zone Active',
+                notificationBody: warningActive ? 'Please return inside your boundary. Open app to confirm safety.' : 'Automated geofence emergency monitoring is active in the background.',
+                notificationColor: warningActive ? '#FF3B69' : '#06b6d4'
               },
               pausesLocationUpdatesAutomatically: false,
               showsBackgroundLocationIndicator: true
             });
-            console.log('[SAFEZONE] Registered background TaskManager location updates.');
           }
         } catch (e) {
           console.log('[SAFEZONE BACKGROUND REGISTER NOTE]:', e.message);
         }
       })();
     }
-  }, [backgroundPermissionGranted, activeZone?.id, status]);
+  }, [backgroundPermissionGranted, activeZone?.id, status, warningActive]);
 
-  // Core Geofencing Evaluation Cycle (every 8 seconds when active zone exists)
+  // Core Geofencing Evaluation Cycle (every 6 seconds when active zone exists)
   useEffect(() => {
     if (!activeZone || !activeZone.destinationCoords || status === 'COMPLETED' || status === 'PAUSED') {
       return;
@@ -188,11 +212,13 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
         }
 
         const now = new Date().toLocaleTimeString();
-        setCurrentCoords({ lat, lng, accuracy });
+        const coordsObj = { lat, lng, accuracy };
+        setCurrentCoords(coordsObj);
+        latestCoordsRef.current = coordsObj;
         setGpsAccuracy(accuracy);
         setLastFixTime(now);
 
-        // Discard poor fixes from boundary evaluations
+        // Discard poor fixes from boundary evaluations (>80m threshold)
         if (accuracy > 80) {
           console.log(`[SafeZone GPS] Inaccurate fix discarded (${accuracy}m > 80m threshold).`);
           return;
@@ -209,9 +235,7 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
         setDistanceMeters(dist);
         setDistanceOutsideMeters(distOutside);
 
-        // ==========================================
         // Client-Side Geofence Evaluation & Transitions
-        // ==========================================
         if (!hasEnteredZone) {
           if (isInside) {
             // First time entry into the 5 km safe zone!
@@ -221,7 +245,6 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
             consecutiveOutsideRef.current = 0;
             setConsecutiveOutsideCount(0);
 
-            // Sync to backend
             sendTelemetry({
               lat,
               lng,
@@ -244,32 +267,27 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
               consecutiveOutsideRef.current = 0;
               setConsecutiveOutsideCount(0);
               stopCountdown();
+              await storage.removeItem(WARNING_EXPIRY_STORAGE_KEY);
             }
           } else {
             // Tourist is outside the 5 km boundary!
             consecutiveOutsideRef.current += 1;
             setConsecutiveOutsideCount(consecutiveOutsideRef.current);
 
-            if (consecutiveOutsideRef.current === 1 && !warningActive) {
-              // 1st reading outside: Trigger WARNING state & 30-sec safety countdown
+            // Require consecutive verified fixes outside (2 fixes) to avoid false positives
+            if (consecutiveOutsideRef.current >= 2 && !warningActive && status !== 'BREACHED') {
               setStatus('WARNING');
               setWarningActive(true);
-              startCountdown();
-            } else if (consecutiveOutsideRef.current >= 3 && !isBreachingRef.current) {
-              // 3 consecutive verified fixes outside: Confirm BREACH!
-              isBreachingRef.current = true;
-              setStatus('BREACHED');
-              setWarningActive(true);
-              stopCountdown();
+              startCountdown(10); // Exact 10-second response countdown
 
-              // Transmit confirmed breach to backend
               sendTelemetry({
                 lat,
                 lng,
                 accuracy,
                 speedKmH: speed,
                 batteryLevel,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                status: 'WARNING'
               });
             }
           }
@@ -279,39 +297,31 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
       }
     };
 
-    // Run initial check and set periodic interval
     checkLocationAndGeofence();
-    const interval = setInterval(checkLocationAndGeofence, 8000);
+    const interval = setInterval(checkLocationAndGeofence, 6000);
 
     return () => {
       clearInterval(interval);
     };
   }, [activeZone?.id, status, hasEnteredZone, warningActive]);
 
-  // Countdown timer for Warning State before automated breach
-  const startCountdown = () => {
+  // Ten-second countdown timer with persistent state
+  const startCountdown = (durationSeconds = 10) => {
     stopCountdown();
-    setWarningCountdown(30);
+    setWarningCountdown(durationSeconds);
+
+    const expiresAt = Date.now() + durationSeconds * 1000;
+    storage.setItem(WARNING_EXPIRY_STORAGE_KEY, String(expiresAt)).catch(() => {});
 
     countdownIntervalRef.current = setInterval(() => {
-      setWarningCountdown((prev) => {
-        if (prev <= 1) {
-          stopCountdown();
-          // Countdown reached zero without confirmation: escalate to BREACHED
-          setStatus('BREACHED');
-          if (currentCoords) {
-            sendTelemetry({
-              lat: currentCoords.lat,
-              lng: currentCoords.lng,
-              accuracy: gpsAccuracy,
-              batteryLevel,
-              timestamp: new Date().toISOString()
-            });
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
+      const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
+      setWarningCountdown(remaining);
+
+      if (remaining <= 0) {
+        stopCountdown();
+        storage.removeItem(WARNING_EXPIRY_STORAGE_KEY).catch(() => {});
+        handleEscalateBreach();
+      }
     }, 1000);
   };
 
@@ -319,6 +329,40 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
     if (countdownIntervalRef.current) {
       clearInterval(countdownIntervalRef.current);
       countdownIntervalRef.current = null;
+    }
+  };
+
+  // Step 5: Escalate unacknowledged breach to Admin Command Center
+  const handleEscalateBreach = async () => {
+    if (isBreachingRef.current) return;
+    isBreachingRef.current = true;
+    setStatus('BREACHED');
+    setWarningActive(false);
+
+    try {
+      const coords = latestCoordsRef.current || currentCoords;
+      const devTelemetry = await getDeviceTelemetry(batteryLevel);
+
+      const breachPayload = {
+        lat: coords?.lat || 24.4346,
+        lng: coords?.lng || 77.1619,
+        accuracy: coords?.accuracy || gpsAccuracy || 15,
+        battery: batteryLevel != null ? batteryLevel : devTelemetry.batteryPercentage,
+        deviceInfo: devTelemetry,
+        distanceMeters,
+        distanceOutside: distanceOutsideMeters,
+        timestamp: new Date().toISOString()
+      };
+
+      if (activeZone?.id) {
+        const res = await safeZoneService.escalateBreach(activeZone.id, breachPayload);
+        if (res.success && res.trip) {
+          setActiveZone(res.trip);
+          onStateChange && onStateChange(res.trip);
+        }
+      }
+    } catch (e) {
+      console.error('[ESCALATE BREACH ERROR]', e.message);
     }
   };
 
@@ -344,9 +388,11 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
     }
   };
 
-  // Tourist confirms "I Am Safe"
+  // Step 4: Tourist confirms safety ("I AM SAFE")
+  // Stops countdown, records acknowledgement, NO SOS alert created.
   const confirmSafe = async (note = 'Tourist confirmed safe in-app') => {
     stopCountdown();
+    await storage.removeItem(WARNING_EXPIRY_STORAGE_KEY).catch(() => {});
     setWarningActive(false);
     consecutiveOutsideRef.current = 0;
     setConsecutiveOutsideCount(0);
@@ -355,7 +401,13 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
 
     if (!activeZone?.id) return;
     try {
-      const res = await safeZoneService.confirmSafe(activeZone.id, note);
+      const coords = latestCoordsRef.current || currentCoords;
+      const res = await safeZoneService.acknowledgeWarning(activeZone.id, {
+        lat: coords?.lat || null,
+        lng: coords?.lng || null,
+        timestamp: new Date().toISOString(),
+        note
+      });
       if (res.success && res.trip) {
         setActiveZone(res.trip);
         onStateChange && onStateChange(res.trip);
@@ -368,6 +420,7 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
   // Pause monitoring
   const pauseMonitoring = async () => {
     stopCountdown();
+    await storage.removeItem(WARNING_EXPIRY_STORAGE_KEY).catch(() => {});
     setWarningActive(false);
     setStatus('PAUSED');
     if (activeZone?.id) {
@@ -387,6 +440,7 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
   // End trip
   const endSafeZone = async () => {
     stopCountdown();
+    await storage.removeItem(WARNING_EXPIRY_STORAGE_KEY).catch(() => {});
     setWarningActive(false);
     setStatus('COMPLETED');
     try {
@@ -424,4 +478,3 @@ export const useSafeZoneGeofence = (initialTrip = null, onStateChange = null) =>
     endSafeZone
   };
 };
-

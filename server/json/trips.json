@@ -1,5 +1,221 @@
 [
   {
+    "id": "sz_trp_1795110205275",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "userPhone": "+91 98765 43210",
+    "destination": "Agra Airport",
+    "destinationName": "Agra Airport",
+    "destinationCoords": {
+      "lat": 27.1558,
+      "lng": 77.9654
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1542296332-2e4473faf563?w=800&q=80",
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-19T17:43:25.275Z",
+    "currentLocation": {
+      "lat": 27.31,
+      "lng": 78.11,
+      "accuracy": 25,
+      "name": "GPS Fix (27.3100, 78.1100)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 22325,
+    "distanceOutsideBoundaryMeters": 17325,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 1,
+    "warningStartedAt": null,
+    "breachConfirmedAt": "2026-11-19T17:43:29.980Z",
+    "activeAlertId": "d6c7cd1e-04db-413a-b2e9-d5e1973f5720",
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-19T17:43:25.275Z",
+    "updatedAt": "2026-11-19T17:43:29.980Z",
+    "history": [
+      {
+        "timestamp": "2026-11-19T17:43:29.980Z",
+        "event": "AUTOMATIC_BREACH_ESCALATED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "alertId": "d6c7cd1e-04db-413a-b2e9-d5e1973f5720",
+        "note": "AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds."
+      },
+      {
+        "timestamp": "2026-11-19T17:43:28.013Z",
+        "event": "AUTOMATIC_BREACH_ESCALATED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "alertId": "d6c7cd1e-04db-413a-b2e9-d5e1973f5720",
+        "note": "AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds."
+      },
+      {
+        "timestamp": "2026-11-19T17:43:28.011Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 22325,
+        "distanceOutside": 17325,
+        "note": "Tourist crossed 5km perimeter. Outside by 17325m. 10-second emergency grace countdown initiated."
+      },
+      {
+        "timestamp": "2026-11-19T17:43:28.007Z",
+        "event": "WARNING_ACKNOWLEDGED_SAFE",
+        "previousStatus": "WARNING",
+        "status": "ACTIVE",
+        "coords": null,
+        "note": "Tourist acknowledged safety warning (\"I AM SAFE\") within 10-second grace countdown. No emergency alert dispatched."
+      },
+      {
+        "timestamp": "2026-11-19T17:43:28.004Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 20838,
+        "distanceOutside": 15838,
+        "note": "Tourist crossed 5km perimeter. Outside by 15838m. 10-second emergency grace countdown initiated."
+      },
+      {
+        "timestamp": "2026-11-19T17:43:25.275Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Agra Airport (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 25,
+    "lastPingAt": "2026-11-19T17:43:28.011Z",
+    "warningExpiresAt": null,
+    "warningAcknowledged": false,
+    "warningAcknowledgedAt": "2026-11-19T17:43:28.007Z",
+    "deviceInfo": {
+      "manufacturer": "Google",
+      "model": "Pixel 7",
+      "platform": "Android",
+      "androidVersion": "14",
+      "osVersion": "UpsideDownCake",
+      "appVersion": "1.0.0",
+      "appBuildNumber": "1",
+      "batteryPercentage": 78,
+      "batteryChargingStatus": "Discharging",
+      "networkConnectionType": "Mobile App (Cellular/Wi-Fi)",
+      "lastTelemetryUpdate": "2026-11-19T17:43:28.013Z"
+    },
+    "supabaseTripId": "ae6605b2-b036-45ce-a90d-c41299dd4ad1"
+  },
+  {
+    "id": "sz_trp_1795110018416",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "userPhone": "+91 98765 43210",
+    "destination": "Agra Airport",
+    "destinationName": "Agra Airport",
+    "destinationCoords": {
+      "lat": 27.1558,
+      "lng": 77.9654
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1542296332-2e4473faf563?w=800&q=80",
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-19T17:40:18.416Z",
+    "currentLocation": {
+      "lat": 27.31,
+      "lng": 78.11,
+      "accuracy": 25,
+      "name": "GPS Fix (27.3100, 78.1100)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 22325,
+    "distanceOutsideBoundaryMeters": 17325,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 1,
+    "warningStartedAt": null,
+    "breachConfirmedAt": "2026-11-19T17:40:27.547Z",
+    "activeAlertId": "95655374-d3a0-46d4-be27-c58180ea3f21",
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-19T17:40:18.416Z",
+    "updatedAt": "2026-11-19T17:40:27.547Z",
+    "history": [
+      {
+        "timestamp": "2026-11-19T17:40:27.547Z",
+        "event": "AUTOMATIC_BREACH_ESCALATED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "alertId": "95655374-d3a0-46d4-be27-c58180ea3f21",
+        "note": "AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds."
+      },
+      {
+        "timestamp": "2026-11-19T17:40:20.685Z",
+        "event": "AUTOMATIC_BREACH_ESCALATED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "alertId": "95655374-d3a0-46d4-be27-c58180ea3f21",
+        "note": "AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds."
+      },
+      {
+        "timestamp": "2026-11-19T17:40:20.683Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 22325,
+        "distanceOutside": 17325,
+        "note": "Tourist crossed 5km perimeter. Outside by 17325m. 10-second emergency grace countdown initiated."
+      },
+      {
+        "timestamp": "2026-11-19T17:40:20.677Z",
+        "event": "WARNING_ACKNOWLEDGED_SAFE",
+        "previousStatus": "WARNING",
+        "status": "ACTIVE",
+        "coords": null,
+        "note": "Tourist acknowledged safety warning (\"I AM SAFE\") within 10-second grace countdown. No emergency alert dispatched."
+      },
+      {
+        "timestamp": "2026-11-19T17:40:20.675Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 20838,
+        "distanceOutside": 15838,
+        "note": "Tourist crossed 5km perimeter. Outside by 15838m. 10-second emergency grace countdown initiated."
+      },
+      {
+        "timestamp": "2026-11-19T17:40:18.416Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Agra Airport (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 25,
+    "lastPingAt": "2026-11-19T17:40:20.683Z",
+    "warningExpiresAt": null,
+    "warningAcknowledged": false,
+    "warningAcknowledgedAt": "2026-11-19T17:40:20.677Z",
+    "deviceInfo": {
+      "manufacturer": "Google",
+      "model": "Pixel 7",
+      "platform": "Android",
+      "androidVersion": "14",
+      "osVersion": "UpsideDownCake",
+      "appVersion": "1.0.0",
+      "appBuildNumber": "1",
+      "batteryPercentage": 78,
+      "batteryChargingStatus": "Discharging",
+      "networkConnectionType": "Mobile App (Cellular/Wi-Fi)",
+      "lastTelemetryUpdate": "2026-11-19T17:40:20.685Z"
+    },
+    "supabaseTripId": "1a0fd205-57b7-4cb3-828b-ce0da66957e6"
+  },
+  {
     "id": "sz_trp_1794934340117",
     "userId": "usr_test_k",
     "userName": "Kailash Traveler",
@@ -64,7 +280,8 @@
     ],
     "lastAccuracyMeters": 12,
     "lastPingAt": "2026-11-17T16:52:25.209Z",
-    "supabaseTripId": "8c4a54b5-3e39-4a68-9cee-d74d2098410e"
+    "supabaseTripId": "8c4a54b5-3e39-4a68-9cee-d74d2098410e",
+    "imageUrl": "https://images.unsplash.com/photo-1570789210967-2cac24afeb00?w=800&q=80"
   },
   {
     "id": "sz_trp_1794934333392",
@@ -158,7 +375,8 @@
     ],
     "lastAccuracyMeters": 18,
     "lastPingAt": "2026-11-17T16:52:20.113Z",
-    "supabaseTripId": "bd7e1521-9167-4fbd-84bb-36eb20637be9"
+    "supabaseTripId": "bd7e1521-9167-4fbd-84bb-36eb20637be9",
+    "imageUrl": "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=800&q=80"
   },
   {
     "id": "sz_trp_1794904544639",
@@ -225,7 +443,8 @@
     ],
     "lastAccuracyMeters": 12,
     "lastPingAt": "2026-11-17T08:35:50.079Z",
-    "supabaseTripId": "7cc861a5-58b0-4953-930b-302b357a56f3"
+    "supabaseTripId": "7cc861a5-58b0-4953-930b-302b357a56f3",
+    "imageUrl": "https://images.unsplash.com/photo-1570789210967-2cac24afeb00?w=800&q=80"
   },
   {
     "id": "sz_trp_1794904537753",
@@ -319,7 +538,8 @@
     ],
     "lastAccuracyMeters": 18,
     "lastPingAt": "2026-11-17T08:35:44.634Z",
-    "supabaseTripId": "73f3eb20-badc-4bb0-b50f-b793294a97d7"
+    "supabaseTripId": "73f3eb20-badc-4bb0-b50f-b793294a97d7",
+    "imageUrl": "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=800&q=80"
   },
   {
     "id": "sz_trp_1794894386732",
@@ -367,7 +587,8 @@
       }
     ],
     "lastAccuracyMeters": 41.71500015258789,
-    "lastPingAt": "2026-11-17T17:42:24.562Z"
+    "lastPingAt": "2026-11-17T17:42:24.562Z",
+    "imageUrl": "https://images.unsplash.com/photo-1508873696983-2df5293cb395?w=800&q=80"
   },
   {
     "id": "sz_trp_1794852129259",
@@ -421,7 +642,8 @@
       }
     ],
     "lastAccuracyMeters": 52.400001525878906,
-    "lastPingAt": "2026-11-17T05:45:39.881Z"
+    "lastPingAt": "2026-11-17T05:45:39.881Z",
+    "imageUrl": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80"
   },
   {
     "id": "sz_trp_1794844069118",
@@ -488,7 +710,8 @@
     ],
     "lastAccuracyMeters": 12,
     "lastPingAt": "2026-11-16T15:47:54.567Z",
-    "supabaseTripId": "9f6a9b34-4bf4-46f8-b4f2-49ebe4d3bec9"
+    "supabaseTripId": "9f6a9b34-4bf4-46f8-b4f2-49ebe4d3bec9",
+    "imageUrl": "https://images.unsplash.com/photo-1570789210967-2cac24afeb00?w=800&q=80"
   },
   {
     "id": "sz_trp_1794844064006",
@@ -582,7 +805,8 @@
     ],
     "lastAccuracyMeters": 18,
     "lastPingAt": "2026-11-16T15:47:49.111Z",
-    "supabaseTripId": "27b1c581-f3ea-4005-a79c-5e16fc7f8ad5"
+    "supabaseTripId": "27b1c581-f3ea-4005-a79c-5e16fc7f8ad5",
+    "imageUrl": "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=800&q=80"
   },
   {
     "id": "sz_trp_1794816315145",
@@ -649,7 +873,8 @@
     ],
     "lastAccuracyMeters": 12,
     "lastPingAt": "2026-11-16T08:05:26.629Z",
-    "supabaseTripId": "3f4221ba-2c71-4525-bf7c-2f7764f6e8e0"
+    "supabaseTripId": "3f4221ba-2c71-4525-bf7c-2f7764f6e8e0",
+    "imageUrl": "https://images.unsplash.com/photo-1570789210967-2cac24afeb00?w=800&q=80"
   },
   {
     "id": "sz_trp_1794816299146",
@@ -743,7 +968,8 @@
     ],
     "lastAccuracyMeters": 18,
     "lastPingAt": "2026-11-16T08:05:15.137Z",
-    "supabaseTripId": "03d12f87-2a88-4f59-afdb-f146e7bc8f94"
+    "supabaseTripId": "03d12f87-2a88-4f59-afdb-f146e7bc8f94",
+    "imageUrl": "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=800&q=80"
   },
   {
     "id": "sz_trp_1794816118377",
@@ -817,7 +1043,8 @@
       }
     ],
     "lastAccuracyMeters": 12,
-    "lastPingAt": "2026-11-16T08:02:02.147Z"
+    "lastPingAt": "2026-11-16T08:02:02.147Z",
+    "imageUrl": "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=800&q=80"
   },
   {
     "id": "sz_trp_1794814850859",
@@ -883,7 +1110,8 @@
       }
     ],
     "lastAccuracyMeters": 12,
-    "lastPingAt": "2026-11-16T07:40:53.642Z"
+    "lastPingAt": "2026-11-16T07:40:53.642Z",
+    "imageUrl": "https://images.unsplash.com/photo-1570789210967-2cac24afeb00?w=800&q=80"
   },
   {
     "id": "sz_trp_1794814845489",
@@ -976,7 +1204,8 @@
       }
     ],
     "lastAccuracyMeters": 18,
-    "lastPingAt": "2026-11-16T07:40:50.852Z"
+    "lastPingAt": "2026-11-16T07:40:50.852Z",
+    "imageUrl": "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=800&q=80"
   },
   {
     "id": "sz_trp_1794813130795",
@@ -1057,7 +1286,8 @@
       }
     ],
     "lastAccuracyMeters": 12,
-    "lastPingAt": "2026-11-16T07:20:14.154Z"
+    "lastPingAt": "2026-11-16T07:20:14.154Z",
+    "imageUrl": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80"
   },
   {
     "id": "trip_manali_01",
@@ -1086,7 +1316,8 @@
         "passed": false,
         "timestamp": null
       }
-    ]
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1508873696983-2df5293cb395?w=800&q=80"
   },
   {
     "id": "trip_rohtang_02",
@@ -1110,7 +1341,8 @@
         "passed": false,
         "timestamp": null
       }
-    ]
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80"
   },
   {
     "id": "trip_guna_01",
@@ -1134,7 +1366,8 @@
         "passed": false,
         "timestamp": null
       }
-    ]
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1508873696983-2df5293cb395?w=800&q=80"
   },
   {
     "id": "trip_guna_02",
@@ -1158,7 +1391,7 @@
         "passed": false,
         "timestamp": null
       }
-    ]
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1599831104328-b141f60ac737?w=800&q=80"
   }
-]
 ]

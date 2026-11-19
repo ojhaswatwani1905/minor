@@ -1,5 +1,6 @@
 import { readJson, writeJson } from '../utils/jsonDb.js';
 import { isSupabaseConfigured, getSupabaseClient, mapAlertFromDb } from '../database/supabase.js';
+import { getDestinationImageUrl } from '../utils/destinationImages.js';
 
 /**
  * Helper to fetch, enrich, and sort all tourists from local DB and Supabase.
@@ -62,11 +63,13 @@ export const fetchEnrichedUsers = async () => {
               }
             ],
             activeTripId: null,
+            avatar: p.medical_info?.avatar_url || null,
             source: 'Supabase'
           });
         } else {
           if (p.full_name) users[existingIndex].fullName = p.full_name;
           if (p.phone) users[existingIndex].phone = p.phone;
+          if (p.medical_info?.avatar_url) users[existingIndex].avatar = p.medical_info.avatar_url;
         }
       });
 
@@ -347,6 +350,7 @@ export const getUserById = async (req, res, next) => {
                 userId: dt.user_id,
                 userName: extractedName,
                 destination: dt.title || 'Emergency Safe Corridor',
+                imageUrl: getDestinationImageUrl(dt.title || 'Emergency Safe Corridor'),
                 status: dt.current_state === 'sos' ? 'Emergency' : (dt.status || 'Active'),
                 boundaryRadiusKm: (dt.buffer_m || 500) / 1000,
                 createdAt: dt.start_at || new Date().toISOString()

@@ -63,39 +63,59 @@ export const SafeZoneStatusCard = ({
     return (
       <View style={[styles.warningContainer, SHADOWS.elevated]}>
         <View style={styles.warningIconCircle}>
-          <Ionicons name="warning" size={38} color="#FF9F1C" />
+          <Ionicons name="warning" size={38} color="#FF3B69" />
         </View>
-        <Text style={styles.warningTitle}>Boundary Warning</Text>
-        <Text style={styles.warningSubtitle}>You are moving outside your safe zone.</Text>
+        <Text style={[styles.warningTitle, { color: '#FF3B69', fontSize: 18, fontWeight: '900', textAlign: 'center' }]}>
+          YOU HAVE LEFT YOUR SAFE TRAVEL ZONE!
+        </Text>
+        <Text style={[styles.warningSubtitle, { textAlign: 'center', marginHorizontal: 8, marginTop: 4 }]}>
+          Please return inside your 5 km safety boundary. If you are safe, confirm below.
+        </Text>
 
         {/* Metrics Row */}
         <View style={styles.warningMetricsRow}>
           <View style={styles.warningMetricCard}>
-            <Text style={styles.warningMetricLabel}>Current Distance</Text>
-            <Text style={styles.warningMetricValue}>{distKm} km</Text>
+            <Text style={styles.warningMetricLabel}>Destination</Text>
+            <Text style={[styles.warningMetricValue, { fontSize: 13 }]} numberOfLines={1}>
+              {destinationName}
+            </Text>
           </View>
           <View style={styles.warningMetricCard}>
-            <Text style={styles.warningMetricLabel}>Allowed Radius</Text>
-            <Text style={styles.warningMetricValue}>5.0 km</Text>
+            <Text style={styles.warningMetricLabel}>Distance</Text>
+            <Text style={styles.warningMetricValue}>{distKm} km</Text>
           </View>
         </View>
+
+        {/* Current GPS location line */}
+        {currentCoords && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 6 }}>
+            <Ionicons name="location-sharp" size={13} color="#FF9F1C" style={{ marginRight: 4 }} />
+            <Text style={{ fontSize: 11, color: '#64748B', fontWeight: '600' }}>
+              GPS Fix: {currentCoords.lat.toFixed(4)}, {currentCoords.lng.toFixed(4)}
+            </Text>
+          </View>
+        )}
 
         {/* Countdown Box */}
         <View style={styles.warningCountdownBox}>
-          <Text style={styles.warningCountdownLabel}>Confirming in</Text>
-          <View style={styles.warningCountdownRing}>
-            <Text style={styles.warningCountdownTimer}>00:{String(warningCountdown).padStart(2, '0')}</Text>
+          <Text style={[styles.warningCountdownLabel, { fontWeight: '700', color: '#1E293B' }]}>
+            Escalating to Emergency SOS in:
+          </Text>
+          <View style={[styles.warningCountdownRing, { borderColor: '#FF3B69', backgroundColor: '#FFF0F5' }]}>
+            <Text style={[styles.warningCountdownTimer, { color: '#FF3B69', fontWeight: '900' }]}>
+              {warningCountdown}s
+            </Text>
           </View>
         </View>
 
-        {/* Action Buttons */}
+        {/* Prominent Action Button: I AM SAFE */}
         <TouchableOpacity
-          style={[styles.warningSafeBtn, SHADOWS.glowCoral]}
+          style={[styles.warningSafeBtn, SHADOWS.glowCoral, { backgroundColor: '#06D6A0', paddingVertical: 14 }]}
           onPress={onConfirmSafe}
           activeOpacity={0.85}
         >
-          <Ionicons name="checkmark-sharp" size={20} color="#FFFFFF" style={{ marginRight: 6 }} />
-          <Text style={styles.warningSafeBtnText}>I'm Safe</Text>
+          <Ionicons name="checkmark-done" size={22} color="#FFFFFF" style={{ marginRight: 6 }} />
+          <Text style={[styles.warningSafeBtnText, { fontSize: 16, fontWeight: '900' }]}>I AM SAFE</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -103,8 +123,8 @@ export const SafeZoneStatusCard = ({
           onPress={onTriggerSos}
           activeOpacity={0.85}
         >
-          <Ionicons name="call" size={18} color="#FF3B69" style={{ marginRight: 6 }} />
-          <Text style={styles.warningAssistBtnText}>Request Assistance</Text>
+          <Ionicons name="megaphone" size={16} color="#FF3B69" style={{ marginRight: 6 }} />
+          <Text style={styles.warningAssistBtnText}>Send SOS Beacon Immediately</Text>
         </TouchableOpacity>
       </View>
     );
@@ -148,15 +168,6 @@ export const SafeZoneStatusCard = ({
         >
           <Ionicons name="checkmark-done" size={20} color="#1E293B" style={{ marginRight: 6 }} />
           <Text style={styles.breachedSafeBtnText}>I'm Safe Now</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.breachedCallBtn}
-          onPress={onTriggerSos}
-          activeOpacity={0.85}
-        >
-          <Ionicons name="call" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
-          <Text style={styles.breachedCallBtnText}>Call Helpline (112)</Text>
         </TouchableOpacity>
       </View>
     );

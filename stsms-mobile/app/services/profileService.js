@@ -17,5 +17,12 @@ export const profileService = {
       method: 'PUT',
       body: JSON.stringify(guardianData),
     });
+  },
+
+  uploadAvatar: async (avatarData) => {
+    return await apiFetch('/profile/avatar', {
+      method: 'POST',
+      body: JSON.stringify({ avatarData }),
+    });
   }
 };

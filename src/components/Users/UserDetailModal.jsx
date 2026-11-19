@@ -30,8 +30,23 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
         {/* Header Profile Summary */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#1E3732] border border-white/10 shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-honey via-[#E5A93C] to-[#F3C878] text-[#25433E] font-black text-xl flex items-center justify-center shadow-lg">
-              {userDetail.fullName.charAt(0)}
+            {userDetail.avatar ? (
+              <img
+                src={userDetail.avatar}
+                alt={userDetail.fullName}
+                className="w-14 h-14 rounded-2xl object-cover border-2 border-honey/40 shadow-lg"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const next = e.currentTarget.nextElementSibling;
+                  if (next) next.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div
+              style={{ display: userDetail.avatar ? 'none' : 'flex' }}
+              className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-honey via-[#E5A93C] to-[#F3C878] text-[#25433E] font-black text-xl items-center justify-center shadow-lg"
+            >
+              {(userDetail.fullName || 'T').charAt(0).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-2">

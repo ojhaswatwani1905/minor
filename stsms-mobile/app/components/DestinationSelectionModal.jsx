@@ -14,23 +14,48 @@ import { Ionicons } from '@expo/vector-icons';
 import { safeZoneService } from '../services/safeZoneService';
 import { useTheme } from '../context/ThemeContext';
 import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
+import { getDestinationImageUrl } from '../utils/destinationImages';
 
-// Popular heritage destinations with imagery
+// Popular heritage & transit destinations with verified imagery
 const POPULAR_DESTINATIONS = [
+  {
+    name: 'Agra Airport',
+    displayName: 'Agra Airport (Kheria Airport), Agra, Uttar Pradesh',
+    lat: 27.1558,
+    lng: 77.9654,
+    imageUrl: getDestinationImageUrl('Agra Airport'),
+    type: 'Aviation Transit',
+  },
   {
     name: 'Sanchi Stupa',
     displayName: 'Sanchi Buddhist Monument Complex, Raisen, MP',
     lat: 23.4867,
     lng: 77.7385,
-    imageUrl: 'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=400&q=80',
+    imageUrl: getDestinationImageUrl('Sanchi Stupa'),
     type: 'UNESCO Heritage',
+  },
+  {
+    name: 'Rohtang Pass Summit',
+    displayName: 'Rohtang Mountain Pass, Himachal Pradesh',
+    lat: 32.3716,
+    lng: 77.2466,
+    imageUrl: getDestinationImageUrl('Rohtang Pass'),
+    type: 'Mountain Pass',
+  },
+  {
+    name: 'Solang Valley',
+    displayName: 'Solang Valley Trail & Ski Reserve, Manali, HP',
+    lat: 32.3166,
+    lng: 77.1575,
+    imageUrl: getDestinationImageUrl('Solang Valley'),
+    type: 'Alpine Valley',
   },
   {
     name: 'Bhojpur Temple',
     displayName: 'Bhojeshwar Mahadev Temple, Bhopal Corridor, MP',
     lat: 23.1008,
     lng: 77.5855,
-    imageUrl: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&q=80',
+    imageUrl: getDestinationImageUrl('Bhojpur Temple'),
     type: 'Historic Monument',
   },
   {
@@ -38,7 +63,7 @@ const POPULAR_DESTINATIONS = [
     displayName: 'Udaygiri Rock Cut Sanctuaries, Vidisha, MP',
     lat: 23.5350,
     lng: 77.7797,
-    imageUrl: 'https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=400&q=80',
+    imageUrl: getDestinationImageUrl('Udaygiri Caves'),
     type: 'Rock Sanctuary',
   },
 ];
@@ -74,7 +99,11 @@ export const DestinationSelectionModal = ({
     try {
       const res = await safeZoneService.geocode(q);
       if (res.success && Array.isArray(res.results) && res.results.length > 0) {
-        setSearchResults(res.results);
+        const enriched = res.results.map((item) => ({
+          ...item,
+          imageUrl: item.imageUrl || getDestinationImageUrl(item.name || item.displayName),
+        }));
+        setSearchResults(enriched);
       } else {
         setSearchResults(POPULAR_DESTINATIONS);
       }
@@ -132,6 +161,7 @@ export const DestinationSelectionModal = ({
         destinationLat: selectedDestination.lat,
         destinationLng: selectedDestination.lng,
         radiusMeters: 5000,
+        imageUrl: selectedDestination.imageUrl || getDestinationImageUrl(selectedDestination.name),
         currentLat: currentCoords?.lat || null,
         currentLng: currentCoords?.lng || null,
         currentAccuracy: currentCoords?.accuracy || null,

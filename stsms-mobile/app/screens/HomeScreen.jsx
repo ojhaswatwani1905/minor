@@ -27,6 +27,8 @@ import { EmergencyModal } from '../components/EmergencyModal';
 import { useSafeZoneGeofence } from '../hooks/useSafeZoneGeofence';
 import { getServerBaseUrl, setServerBaseUrl } from '../utils/api';
 import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
+import { getDestinationImageUrl } from '../utils/destinationImages';
+import { getDeviceTelemetry } from '../utils/deviceInfo';
 
 export const HomeScreen = ({
   onNavigateProfile,
@@ -264,11 +266,7 @@ export const HomeScreen = ({
           : null,
         batteryLevel,
         networkStatus: serverReachable ? 'Online (LAN)' : 'Attempting Broadcast',
-        deviceInfo: {
-          platform: Platform.OS,
-          osVersion: String(Platform.Version),
-          model: Platform.constants?.Model || Platform.constants?.Brand || Platform.OS,
-        },
+        deviceInfo: await getDeviceTelemetry(batteryLevel),
         tripId: user?.activeTripId || activeSafeZone?.id || null,
         timestamp: new Date().toISOString(),
       };
@@ -305,7 +303,7 @@ export const HomeScreen = ({
         status: safeZoneStatus === 'ACTIVE' ? 'Active' : safeZoneStatus,
         imageUrl:
           activeZone.imageUrl ||
-          'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=400&q=80',
+          getDestinationImageUrl(activeZone.destination || activeZone.destinationName),
       }
     : null;
 
@@ -343,14 +341,15 @@ export const HomeScreen = ({
 
             {/* Profile Avatar */}
             <TouchableOpacity onPress={onNavigateProfile} activeOpacity={0.7}>
-              <Image
-                source={{
-                  uri:
-                    user?.avatar ||
-                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-                }}
-                style={styles.avatarImage}
-              />
+              {user?.avatar ? (
+                <Image source={{ uri: user.avatar }} style={styles.avatarImage} />
+              ) : (
+                <View style={[styles.avatarImage, { backgroundColor: '#FFE5EC', alignItems: 'center', justifyContent: 'center' }]}>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#FF5E7E' }}>
+                    {(travellerName || 'T').charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
         </View>

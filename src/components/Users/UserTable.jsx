@@ -36,7 +36,22 @@ export const UserTable = ({ users, onView, onEdit, onDelete }) => {
                 {/* Tourist info */}
                 <td className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-pine/10 text-pine border border-pine/20 font-black flex items-center justify-center text-sm shadow-sm">
+                    {u.avatar ? (
+                      <img
+                        src={u.avatar}
+                        alt={u.fullName}
+                        className="w-10 h-10 rounded-2xl object-cover border border-pine/20 shadow-sm"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const fallback = e.currentTarget.nextElementSibling;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      style={{ display: u.avatar ? 'none' : 'flex' }}
+                      className="w-10 h-10 rounded-2xl bg-pine/10 text-pine border border-pine/20 font-black items-center justify-center text-sm shadow-sm"
+                    >
                       {(u.fullName || 'T').charAt(0).toUpperCase()}
                     </div>
                     <div>

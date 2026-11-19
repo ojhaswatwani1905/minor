@@ -2,6 +2,54 @@ import bcrypt from 'bcryptjs';
 import { readJson, writeJson } from '../utils/jsonDb.js';
 import { isSupabaseConfigured, getSupabaseClient } from '../database/supabase.js';
 
+/**
+ * Uploads or resolves permanent public avatar image URL using Supabase Storage bucket 'avatars'.
+ */
+export const saveAvatarToStorage = async (avatarInput, userId) => {
+  if (!avatarInput || typeof avatarInput !== 'string') return null;
+
+  // If already an HTTP/HTTPS URL, return it directly
+  if (avatarInput.startsWith('http://') || avatarInput.startsWith('https://')) {
+    return avatarInput;
+  }
+
+  // If base64 data URL
+  if (avatarInput.startsWith('data:image/')) {
+    const matches = avatarInput.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+    if (!matches) return null;
+
+    const rawExt = matches[1].toLowerCase();
+    const ext = rawExt === 'jpeg' ? 'jpg' : rawExt;
+    const buffer = Buffer.from(matches[2], 'base64');
+    const fileName = `tourist_${userId || 'usr'}_${Date.now()}.${ext}`;
+
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = getSupabaseClient();
+        const { error } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, buffer, {
+            contentType: `image/${rawExt}`,
+            upsert: true
+          });
+
+        if (!error) {
+          const { data: pubData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+          if (pubData?.publicUrl) {
+            return pubData.publicUrl;
+          }
+        } else {
+          console.warn('[SUPABASE AVATAR UPLOAD ERROR]', error.message);
+        }
+      } catch (err) {
+        console.warn('[SUPABASE AVATAR UPLOAD WARNING]', err.message);
+      }
+    }
+  }
+
+  return avatarInput;
+};
+
 export const getProfile = async (req, res, next) => {
   try {
     const authId = req.admin?.id || req.user?.id;
@@ -84,6 +132,11 @@ export const updateProfile = async (req, res, next) => {
     } = req.body;
 
     const newName = fullName || name;
+    let resolvedAvatar = avatar;
+    if (avatar) {
+      resolvedAvatar = await saveAvatarToStorage(avatar, authId);
+    }
+
     const admins = await readJson('admins');
     const users = await readJson('users');
 
@@ -109,7 +162,7 @@ export const updateProfile = async (req, res, next) => {
       if (updatedGuardians) users[userIndex].guardians = updatedGuardians;
       if (guardianPhone) users[userIndex].emergencyContact = guardianPhone;
       else if (emergencyContact) users[userIndex].emergencyContact = emergencyContact;
-      if (avatar) users[userIndex].avatar = avatar;
+      if (resolvedAvatar) users[userIndex].avatar = resolvedAvatar;
       users[userIndex].updatedAt = new Date().toISOString();
     } else {
       const newUser = {
@@ -121,7 +174,7 @@ export const updateProfile = async (req, res, next) => {
         emergencyContact: guardianPhone || emergencyContact || phone || '',
         status: 'Online',
         guardians: updatedGuardians || [],
-        avatar: avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(newName || 'Tourist')}`,
+        avatar: resolvedAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(newName || 'Tourist')}`,
         createdAt: new Date().toISOString()
       };
       users.unshift(newUser);
@@ -135,7 +188,7 @@ export const updateProfile = async (req, res, next) => {
       if (newName) admins[adminIndex].name = newName;
       if (phone) admins[adminIndex].phone = phone;
       if (department) admins[adminIndex].department = department;
-      if (avatar) admins[adminIndex].avatar = avatar;
+      if (resolvedAvatar) admins[adminIndex].avatar = resolvedAvatar;
       await writeJson('admins', admins);
     }
 
@@ -146,6 +199,12 @@ export const updateProfile = async (req, res, next) => {
         const sbUpdate = {};
         if (newName) sbUpdate.full_name = newName;
         if (phone) sbUpdate.phone = phone;
+        if (resolvedAvatar) {
+          const { data: prof } = await supabase.from('profiles').select('medical_info').eq('id', authId).maybeSingle();
+          const med = prof?.medical_info || {};
+          med.avatar_url = resolvedAvatar;
+          sbUpdate.medical_info = med;
+        }
         await supabase.from('profiles').update(sbUpdate).eq('id', authId);
       } catch (sbErr) {
         console.warn('[PROFILE SUPABASE SYNC NOTE]', sbErr.message);
@@ -171,6 +230,65 @@ export const updateProfile = async (req, res, next) => {
       message: 'Profile details and emergency contacts saved successfully',
       profile: responseProfile,
       user: responseProfile
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Upload tourist profile picture directly to Supabase Storage bucket 'avatars'.
+ * Persists URL to users.json and Supabase profiles table.
+ */
+export const uploadAvatar = async (req, res, next) => {
+  try {
+    const authId = req.admin?.id || req.user?.id || 'usr_102';
+    const { avatarData, avatarUrl, image } = req.body;
+    const input = avatarData || avatarUrl || image;
+
+    if (!input) {
+      return res.status(400).json({ success: false, message: 'Image data or URL is required.' });
+    }
+
+    const publicUrl = await saveAvatarToStorage(input, authId);
+    if (!publicUrl) {
+      return res.status(400).json({ success: false, message: 'Failed to process avatar image.' });
+    }
+
+    // Persist to users.json
+    const users = await readJson('users');
+    const uIdx = users.findIndex(u => (authId && u.id === authId) || (req.user?.email && u.email?.toLowerCase() === req.user.email.toLowerCase()));
+    if (uIdx !== -1) {
+      users[uIdx].avatar = publicUrl;
+      users[uIdx].updatedAt = new Date().toISOString();
+      await writeJson('users', users);
+    }
+
+    // Persist to admins.json
+    const admins = await readJson('admins');
+    const aIdx = admins.findIndex(a => (authId && a.id === authId) || (req.admin?.email && a.email?.toLowerCase() === req.admin.email.toLowerCase()));
+    if (aIdx !== -1) {
+      admins[aIdx].avatar = publicUrl;
+      await writeJson('admins', admins);
+    }
+
+    // Persist to Supabase profiles table
+    if (isSupabaseConfigured() && authId) {
+      try {
+        const supabase = getSupabaseClient();
+        const { data: existingProf } = await supabase.from('profiles').select('medical_info').eq('id', authId).maybeSingle();
+        const medInfo = existingProf?.medical_info || {};
+        medInfo.avatar_url = publicUrl;
+        await supabase.from('profiles').update({ medical_info: medInfo }).eq('id', authId);
+      } catch (sbErr) {
+        console.warn('[SUPABASE AVATAR SYNC WARNING]', sbErr.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Tourist profile picture updated and synchronized successfully.',
+      avatarUrl: publicUrl
     });
   } catch (error) {
     next(error);

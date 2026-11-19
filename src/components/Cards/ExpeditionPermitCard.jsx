@@ -63,13 +63,27 @@ export const ExpeditionPermitCard = ({ users = [], activities, trips = [] }) => 
         id: u.id || `member_${idx}`,
         fullName: u.fullName || 'Active Traveller',
         email: u.email || 'telemetry@stsms.gov',
-        avatar: u.avatar || (idx % 2 === 0 
-          ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150' 
-          : 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150'),
+        avatar: u.avatar || null,
         corridor,
         groupSize,
         status: rawStatus
       };
+    });
+
+    displayMembers.sort((a, b) => {
+      // Prioritize active emergency / SOS distress
+      const aIsEm = a.status === 'EMERGENCY' || a.status === 'CRITICAL' || a.status === 'SOS DISTRESS';
+      const bIsEm = b.status === 'EMERGENCY' || b.status === 'CRITICAL' || b.status === 'SOS DISTRESS';
+      if (aIsEm && !bIsEm) return -1;
+      if (!aIsEm && bIsEm) return 1;
+
+      // Prioritize active trips / corridors
+      const aHasTrip = a.corridor && a.corridor !== 'Manali High Pass' && a.corridor !== 'Rohtang Valley Trail';
+      const bHasTrip = b.corridor && b.corridor !== 'Manali High Pass' && b.corridor !== 'Rohtang Valley Trail';
+      if (aHasTrip && !bHasTrip) return -1;
+      if (!aHasTrip && bHasTrip) return 1;
+
+      return 0;
     });
   } else {
     displayMembers = defaultMembers;
@@ -163,11 +177,24 @@ export const ExpeditionPermitCard = ({ users = [], activities, trips = [] }) => 
           >
             {/* Member Info: Avatar with soft ring + Name + Email */}
             <div className="col-span-6 sm:col-span-5 flex items-center gap-3 pr-2">
-              <img
-                src={item.avatar}
-                alt={item.fullName}
-                className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm ring-2 ring-sky-300 group-hover:scale-105 transition-transform shrink-0"
-              />
+              {item.avatar ? (
+                <img
+                  src={item.avatar}
+                  alt={item.fullName}
+                  className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm ring-2 ring-sky-300 group-hover:scale-105 transition-transform shrink-0"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.nextElementSibling;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div
+                style={{ display: item.avatar ? 'none' : 'flex' }}
+                className="w-11 h-11 rounded-full bg-honey/20 border border-honey/40 items-center justify-center font-bold text-honey text-sm shrink-0"
+              >
+                {(item.fullName?.charAt(0) || 'T').toUpperCase()}
+              </div>
               <div className="min-w-0">
                 <p className="text-sm font-extrabold text-[#192E2A] group-hover:text-pine transition-colors truncate font-sans">
                   {item.fullName}

@@ -53,6 +53,30 @@ export const safeZoneService = {
     });
   },
 
+  // Tourist confirms "I AM SAFE" within the 10-second grace window (no alert created)
+  acknowledgeWarning: async (tripId, data = {}) => {
+    const res = await apiFetch(`/safe-zones/${tripId}/acknowledge-warning`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (res.success && res.trip) {
+      await storage.setItem(SAFE_ZONE_STORAGE_KEY, JSON.stringify(res.trip));
+    }
+    return res;
+  },
+
+  // 10-second grace countdown expired with no acknowledgement: escalate to emergency SOS
+  escalateBreach: async (tripId, telemetry = {}) => {
+    const res = await apiFetch(`/safe-zones/${tripId}/escalate-breach`, {
+      method: 'POST',
+      body: JSON.stringify(telemetry),
+    });
+    if (res.success && res.trip) {
+      await storage.setItem(SAFE_ZONE_STORAGE_KEY, JSON.stringify(res.trip));
+    }
+    return res;
+  },
+
   // Tourist confirms "I Am Safe" after warning/breach
   confirmSafe: async (tripId, note = 'Tourist confirmed safe in-app') => {
     const res = await apiFetch(`/safe-zones/${tripId}/confirm-safe`, {

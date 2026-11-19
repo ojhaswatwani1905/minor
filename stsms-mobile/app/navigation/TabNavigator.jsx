@@ -16,6 +16,7 @@ import { useSafetyMonitoring } from '../hooks/useSafetyMonitoring';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { emergencyService } from '../services/emergencyService';
+import { getDeviceTelemetry } from '../utils/deviceInfo';
 import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
 
 export const TabNavigator = () => {
@@ -56,6 +57,7 @@ export const TabNavigator = () => {
       } catch (e) {}
 
       const userName = user?.name || user?.fullName || 'Active Tourist';
+      const devTelemetry = await getDeviceTelemetry(batPct);
       await emergencyService.triggerSos({
         userId: user?.id,
         userName,
@@ -65,6 +67,7 @@ export const TabNavigator = () => {
         message: `🚨 MANUAL SOS triggered by ${userName}! Immediate emergency response required.`,
         location: locCoords,
         batteryLevel: batPct,
+        deviceInfo: devTelemetry,
         timestamp: new Date().toISOString(),
       });
     } catch (err) {

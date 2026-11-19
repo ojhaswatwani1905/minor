@@ -74,6 +74,62 @@ export const getAlerts = async (req, res, next) => {
 
     let alerts = (data || []).map(mapAlertFromDb);
 
+    try {
+      const users = await readJson('users');
+      const jsonAlerts = await readJson('alerts');
+
+      alerts = alerts.map(a => {
+        let match = null;
+        if (a.userName && a.userName !== 'Active Traveller' && a.userName !== 'Traveller') {
+          match = users.find(u => 
+            (u.fullName && u.fullName.toLowerCase().trim() === a.userName.toLowerCase().trim()) ||
+            (u.name && u.name.toLowerCase().trim() === a.userName.toLowerCase().trim()) ||
+            (u.id && u.id.toLowerCase() === a.userName.toLowerCase())
+          );
+        }
+        if (!match && a.userId) {
+          match = users.find(u => u.id === a.userId);
+        }
+        const jsonA = jsonAlerts.find(ja => ja.id === a.id || ja.tripId === a.tripId);
+        const dev = jsonA?.deviceInfo || match?.deviceInfo;
+
+        const realName = a.userName && a.userName !== 'Active Traveller' && a.userName !== 'Traveller'
+          ? a.userName 
+          : (match?.fullName || match?.name || a.userName || 'Active Traveller');
+        const realId = match?.id || a.userId;
+        const realAvatar = match?.avatar || null;
+        const realPhone = match?.phone || a.user?.phone || null;
+        const realEmail = match?.email || null;
+
+        return {
+          ...a,
+          userName: realName,
+          userId: realId,
+          user: {
+            id: realId,
+            fullName: realName,
+            name: realName,
+            avatar: realAvatar,
+            phone: realPhone,
+            email: realEmail
+          },
+          deviceInfo: {
+            manufacturer: dev?.manufacturer || 'Unavailable',
+            model: dev?.model || 'Unavailable',
+            platform: dev?.platform || 'Android',
+            androidVersion: dev?.androidVersion || 'Unavailable',
+            osVersion: dev?.osVersion || 'Unavailable',
+            appVersion: dev?.appVersion || '1.0.0',
+            appBuildNumber: dev?.appBuildNumber || '1',
+            batteryPercentage: a.batteryLevel != null ? a.batteryLevel : dev?.batteryPercentage,
+            batteryChargingStatus: dev?.batteryChargingStatus || 'Unavailable',
+            networkConnectionType: dev?.networkConnectionType || a.networkStatus || 'Unavailable',
+            lastTelemetryUpdate: dev?.lastTelemetryUpdate || a.timestamp
+          }
+        };
+      });
+    } catch (enrichErr) {}
+
     if (type && type !== 'All') {
       alerts = alerts.filter(a => a.type.toLowerCase().includes(type.toLowerCase()));
     }
@@ -113,30 +169,108 @@ export const getAlertById = async (req, res, next) => {
     const alert = mapAlertFromDb(alertRow);
 
     // Fetch related alert events (audit trail)
+    let events = [];
     try {
-      const { data: events } = await supabase
+      const { data: evData } = await supabase
         .from('alert_events')
         .select('*')
         .eq('alert_id', req.params.id)
         .order('created_at', { ascending: false });
 
-      if (events && events.length > 0) {
-        alert.rescueNotes = events.map(e => ({
+      if (evData && evData.length > 0) {
+        events = evData;
+        alert.rescueNotes = evData.map(e => ({
           timestamp: e.created_at,
-          note: `[${e.kind}] ${JSON.stringify(e.payload)}`,
+          note: `[${e.kind}] ${typeof e.payload === 'object' ? JSON.stringify(e.payload) : e.payload}`,
           author: e.actor || 'System'
         }));
       }
     } catch (e) {}
 
+    // 1. Resolve Tourist Identity from authenticated user profile records
+    const users = await readJson('users');
+    let matchedUser = null;
+    if (alert.userName && alert.userName !== 'Active Traveller' && alert.userName !== 'Traveller') {
+      matchedUser = users.find(u => 
+        (u.fullName && u.fullName.toLowerCase().trim() === alert.userName.toLowerCase().trim()) ||
+        (u.name && u.name.toLowerCase().trim() === alert.userName.toLowerCase().trim()) ||
+        (u.id && u.id.toLowerCase() === alert.userName.toLowerCase())
+      );
+    }
+    if (!matchedUser && alert.userId) {
+      matchedUser = users.find(u => u.id === alert.userId);
+    }
+
+    if (!matchedUser && alertRow.user_id) {
+      try {
+        const { data: pData } = await supabase.from('profiles').select('*').eq('id', alertRow.user_id).maybeSingle();
+        if (pData) {
+          matchedUser = {
+            id: pData.id,
+            fullName: pData.full_name,
+            phone: pData.phone,
+            avatar: pData.medical_info?.avatar_url || null,
+            email: null
+          };
+        }
+      } catch (pErr) {}
+    }
+
+    const realTouristName = alert.userName && alert.userName !== 'Active Traveller' && alert.userName !== 'Traveller'
+      ? alert.userName
+      : (matchedUser?.fullName || matchedUser?.name || alert.userName || 'Active Traveller');
+    const realTouristId = matchedUser?.id || alert.userId || alertRow.user_id || 'usr_unassigned';
+    const realTouristAvatar = matchedUser?.avatar || (matchedUser?.medical_info?.avatar_url) || null;
+    const realTouristEmail = matchedUser?.email || null;
+    const realTouristPhone = matchedUser?.phone || alertRow.profiles?.phone || null;
+
+    alert.userName = realTouristName;
+    alert.userId = realTouristId;
+    alert.user = {
+      id: realTouristId,
+      fullName: realTouristName,
+      name: realTouristName,
+      avatar: realTouristAvatar,
+      email: realTouristEmail,
+      phone: realTouristPhone
+    };
+
+    // 2. Resolve Device Information from collected telemetry
+    const alerts = await readJson('alerts');
+    const jsonAlert = alerts.find(a => a.id === req.params.id || a.tripId === alert.tripId);
+    let dev = jsonAlert?.deviceInfo || null;
+
+    if (!dev && events.length > 0) {
+      for (const ev of events) {
+        if (ev.payload?.deviceInfo) {
+          dev = ev.payload.deviceInfo;
+          break;
+        }
+      }
+    }
+
+    if (!dev && matchedUser?.deviceInfo) {
+      dev = matchedUser.deviceInfo;
+    }
+
+    alert.deviceInfo = {
+      manufacturer: dev?.manufacturer || 'Unavailable',
+      model: dev?.model || 'Unavailable',
+      platform: dev?.platform || (alertRow.source === 'app' ? 'Android' : 'Unavailable'),
+      androidVersion: dev?.androidVersion || 'Unavailable',
+      osVersion: dev?.osVersion || 'Unavailable',
+      appVersion: dev?.appVersion || '1.0.0',
+      appBuildNumber: dev?.appBuildNumber || '1',
+      batteryPercentage: alert.batteryLevel != null ? alert.batteryLevel : (dev?.batteryPercentage != null ? dev.batteryPercentage : null),
+      batteryChargingStatus: dev?.batteryChargingStatus || 'Unavailable',
+      networkConnectionType: dev?.networkConnectionType || alert.networkStatus || (alertRow.source === 'app' ? 'Cellular / Wi-Fi (Active)' : 'Unavailable'),
+      lastTelemetryUpdate: dev?.lastTelemetryUpdate || alert.timestamp
+    };
+
     res.json({
       success: true,
       alert,
-      user: {
-        id: alert.userId,
-        fullName: alert.userName,
-        phone: alertRow.profiles?.phone || null
-      }
+      user: alert.user
     });
   } catch (error) {
     console.error('[GET ALERT BY ID ERROR]', error.message);
@@ -274,6 +408,7 @@ export const createSosAlert = async (req, res, next) => {
       message, 
       location, 
       batteryLevel, 
+      deviceInfo,
       tripId 
     } = req.body || {};
 
@@ -296,6 +431,24 @@ export const createSosAlert = async (req, res, next) => {
       }
     }
 
+    // Parse and normalize real hardware device telemetry
+    let validatedDeviceInfo = null;
+    if (deviceInfo && typeof deviceInfo === 'object') {
+      validatedDeviceInfo = {
+        manufacturer: deviceInfo.manufacturer || 'Unavailable',
+        model: deviceInfo.model || 'Unavailable',
+        platform: deviceInfo.platform || 'Android',
+        androidVersion: deviceInfo.androidVersion || 'Unavailable',
+        osVersion: deviceInfo.osVersion || 'Unavailable',
+        appVersion: deviceInfo.appVersion || '1.0.0',
+        appBuildNumber: deviceInfo.appBuildNumber || '1',
+        batteryPercentage: validatedBattery != null ? validatedBattery : deviceInfo.batteryPercentage,
+        batteryChargingStatus: deviceInfo.batteryChargingStatus || 'Unavailable',
+        networkConnectionType: deviceInfo.networkConnectionType || 'Mobile App (Cellular/Wi-Fi)',
+        lastTelemetryUpdate: deviceInfo.lastTelemetryUpdate || new Date().toISOString()
+      };
+    }
+
     const alertPayload = {
       userId,
       userName: userName || 'Active Traveller',
@@ -305,6 +458,7 @@ export const createSosAlert = async (req, res, next) => {
       message: message || `🚨 MANUAL SOS triggered by ${userName || 'Traveller'}! Immediate emergency response required.`,
       location: validatedLocation,
       batteryLevel: validatedBattery,
+      deviceInfo: validatedDeviceInfo,
       status: 'Pending'
     };
 
@@ -462,6 +616,7 @@ export const createSosAlert = async (req, res, next) => {
                 hasGps: Boolean(validatedLocation),
                 lat: validatedLocation?.lat || null,
                 lng: validatedLocation?.lng || null,
+                deviceInfo: validatedDeviceInfo,
                 isUpdate
               },
               actor: 'mobile_app'
@@ -471,6 +626,9 @@ export const createSosAlert = async (req, res, next) => {
           createdAlert = mapAlertFromDb(targetAlertRow);
           if (createdAlert && (!createdAlert.userName || createdAlert.userName === 'Active Traveller') && alertPayload.userName) {
             createdAlert.userName = alertPayload.userName;
+          }
+          if (createdAlert && validatedDeviceInfo) {
+            createdAlert.deviceInfo = validatedDeviceInfo;
           }
         }
       } catch (sbError) {
@@ -490,6 +648,7 @@ export const createSosAlert = async (req, res, next) => {
       message: alertPayload.message,
       location: alertPayload.location,
       batteryLevel: alertPayload.batteryLevel,
+      deviceInfo: validatedDeviceInfo,
       status: 'Pending',
       source: 'mobile_app',
       timestamp: new Date().toISOString()
@@ -536,7 +695,11 @@ export const createSosAlert = async (req, res, next) => {
         if (validatedBattery !== null) {
           users[uIdx].batteryLevel = validatedBattery;
         }
+        if (validatedDeviceInfo) {
+          users[uIdx].deviceInfo = validatedDeviceInfo;
+        }
         users[uIdx].status = 'EMERGENCY';
+        users[uIdx].lastAlertTimestamp = new Date().toISOString();
         users[uIdx].lastPing = new Date().toISOString();
         await writeJson('users', users);
       } else {

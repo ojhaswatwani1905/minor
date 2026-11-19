@@ -41,9 +41,11 @@ export const AlertCard = ({
     batteryLevel < 50 ? 'text-amber-500' : 'text-emerald-600';
 
   // Device info label
-  const deviceLabel = alert.deviceInfo?.platform
-    ? `${alert.deviceInfo.platform.toUpperCase()} ${alert.deviceInfo.model || ''}`.trim()
-    : alert.user?.phone || null;
+  const deviceLabel = alert.deviceInfo?.model && alert.deviceInfo.model !== 'Unavailable'
+    ? `${alert.deviceInfo.model} (${alert.deviceInfo.platform || 'Android'})`
+    : (alert.deviceInfo?.platform && alert.deviceInfo.platform !== 'Unavailable'
+      ? `${alert.deviceInfo.platform.toUpperCase()} Device`
+      : (alert.user?.phone || null));
 
   return (
     <div
@@ -93,14 +95,34 @@ export const AlertCard = ({
 
       {/* Traveller Name & Timestamp */}
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="text-base font-extrabold text-[#192E2A] tracking-tight font-sans">
-            {alert.userName || 'Anonymous Traveller'}
-          </h3>
-          <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-            <Clock className="w-3.5 h-3.5 text-slate-400" />
-            <span>{new Date(alert.timestamp).toLocaleString()}</span>
-          </p>
+        <div className="flex items-center gap-2.5 min-w-0">
+          {alert.user?.avatar ? (
+            <img
+              src={alert.user.avatar}
+              alt={alert.userName || 'Traveller'}
+              className="w-9 h-9 rounded-full object-cover border border-slate-200 shadow-xs flex-shrink-0"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const next = e.currentTarget.nextElementSibling;
+                if (next) next.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div
+            style={{ display: alert.user?.avatar ? 'none' : 'flex' }}
+            className="w-9 h-9 rounded-full bg-honey/20 border border-honey/40 flex items-center justify-center font-bold text-honey text-xs flex-shrink-0"
+          >
+            {((alert.user?.fullName || alert.userName || 'T').charAt(0)).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-base font-extrabold text-[#192E2A] tracking-tight font-sans truncate">
+              {alert.user?.fullName || alert.userName || 'Anonymous Traveller'}
+            </h3>
+            <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+              <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              <span>{new Date(alert.timestamp).toLocaleString()}</span>
+            </p>
+          </div>
         </div>
 
         {alert.guardianNotified && (

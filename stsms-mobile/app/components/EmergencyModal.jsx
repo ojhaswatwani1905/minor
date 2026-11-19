@@ -119,16 +119,6 @@ export const EmergencyModal = ({
               <Ionicons name="checkmark-done" size={20} color="#1E293B" style={{ marginRight: 6 }} />
               <Text style={styles.whiteActionBtnText}>I'm Safe Now</Text>
             </TouchableOpacity>
-
-            {/* Secondary Action: Call Helpline */}
-            <TouchableOpacity
-              style={styles.crimsonActionBtn}
-              onPress={handleCallHelpline}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="call" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
-              <Text style={styles.crimsonActionBtnText}>Call Helpline (112)</Text>
-            </TouchableOpacity>
           </View>
         ) : (
           /* ========================================================
@@ -166,16 +156,6 @@ export const EmergencyModal = ({
                 </Text>
               </View>
             )}
-
-            {/* Direct Helpline 112 Call */}
-            <TouchableOpacity
-              style={[styles.call112Btn, SHADOWS.card]}
-              onPress={handleCallHelpline}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="call" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
-              <Text style={styles.call112BtnText}>Call Police / Ambulance (112)</Text>
-            </TouchableOpacity>
 
             {/* Action Buttons */}
             <View style={styles.actionRow}>

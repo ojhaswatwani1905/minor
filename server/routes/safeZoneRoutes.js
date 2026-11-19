@@ -4,6 +4,8 @@ import {
   createSafeZoneTrip,
   getActiveSafeZoneTrip,
   updateSafeZoneLocation,
+  acknowledgeBreachWarning,
+  escalateBreach,
   confirmSafe,
   updateSafeZoneStatus,
   getAllSafeZones,
@@ -21,6 +23,8 @@ router.post('/', createSafeZoneTrip);
 router.get('/active', getActiveSafeZoneTrip);
 router.get('/active/:userId', getActiveSafeZoneTrip);
 router.post('/:id/location', updateSafeZoneLocation);
+router.post('/:id/acknowledge-warning', acknowledgeBreachWarning);
+router.post('/:id/escalate-breach', escalateBreach);
 router.post('/:id/confirm-safe', confirmSafe);
 router.post('/:id/status', updateSafeZoneStatus);
 

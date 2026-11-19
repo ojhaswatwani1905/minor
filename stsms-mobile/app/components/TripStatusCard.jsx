@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
+import { getDestinationImageUrl } from '../utils/destinationImages';
 
 export const TripStatusCard = ({
   activeTrip,
@@ -19,7 +20,7 @@ export const TripStatusCard = ({
     const radiusText = activeTrip.radiusMeters ? `${(activeTrip.radiusMeters / 1000).toFixed(0)} km` : '5 km';
     const photoUrl =
       activeTrip.imageUrl ||
-      'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=400&q=80';
+      getDestinationImageUrl(destinationName);
 
     return (
       <View style={styles.container}>

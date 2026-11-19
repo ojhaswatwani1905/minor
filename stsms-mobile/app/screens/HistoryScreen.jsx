@@ -16,6 +16,7 @@ import { useTheme } from '../context/ThemeContext';
 import { tripService } from '../services/tripService';
 import { safeZoneService } from '../services/safeZoneService';
 import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
+import { getDestinationImageUrl } from '../utils/destinationImages';
 
 export const HistoryScreen = ({ onBack, onSelectTrip }) => {
   const { user } = useAuth();
@@ -61,7 +62,7 @@ export const HistoryScreen = ({ onBack, onSelectTrip }) => {
           rawDate,
           status,
           safeRadius: t.radiusMeters ? `${(t.radiusMeters / 1000).toFixed(0)} km` : (t.boundaryRadiusKm ? `${t.boundaryRadiusKm} km` : '5 km'),
-          imageUrl: t.imageUrl || 'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=400&q=80',
+          imageUrl: t.imageUrl || getDestinationImageUrl(dest),
           destinationCoords: t.destinationCoords || null,
           isSafeZone: !!t.destinationCoords,
         };
@@ -72,9 +73,10 @@ export const HistoryScreen = ({ onBack, onSelectTrip }) => {
         const exists = allTrips.some((t) => t.id === activeSafeTrip.id);
         if (!exists) {
           const rawDate = activeSafeTrip.startDate || new Date().toISOString();
+          const safeDest = activeSafeTrip.destination || activeSafeTrip.destinationName || 'Safe Travel Zone';
           allTrips.unshift({
             id: activeSafeTrip.id,
-            destination: activeSafeTrip.destination || activeSafeTrip.destinationName || 'Safe Travel Zone',
+            destination: safeDest,
             date: new Date(rawDate).toLocaleDateString('en-GB', {
               day: 'numeric',
               month: 'short',
@@ -83,7 +85,7 @@ export const HistoryScreen = ({ onBack, onSelectTrip }) => {
             rawDate,
             status: activeSafeTrip.status || 'Active',
             safeRadius: activeSafeTrip.radiusMeters ? `${(activeSafeTrip.radiusMeters / 1000).toFixed(0)} km` : '5 km',
-            imageUrl: activeSafeTrip.imageUrl || 'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=400&q=80',
+            imageUrl: activeSafeTrip.imageUrl || getDestinationImageUrl(safeDest),
             destinationCoords: activeSafeTrip.destinationCoords || null,
             isSafeZone: true,
           });

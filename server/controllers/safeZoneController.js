@@ -1,5 +1,6 @@
 import { readJson, writeJson } from '../utils/jsonDb.js';
 import { isSupabaseConfigured, getSupabaseClient, mapAlertToDb, mapAlertFromDb } from '../database/supabase.js';
+import { getDestinationImageUrl } from '../utils/destinationImages.js';
 
 // Haversine formula to compute distance in meters between two lat/lon coordinates
 export const calculateHaversineDistanceMeters = (lat1, lon1, lat2, lon2) => {
@@ -19,16 +20,18 @@ const geocodeCache = new Map();
 
 // Built-in verified tourist destinations fallback
 const POPULAR_DESTINATIONS = [
-  { name: 'Rohtang Pass Summit', displayName: 'Rohtang Pass, Himachal Pradesh, India', lat: 32.3716, lng: 77.2466, type: 'mountain_pass' },
-  { name: 'Solang Valley', displayName: 'Solang Valley, Manali, Himachal Pradesh, India', lat: 32.3166, lng: 77.1575, type: 'valley' },
-  { name: 'Manali Mall Road', displayName: 'Mall Road, Manali, Himachal Pradesh, India', lat: 32.2396, lng: 77.1887, type: 'town' },
-  { name: 'Guna Fort & Forest Reserve', displayName: 'Guna Fort, Guna, Madhya Pradesh, India', lat: 24.6467, lng: 77.3117, type: 'historical' },
-  { name: 'Mohanpur Safety Corridor', displayName: 'Mohanpur, Guna, Madhya Pradesh, India', lat: 24.5821, lng: 77.2894, type: 'sanctuary' },
-  { name: 'Pangong Tso Lake', displayName: 'Pangong Tso, Ladakh, India', lat: 33.7595, lng: 78.6674, type: 'lake' },
-  { name: 'Rishikesh River Camp', displayName: 'Rishikesh, Uttarakhand, India', lat: 30.0869, lng: 78.2676, type: 'river' },
-  { name: 'Valley of Flowers', displayName: 'Valley of Flowers National Park, Uttarakhand, India', lat: 30.7280, lng: 79.6053, type: 'national_park' },
-  { name: 'Munnar Tea Estate Ridge', displayName: 'Munnar, Idukki, Kerala, India', lat: 10.0889, lng: 77.0595, type: 'hill_station' },
-  { name: 'Anjuna Coastal Trail', displayName: 'Anjuna Beach, Goa, India', lat: 15.5733, lng: 73.7410, type: 'coastal' }
+  { name: 'Agra Airport', displayName: 'Agra Airport (Kheria Airport), Agra, Uttar Pradesh', lat: 27.1558, lng: 77.9654, type: 'airport', imageUrl: getDestinationImageUrl('Agra Airport') },
+  { name: 'Sanchi Stupa', displayName: 'Sanchi Buddhist Monument Complex, Raisen, MP', lat: 23.4867, lng: 77.7385, type: 'heritage', imageUrl: getDestinationImageUrl('Sanchi Stupa') },
+  { name: 'Rohtang Pass Summit', displayName: 'Rohtang Pass, Himachal Pradesh, India', lat: 32.3716, lng: 77.2466, type: 'mountain_pass', imageUrl: getDestinationImageUrl('Rohtang Pass') },
+  { name: 'Solang Valley', displayName: 'Solang Valley, Manali, Himachal Pradesh, India', lat: 32.3166, lng: 77.1575, type: 'valley', imageUrl: getDestinationImageUrl('Solang Valley') },
+  { name: 'Manali Mall Road', displayName: 'Mall Road, Manali, Himachal Pradesh, India', lat: 32.2396, lng: 77.1887, type: 'town', imageUrl: getDestinationImageUrl('Manali Mall Road') },
+  { name: 'Guna Fort & Forest Reserve', displayName: 'Guna Fort, Guna, Madhya Pradesh, India', lat: 24.6467, lng: 77.3117, type: 'historical', imageUrl: getDestinationImageUrl('Guna Fort') },
+  { name: 'Mohanpur Safety Corridor', displayName: 'Mohanpur, Guna, Madhya Pradesh, India', lat: 24.5821, lng: 77.2894, type: 'sanctuary', imageUrl: getDestinationImageUrl('Mohanpur') },
+  { name: 'Pangong Tso Lake', displayName: 'Pangong Tso, Ladakh, India', lat: 33.7595, lng: 78.6674, type: 'lake', imageUrl: getDestinationImageUrl('Pangong Tso') },
+  { name: 'Rishikesh River Camp', displayName: 'Rishikesh, Uttarakhand, India', lat: 30.0869, lng: 78.2676, type: 'river', imageUrl: getDestinationImageUrl('Rishikesh') },
+  { name: 'Valley of Flowers', displayName: 'Valley of Flowers National Park, Uttarakhand, India', lat: 30.7280, lng: 79.6053, type: 'national_park', imageUrl: getDestinationImageUrl('Valley of Flowers') },
+  { name: 'Munnar Tea Estate Ridge', displayName: 'Munnar, Idukki, Kerala, India', lat: 10.0889, lng: 77.0595, type: 'hill_station', imageUrl: getDestinationImageUrl('Munnar') },
+  { name: 'Anjuna Coastal Trail', displayName: 'Anjuna Beach, Goa, India', lat: 15.5733, lng: 73.7410, type: 'coastal', imageUrl: getDestinationImageUrl('Anjuna Beach') }
 ];
 
 /**
@@ -109,18 +112,28 @@ export const createSafeZoneTrip = async (req, res, next) => {
       userId,
       userName,
       userPhone,
-      destinationName,
-      destinationLat,
-      destinationLng,
+      destinationName: rawDestName,
+      destination: altDestName,
+      destinationLat: rawDestLat,
+      destinationLng: rawDestLng,
+      destinationCoordinates,
       radiusMeters = 5000,
-      currentLat,
-      currentLng,
+      currentLat: rawCurrLat,
+      currentLng: rawCurrLng,
+      userLocation,
       batteryLevel,
       guardianName,
       guardianPhone,
       guardianEmail,
+      imageUrl,
       notes
     } = req.body;
+
+    const destinationName = rawDestName || altDestName;
+    const destinationLat = rawDestLat ?? destinationCoordinates?.lat;
+    const destinationLng = rawDestLng ?? destinationCoordinates?.lng;
+    const currentLat = rawCurrLat ?? userLocation?.lat;
+    const currentLng = rawCurrLng ?? userLocation?.lng;
 
     if (!destinationName || destinationLat == null || destinationLng == null) {
       return res.status(400).json({
@@ -165,6 +178,7 @@ export const createSafeZoneTrip = async (req, res, next) => {
       destination: destinationName,
       destinationName,
       destinationCoords: { lat: destLat, lng: destLng },
+      imageUrl: req.body.imageUrl || getDestinationImageUrl(destinationName),
       radiusMeters: radius,
       boundaryRadiusKm: +(radius / 1000).toFixed(1),
       status: initialStatus, // 'APPROACHING' | 'ACTIVE' | 'WARNING' | 'BREACHED' | 'PAUSED' | 'COMPLETED'
@@ -387,10 +401,12 @@ export const updateSafeZoneLocation = async (req, res, next) => {
     } else if (trip.status === 'ACTIVE') {
       if (!isInsideRadius) {
         if (isReliableFix) {
-          // Tourist moved outside boundary: enter WARNING state
+          // Tourist moved outside boundary: enter WARNING state & start 10-second response window
           nextStatus = 'WARNING';
           trip.consecutiveOutsideCount = 1;
           trip.warningStartedAt = now;
+          trip.warningExpiresAt = new Date(Date.now() + 10000).toISOString();
+          trip.warningAcknowledged = false;
           transitionEvent = {
             timestamp: now,
             event: 'BOUNDARY_WARNING',
@@ -398,7 +414,7 @@ export const updateSafeZoneLocation = async (req, res, next) => {
             status: nextStatus,
             distanceMeters,
             distanceOutside,
-            note: `Tourist crossed 5km perimeter. Outside by ${distanceOutside}m. Awaiting verification confirmation.`
+            note: `Tourist crossed 5km perimeter. Outside by ${distanceOutside}m. 10-second emergency grace countdown initiated.`
           };
         }
       } else {
@@ -410,6 +426,8 @@ export const updateSafeZoneLocation = async (req, res, next) => {
         nextStatus = 'ACTIVE';
         trip.consecutiveOutsideCount = 0;
         trip.warningStartedAt = null;
+        trip.warningExpiresAt = null;
+        trip.warningAcknowledged = false;
         transitionEvent = {
           timestamp: now,
           event: 'RETURNED_TO_SAFE_ZONE',
@@ -422,10 +440,15 @@ export const updateSafeZoneLocation = async (req, res, next) => {
         // Increment consecutive outside reading count
         trip.consecutiveOutsideCount = (trip.consecutiveOutsideCount || 1) + 1;
 
-        // Require 3 consecutive outside readings to confirm breach
-        if (trip.consecutiveOutsideCount >= 3) {
+        // Check if 10-second grace window elapsed without tourist acknowledgement
+        const isExpired = trip.warningExpiresAt && (new Date(now).getTime() >= new Date(trip.warningExpiresAt).getTime());
+
+        // Confirmed breach after grace window or consecutive verified pings
+        if (isExpired && !trip.warningAcknowledged && trip.consecutiveOutsideCount >= 2) {
           nextStatus = 'BREACHED';
           trip.breachConfirmedAt = now;
+          trip.warningStartedAt = null;
+          trip.warningExpiresAt = null;
           transitionEvent = {
             timestamp: now,
             event: 'BREACH_CONFIRMED',
@@ -433,7 +456,7 @@ export const updateSafeZoneLocation = async (req, res, next) => {
             status: nextStatus,
             distanceMeters,
             distanceOutside,
-            note: `Confirmed 5km boundary breach after ${trip.consecutiveOutsideCount} consecutive verified GNSS readings. Outside by ${distanceOutside}m.`
+            note: `AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Confirmed after ${trip.consecutiveOutsideCount} consecutive verified readings. Outside by ${distanceOutside}m.`
           };
 
           // Trigger automatic GEOFENCE_BREACH incident idempotently
@@ -442,6 +465,7 @@ export const updateSafeZoneLocation = async (req, res, next) => {
             lng: parsedLng,
             accuracy: parsedAccuracy,
             battery: parsedBattery,
+            deviceInfo: req.body.deviceInfo || trip.deviceInfo || null,
             distanceMeters,
             distanceOutside,
             timestamp: now
@@ -541,8 +565,10 @@ export const updateSafeZoneLocation = async (req, res, next) => {
       status: nextStatus,
       previousStatus,
       transitionOccurred: previousStatus !== nextStatus,
+      distanceMeters,
       distanceFromDestMeters: distanceMeters,
       distanceOutsideBoundaryMeters: distanceOutside,
+      countdownSeconds: nextStatus === 'WARNING' ? 10 : null,
       isInsideRadius,
       consecutiveOutsideCount: trip.consecutiveOutsideCount,
       alertDispatched: Boolean(alertCreated),
@@ -567,14 +593,21 @@ const dispatchAutomaticGeofenceAlert = async (trip, telemetry) => {
     userName: trip.userName,
     tripId: trip.id,
     type: 'GEOFENCE_BREACH',
+    subtype: 'AUTOMATIC_SAFEZONE_BREACH',
     priority: 'CRITICAL',
-    message: `🚨 [GEOFENCE_BREACH] Automatic boundary breach confirmed for ${trip.userName}! Exited designated 5km Safe Zone around ${trip.destination}. Distance outside: ${telemetry.distanceOutside}m. Lat: ${telemetry.lat.toFixed(4)}, Lng: ${telemetry.lng.toFixed(4)}. Battery: ${telemetry.battery}%.`,
+    message: `🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist ${trip.userName} exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Boundary: ${trip.destination} (5 km). Outside by: ${telemetry.distanceOutside != null ? telemetry.distanceOutside + 'm' : 'Outside boundary'}. Coordinates: (${telemetry.lat.toFixed(4)}, ${telemetry.lng.toFixed(4)}). Battery: ${telemetry.battery}%.`,
     location: {
       lat: telemetry.lat,
       lng: telemetry.lng,
-      name: `Geofence Breach Exit (${telemetry.lat.toFixed(4)}, ${telemetry.lng.toFixed(4)})`
+      name: `Automatic Safe-Zone Breach (${telemetry.lat.toFixed(4)}, ${telemetry.lng.toFixed(4)})`
     },
     batteryLevel: telemetry.battery,
+    deviceInfo: telemetry.deviceInfo || trip.deviceInfo || {
+      platform: 'Android',
+      manufacturer: 'Unavailable',
+      model: 'Unavailable',
+      osVersion: 'Unavailable'
+    },
     status: 'Pending',
     source: 'app',
     timestamp: now
@@ -631,6 +664,7 @@ const dispatchAutomaticGeofenceAlert = async (trip, telemetry) => {
 
         const mapped = mapAlertFromDb(live);
         mapped.tripId = trip.id;
+        mapped.isExisting = true;
         return mapped;
       }
 
@@ -683,6 +717,142 @@ const dispatchAutomaticGeofenceAlert = async (trip, telemetry) => {
   } catch (e) {}
 
   return alertPayload;
+};
+
+/**
+ * 5a. Tourist acknowledges boundary warning ("I AM SAFE") within 10 seconds.
+ * Cancels countdown, records acknowledgement timestamp and GPS location,
+ * does NOT create an emergency SOS alert, and continues safe zone monitoring.
+ */
+export const acknowledgeBreachWarning = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { lat, lng, timestamp, note } = req.body;
+    const trips = await readJson('trips');
+    const tripIndex = trips.findIndex(t => t.id === id);
+
+    if (tripIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Safe travel zone trip not found.' });
+    }
+
+    const trip = trips[tripIndex];
+    const now = timestamp || new Date().toISOString();
+    const prevStatus = trip.status;
+
+    // Reset warning state without terminating trip
+    trip.warningStartedAt = null;
+    trip.warningExpiresAt = null;
+    trip.warningAcknowledged = true;
+    trip.warningAcknowledgedAt = now;
+    trip.consecutiveOutsideCount = 0;
+    trip.status = 'ACTIVE';
+
+    if (lat != null && lng != null) {
+      trip.currentLocation = {
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+        name: `GPS Fix (${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)})`,
+        timestamp: now
+      };
+    }
+
+    const auditEntry = {
+      timestamp: now,
+      event: 'WARNING_ACKNOWLEDGED_SAFE',
+      previousStatus: prevStatus,
+      status: 'ACTIVE',
+      coords: (lat != null && lng != null) ? { lat: parseFloat(lat), lng: parseFloat(lng) } : null,
+      note: note || 'Tourist acknowledged safety warning ("I AM SAFE") within 10-second grace countdown. No emergency alert dispatched.'
+    };
+
+    if (!trip.history) trip.history = [];
+    trip.history.unshift(auditEntry);
+
+    trip.updatedAt = now;
+    trips[tripIndex] = trip;
+    await writeJson('trips', trips);
+
+    res.json({
+      success: true,
+      message: 'Safety warning acknowledged! No SOS alert dispatched. Safe Travel Zone monitoring active.',
+      trip
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * 5b. Escalate unacknowledged boundary breach to Admin Command Center.
+ * Triggered when 10 seconds elapse with NO response from the tourist.
+ * Creates an AUTOMATIC_SAFEZONE_BREACH incident with full device intelligence & telemetry.
+ * Idempotent: does not duplicate if an alert is already active on this trip.
+ */
+export const escalateBreach = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { lat, lng, accuracy, battery, deviceInfo, distanceMeters, distanceOutside, timestamp } = req.body;
+    const trips = await readJson('trips');
+    const tripIndex = trips.findIndex(t => t.id === id);
+
+    if (tripIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Safe travel zone trip not found.' });
+    }
+
+    const trip = trips[tripIndex];
+    const now = timestamp || new Date().toISOString();
+
+    trip.status = 'BREACHED';
+    trip.breachConfirmedAt = now;
+    trip.warningStartedAt = null;
+    trip.warningExpiresAt = null;
+
+    if (deviceInfo) {
+      trip.deviceInfo = deviceInfo;
+    }
+
+    const alertCreated = await dispatchAutomaticGeofenceAlert(trip, {
+      lat: lat != null ? parseFloat(lat) : (trip.currentLocation?.lat || 24.4346),
+      lng: lng != null ? parseFloat(lng) : (trip.currentLocation?.lng || 77.1619),
+      accuracy: accuracy || 15,
+      battery: battery != null ? parseInt(battery, 10) : (trip.batteryLevel || 60),
+      deviceInfo: deviceInfo || trip.deviceInfo || null,
+      distanceMeters: distanceMeters || trip.distanceFromDestMeters,
+      distanceOutside: distanceOutside || trip.distanceOutsideBoundaryMeters,
+      timestamp: now
+    });
+
+    if (alertCreated?.id) {
+      trip.activeAlertId = alertCreated.id;
+    }
+
+    const auditEntry = {
+      timestamp: now,
+      event: 'AUTOMATIC_BREACH_ESCALATED',
+      previousStatus: 'WARNING',
+      status: 'BREACHED',
+      alertId: alertCreated?.id || null,
+      note: 'AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds.'
+    };
+
+    if (!trip.history) trip.history = [];
+    trip.history.unshift(auditEntry);
+
+    trip.updatedAt = now;
+    trips[tripIndex] = trip;
+    await writeJson('trips', trips);
+
+    const isExisting = Boolean(alertCreated?.isExisting);
+    res.json({
+      success: true,
+      isExisting,
+      message: isExisting ? 'Safe-Zone breach already active on this trip. Telemetry updated.' : 'Automatic Safe-Zone breach escalated to Admin Command Center.',
+      alert: alertCreated,
+      trip
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 /**

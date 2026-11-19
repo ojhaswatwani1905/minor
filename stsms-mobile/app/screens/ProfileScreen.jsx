@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Modal, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -31,6 +31,41 @@ export const ProfileScreen = ({ onBack }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [customAvatarUrl, setCustomAvatarUrl] = useState('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  const AVATAR_PRESETS = [
+    { id: '1', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300', label: 'Traveller 1' },
+    { id: '2', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300', label: 'Traveller 2' },
+    { id: '3', url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300', label: 'Traveller 3' },
+    { id: '4', url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=300', label: 'Traveller 4' },
+    { id: '5', url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300', label: 'Traveller 5' },
+  ];
+
+  const handleSelectAvatar = async (avatarUrl) => {
+    if (!avatarUrl || isUploadingAvatar) return;
+    setIsUploadingAvatar(true);
+    setSaveError('');
+    try {
+      const res = await profileService.uploadAvatar(avatarUrl);
+      if (res && res.success) {
+        const finalUrl = res.avatarUrl || avatarUrl;
+        if (updateUser) {
+          await updateUser({ ...user, avatar: finalUrl });
+        }
+        setIsAvatarModalOpen(false);
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+      } else {
+        setSaveError(res?.message || 'Failed to update profile picture.');
+      }
+    } catch (e) {
+      setSaveError(e.message || 'Error updating profile picture.');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   // Fetch real profile from backend on mount
   useEffect(() => {
@@ -175,19 +210,24 @@ export const ProfileScreen = ({ onBack }) => {
             SHADOWS.card,
           ]}
         >
-          <View style={styles.avatarWrapper}>
-            <Image
-              source={{
-                uri:
-                  user?.avatar ||
-                  `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name || 'Tourist')}`,
-              }}
-              style={styles.avatarImg}
-            />
+          <TouchableOpacity
+            style={styles.avatarWrapper}
+            onPress={() => setIsAvatarModalOpen(true)}
+            activeOpacity={0.8}
+          >
+            {user?.avatar ? (
+              <Image source={{ uri: user.avatar }} style={styles.avatarImg} />
+            ) : (
+              <View style={[styles.avatarImg, { backgroundColor: '#FFE5EC', alignItems: 'center', justifyContent: 'center' }]}>
+                <Text style={{ fontSize: 22, fontWeight: '800', color: '#FF3B69' }}>
+                  {(name || user?.name || user?.fullName || 'T').charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            )}
             <View style={styles.avatarCameraBadge}>
-              <Ionicons name="shield-checkmark" size={14} color="#FFFFFF" />
+              <Ionicons name="camera" size={13} color="#FFFFFF" />
             </View>
-          </View>
+          </TouchableOpacity>
 
           <View style={styles.userInfo}>
             <Text style={[styles.userName, { color: colors.text }]}>{name || user?.name || user?.fullName || 'Active Tourist'}</Text>
@@ -282,6 +322,77 @@ export const ProfileScreen = ({ onBack }) => {
           <Text style={styles.signOutText}>Sign Out of Tourist Profile</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Avatar Selection Modal */}
+      <Modal
+        visible={isAvatarModalOpen}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setIsAvatarModalOpen(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, maxHeight: '80%' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: '#1E293B' }}>Choose Profile Picture</Text>
+              <TouchableOpacity onPress={() => setIsAvatarModalOpen(false)}>
+                <Ionicons name="close-circle" size={24} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={{ fontSize: 12, color: '#64748B', marginBottom: 12 }}>
+              Select a verified portrait or enter an image URL to sync with Command Center:
+            </Text>
+
+            {/* Presets Grid */}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginBottom: 16 }}>
+              {AVATAR_PRESETS.map((p) => (
+                <TouchableOpacity
+                  key={p.id}
+                  onPress={() => handleSelectAvatar(p.url)}
+                  disabled={isUploadingAvatar}
+                  style={{
+                    borderWidth: user?.avatar === p.url ? 3 : 1,
+                    borderColor: user?.avatar === p.url ? '#FF5E7E' : '#E2E8F0',
+                    borderRadius: 36,
+                    padding: 2,
+                  }}
+                >
+                  <Image source={{ uri: p.url }} style={{ width: 56, height: 56, borderRadius: 28 }} />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Custom Image URL input */}
+            <View style={{ marginBottom: 16 }}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#1E293B', marginBottom: 4 }}>Or Custom Image URL:</Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <TextInput
+                  style={{ flex: 1, borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 8, fontSize: 12 }}
+                  placeholder="https://..."
+                  value={customAvatarUrl}
+                  onChangeText={setCustomAvatarUrl}
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity
+                  onPress={() => handleSelectAvatar(customAvatarUrl.trim())}
+                  disabled={!customAvatarUrl.trim() || isUploadingAvatar}
+                  style={{ backgroundColor: '#FF5E7E', borderRadius: 10, paddingHorizontal: 14, justifyContent: 'center' }}
+                >
+                  {isUploadingAvatar ? <ActivityIndicator size="small" color="#FFFFFF" /> : <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 12 }}>Set</Text>}
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Clear / Initials Fallback */}
+            <TouchableOpacity
+              onPress={() => handleSelectAvatar(`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name || 'Tourist')}`)}
+              style={{ paddingVertical: 10, alignItems: 'center' }}
+            >
+              <Text style={{ fontSize: 12, color: '#FF5E7E', fontWeight: '700' }}>Reset to Avatar Initials</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

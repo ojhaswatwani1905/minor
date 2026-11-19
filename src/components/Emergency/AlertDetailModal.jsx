@@ -6,6 +6,7 @@ import {
   MapPin, 
   MapPinOff,
   Phone, 
+  Mail,
   Clock, 
   ShieldAlert, 
   Plus, 
@@ -53,6 +54,19 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
 
   const deviceInfo = alertDetail.deviceInfo || null;
 
+  const touristName = alertDetail.user?.fullName || alertDetail.userName || 'Active Traveller';
+  const touristId = alertDetail.user?.id || alertDetail.userId || 'Guest/Unassigned';
+  const touristEmail = alertDetail.user?.email || null;
+  const touristPhone = alertDetail.user?.phone || null;
+  const touristAvatar = alertDetail.user?.avatar || null;
+  const touristInitials = touristName
+    .split(' ')
+    .filter(Boolean)
+    .map(w => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || 'T';
+
   return (
     <Modal
       isOpen={isOpen}
@@ -91,21 +105,51 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
         {/* Telemetry Breakdown Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Traveller & Contact Info */}
-          <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-2">
+          <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-3">
             <p className="font-bold text-white/70 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
               <UserCheck className="w-3.5 h-3.5 text-honey" />
               Traveller Identity
             </p>
-            <p className="text-sm font-extrabold text-white">{alertDetail.userName || 'Anonymous Traveller'}</p>
-            <p className="text-white/70">
-              User ID: <span className="font-mono text-white/90">{alertDetail.userId || 'Guest/Unassigned'}</span>
-            </p>
-            {alertDetail.user?.phone && (
-              <p className="text-white/80 flex items-center gap-1">
-                <Phone className="w-3 h-3 text-honey" />
-                {alertDetail.user.phone}
+            <div className="flex items-center gap-3">
+              {touristAvatar ? (
+                <img
+                  src={touristAvatar}
+                  alt={touristName}
+                  className="w-12 h-12 rounded-full object-cover border-2 border-honey/40 flex-shrink-0 bg-black/20"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.nextElementSibling;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div
+                style={{ display: touristAvatar ? 'none' : 'flex' }}
+                className="w-12 h-12 rounded-full bg-honey/20 border-2 border-honey/40 flex items-center justify-center font-black text-honey text-sm flex-shrink-0"
+              >
+                {touristInitials}
+              </div>
+              <div className="space-y-0.5 min-w-0">
+                <p className="text-sm font-extrabold text-white truncate">{touristName}</p>
+                {touristEmail && (
+                  <p className="text-white/80 flex items-center gap-1 text-[11px] truncate">
+                    <Mail className="w-3 h-3 text-honey flex-shrink-0" />
+                    <span>{touristEmail}</span>
+                  </p>
+                )}
+                {touristPhone && (
+                  <p className="text-white/80 flex items-center gap-1 text-[11px]">
+                    <Phone className="w-3 h-3 text-honey flex-shrink-0" />
+                    <span>{touristPhone}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="pt-2 border-t border-white/10">
+              <p className="text-white/60 text-[11px]">
+                User ID: <span className="font-mono text-white/90">{touristId}</span>
               </p>
-            )}
+            </div>
           </div>
 
           {/* GPS Coordinates & Map Link */}
@@ -187,31 +231,57 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
           </div>
 
           {/* Device & Trip Telemetry */}
-          <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-3">
+          <div className="p-4 rounded-2xl bg-[#1E3732] border border-white/10 space-y-2.5">
             <p className="font-bold text-white/70 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
               <Smartphone className="w-3.5 h-3.5 text-honey" />
-              Device & Trip Association
+              Device Intelligence & Telemetry
             </p>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 text-[11px]">
               <div className="flex items-center justify-between">
                 <span className="text-white/70">Device Platform:</span>
                 <span className="font-medium text-white/90">
-                  {deviceInfo?.platform ? deviceInfo.platform.toUpperCase() : 'Unknown'}
+                  {deviceInfo?.platform ? deviceInfo.platform.toUpperCase() : 'Unavailable'}
                 </span>
               </div>
-              {deviceInfo?.model && (
-                <div className="flex items-center justify-between">
-                  <span className="text-white/70">Device Model:</span>
-                  <span className="font-medium text-white/90">{deviceInfo.model}</span>
-                </div>
-              )}
-              {deviceInfo?.osVersion && (
-                <div className="flex items-center justify-between">
-                  <span className="text-white/70">OS Version:</span>
-                  <span className="font-mono text-white/90">{deviceInfo.osVersion}</span>
-                </div>
-              )}
+              <div className="flex items-center justify-between">
+                <span className="text-white/70">Device Manufacturer:</span>
+                <span className="font-medium text-white/90">{deviceInfo?.manufacturer || 'Unavailable'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/70">Device Model:</span>
+                <span className="font-medium text-white/90">{deviceInfo?.model || 'Unavailable'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/70">Android Version:</span>
+                <span className="font-mono text-white/90">{deviceInfo?.androidVersion || 'Unavailable'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/70">Device OS Version:</span>
+                <span className="font-mono text-white/90">{deviceInfo?.osVersion || 'Unavailable'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/70">App Version / Build:</span>
+                <span className="font-mono text-white/90">
+                  {deviceInfo?.appVersion ? `v${deviceInfo.appVersion} (${deviceInfo.appBuildNumber || '1'})` : 'Unavailable'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/70">Charging Status:</span>
+                <span className="font-medium text-emerald-400">{deviceInfo?.batteryChargingStatus || 'Unavailable'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/70">Network Type:</span>
+                <span className="font-medium text-white/90">
+                  {deviceInfo?.networkConnectionType || networkStatus || 'Unavailable'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/70">Last Telemetry Ping:</span>
+                <span className="font-mono text-honey text-[10px]">
+                  {deviceInfo?.lastTelemetryUpdate ? new Date(deviceInfo.lastTelemetryUpdate).toLocaleTimeString() : (alertDetail.timestamp ? new Date(alertDetail.timestamp).toLocaleTimeString() : 'Unavailable')}
+                </span>
+              </div>
               <div className="flex items-center justify-between pt-1 border-t border-white/10">
                 <span className="text-white/70">Associated Trip:</span>
                 <span className="font-medium text-honey">

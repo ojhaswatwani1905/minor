@@ -67,8 +67,18 @@
     ],
     "activeTripId": "e365a2d6-ac2c-42f1-bdc4-a1c31b05d81c",
     "lastAlertTimestamp": "2026-11-19T09:54:43.458283+00:00",
-    "lastPing": "2026-11-19T10:11:27.087Z",
-    "source": "Supabase"
+    "lastPing": "2026-11-19T17:43:28.011Z",
+    "source": "Supabase",
+    "activeSafeZone": {
+      "tripId": "sz_trp_1795110205275",
+      "destination": "Agra Airport",
+      "coords": {
+        "lat": 27.1558,
+        "lng": 77.9654
+      },
+      "radiusMeters": 5000,
+      "status": "ACTIVE"
+    }
   },
   {
     "id": "usr_1794942568604",
@@ -193,9 +203,9 @@
         "verified": true
       }
     ],
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Priya%20Sharma%20(Verified)",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80",
     "createdAt": "2026-11-17T08:36:27.743Z",
-    "updatedAt": "2026-11-17T16:48:57.123Z",
+    "updatedAt": "2026-11-19T17:43:31.200Z",
     "currentLocation": {
       "name": "Emergency GPS Fix (32.2410, 77.1895)",
       "lat": 32.241,
