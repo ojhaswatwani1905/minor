@@ -1,5 +1,350 @@
 [
   {
+    "id": "sz_trp_1795167892331",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "userPhone": "+91 98765 43210",
+    "destination": "Agra Airport",
+    "destinationName": "Agra Airport",
+    "destinationCoords": {
+      "lat": 27.1558,
+      "lng": 77.9654
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1542296332-2e4473faf563?w=800&q=80",
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-20T09:44:52.331Z",
+    "currentLocation": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "accuracy": 20,
+      "name": "GPS Fix (27.3200, 78.1200)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 23811,
+    "distanceOutsideBoundaryMeters": 18811,
+    "batteryLevel": 65,
+    "consecutiveOutsideCount": 1,
+    "warningStartedAt": "2026-11-20T09:44:56.711Z",
+    "breachConfirmedAt": "2026-11-20T09:45:07.046Z",
+    "activeAlertId": "830e848c-6697-4a24-b3bc-ea2fa2d3baa3",
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-20T09:44:52.331Z",
+    "updatedAt": "2026-11-20T09:44:56.711Z",
+    "history": [
+      {
+        "timestamp": "2026-11-20T09:45:09.209Z",
+        "event": "AUTOMATIC_BREACH_ESCALATED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "alertId": "830e848c-6697-4a24-b3bc-ea2fa2d3baa3",
+        "trigger": "SERVER_SIDE_10S_WORKER",
+        "note": "AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds."
+      },
+      {
+        "timestamp": "2026-11-20T09:44:56.711Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 23811,
+        "distanceOutside": 18811,
+        "warningExpiresAt": "2026-11-20T09:45:06.711Z",
+        "note": "Tourist crossed 5km perimeter. Outside by 18811m. 10-second emergency grace countdown initiated."
+      },
+      {
+        "timestamp": "2026-11-20T09:44:52.331Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Agra Airport (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 20,
+    "lastPingAt": "2026-11-20T09:44:56.711Z",
+    "warningExpiresAt": "2026-11-20T09:45:06.711Z",
+    "warningAcknowledged": false,
+    "escalationProcessed": true,
+    "latestTelemetry": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "accuracy": 20,
+      "battery": 65,
+      "deviceInfo": {
+        "manufacturer": "Google",
+        "model": "Pixel 7",
+        "platform": "Android",
+        "androidVersion": "14",
+        "appVersion": "1.0.0",
+        "batteryPercentage": 65
+      },
+      "distanceMeters": 23811,
+      "distanceOutside": 18811,
+      "timestamp": "2026-11-20T09:44:56.711Z"
+    },
+    "supabaseTripId": "e113107a-05ed-4762-8868-9c5d0eece564"
+  },
+  {
+    "id": "sz_trp_1795167885001",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "userPhone": "+91 98765 43210",
+    "destination": "Agra Airport",
+    "destinationName": "Agra Airport",
+    "destinationCoords": {
+      "lat": 27.1558,
+      "lng": 77.9654
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1542296332-2e4473faf563?w=800&q=80",
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "ACTIVE",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-20T09:44:45.001Z",
+    "currentLocation": {
+      "lat": 27.3,
+      "lng": 78.1,
+      "name": "GPS Fix (27.3000, 78.1000)",
+      "timestamp": "2026-11-20T09:44:52.328Z"
+    },
+    "distanceFromDestMeters": 20838,
+    "distanceOutsideBoundaryMeters": 15838,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": null,
+    "activeAlertId": null,
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-20T09:44:45.001Z",
+    "updatedAt": "2026-11-20T09:44:52.328Z",
+    "history": [
+      {
+        "timestamp": "2026-11-20T09:44:52.328Z",
+        "event": "WARNING_ACKNOWLEDGED_SAFE",
+        "previousStatus": "WARNING",
+        "status": "ACTIVE",
+        "coords": {
+          "lat": 27.3,
+          "lng": 78.1
+        },
+        "note": "Verified safe by tourist bhoot on mobile device."
+      },
+      {
+        "timestamp": "2026-11-20T09:44:52.324Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 20838,
+        "distanceOutside": 15838,
+        "warningExpiresAt": "2026-11-20T09:45:02.324Z",
+        "note": "Tourist crossed 5km perimeter. Outside by 15838m. 10-second emergency grace countdown initiated."
+      },
+      {
+        "timestamp": "2026-11-20T09:44:45.001Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Agra Airport (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 18,
+    "lastPingAt": "2026-11-20T09:44:52.324Z",
+    "warningExpiresAt": null,
+    "warningAcknowledged": true,
+    "escalationProcessed": false,
+    "latestTelemetry": {
+      "lat": 27.3,
+      "lng": 78.1,
+      "accuracy": 18,
+      "battery": null,
+      "deviceInfo": null,
+      "distanceMeters": 20838,
+      "distanceOutside": 15838,
+      "timestamp": "2026-11-20T09:44:52.324Z"
+    },
+    "warningAcknowledgedAt": "2026-11-20T09:44:52.328Z",
+    "pendingBreachEventId": null
+  },
+  {
+    "id": "sz_trp_1795167672543",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "userPhone": "+91 98765 43210",
+    "destination": "Agra Airport",
+    "destinationName": "Agra Airport",
+    "destinationCoords": {
+      "lat": 27.1558,
+      "lng": 77.9654
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1542296332-2e4473faf563?w=800&q=80",
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "BREACHED",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-20T09:41:12.543Z",
+    "currentLocation": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "accuracy": 20,
+      "name": "GPS Fix (27.3200, 78.1200)",
+      "elevation": null
+    },
+    "distanceFromDestMeters": 23811,
+    "distanceOutsideBoundaryMeters": 18811,
+    "batteryLevel": 65,
+    "consecutiveOutsideCount": 1,
+    "warningStartedAt": null,
+    "breachConfirmedAt": "2026-11-20T09:41:38.132Z",
+    "activeAlertId": "b4b8f266-4927-4e96-8390-441255d9d5d2",
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-20T09:41:12.543Z",
+    "updatedAt": "2026-11-20T09:41:38.132Z",
+    "history": [
+      {
+        "timestamp": "2026-11-20T09:41:38.132Z",
+        "event": "AUTOMATIC_BREACH_ESCALATED",
+        "previousStatus": "WARNING",
+        "status": "BREACHED",
+        "alertId": "b4b8f266-4927-4e96-8390-441255d9d5d2",
+        "note": "AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds."
+      },
+      {
+        "timestamp": "2026-11-20T09:41:15.042Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 23811,
+        "distanceOutside": 18811,
+        "warningExpiresAt": "2026-11-20T09:41:25.042Z",
+        "note": "Tourist crossed 5km perimeter. Outside by 18811m. 10-second emergency grace countdown initiated."
+      },
+      {
+        "timestamp": "2026-11-20T09:41:12.543Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Agra Airport (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 20,
+    "lastPingAt": "2026-11-20T09:41:15.042Z",
+    "warningExpiresAt": null,
+    "warningAcknowledged": false,
+    "escalationProcessed": true,
+    "latestTelemetry": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "accuracy": 20,
+      "battery": 65,
+      "deviceInfo": {
+        "manufacturer": "Google",
+        "model": "Pixel 7",
+        "platform": "Android",
+        "androidVersion": "14",
+        "appVersion": "1.0.0",
+        "batteryPercentage": 65
+      },
+      "distanceMeters": 23811,
+      "distanceOutside": 18811,
+      "timestamp": "2026-11-20T09:41:15.042Z"
+    },
+    "supabaseTripId": "433fb55d-9277-4a89-9719-7e0085f16f82"
+  },
+  {
+    "id": "sz_trp_1795167668356",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "userPhone": "+91 98765 43210",
+    "destination": "Agra Airport",
+    "destinationName": "Agra Airport",
+    "destinationCoords": {
+      "lat": 27.1558,
+      "lng": 77.9654
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1542296332-2e4473faf563?w=800&q=80",
+    "radiusMeters": 5000,
+    "boundaryRadiusKm": 5,
+    "status": "ACTIVE",
+    "hasEnteredZone": true,
+    "enteredZoneAt": "2026-11-20T09:41:08.356Z",
+    "currentLocation": {
+      "lat": 27.3,
+      "lng": 78.1,
+      "name": "GPS Fix (27.3000, 78.1000)",
+      "timestamp": "2026-11-20T09:41:12.541Z"
+    },
+    "distanceFromDestMeters": 20838,
+    "distanceOutsideBoundaryMeters": 15838,
+    "batteryLevel": null,
+    "consecutiveOutsideCount": 0,
+    "warningStartedAt": null,
+    "breachConfirmedAt": null,
+    "activeAlertId": null,
+    "guardianName": "Primary Guardian",
+    "guardianPhone": "+91 98765 43210",
+    "guardianEmail": "guardian@stsms.gov",
+    "notes": "Safe Travel Zone auto-geofencing active.",
+    "createdAt": "2026-11-20T09:41:08.356Z",
+    "updatedAt": "2026-11-20T09:41:12.541Z",
+    "history": [
+      {
+        "timestamp": "2026-11-20T09:41:12.541Z",
+        "event": "WARNING_ACKNOWLEDGED_SAFE",
+        "previousStatus": "WARNING",
+        "status": "ACTIVE",
+        "coords": {
+          "lat": 27.3,
+          "lng": 78.1
+        },
+        "note": "Verified safe by tourist bhoot on mobile device."
+      },
+      {
+        "timestamp": "2026-11-20T09:41:12.538Z",
+        "event": "BOUNDARY_WARNING",
+        "previousStatus": "ACTIVE",
+        "status": "WARNING",
+        "distanceMeters": 20838,
+        "distanceOutside": 15838,
+        "warningExpiresAt": "2026-11-20T09:41:22.538Z",
+        "note": "Tourist crossed 5km perimeter. Outside by 15838m. 10-second emergency grace countdown initiated."
+      },
+      {
+        "timestamp": "2026-11-20T09:41:08.356Z",
+        "event": "ZONE_CREATED",
+        "status": "ACTIVE",
+        "distanceMeters": 0,
+        "note": "Safe Travel Zone activated around Agra Airport (5000m boundary)"
+      }
+    ],
+    "lastAccuracyMeters": 18,
+    "lastPingAt": "2026-11-20T09:41:12.538Z",
+    "warningExpiresAt": null,
+    "warningAcknowledged": true,
+    "escalationProcessed": false,
+    "latestTelemetry": {
+      "lat": 27.3,
+      "lng": 78.1,
+      "accuracy": 18,
+      "battery": null,
+      "deviceInfo": null,
+      "distanceMeters": 20838,
+      "distanceOutside": 15838,
+      "timestamp": "2026-11-20T09:41:12.538Z"
+    },
+    "warningAcknowledgedAt": "2026-11-20T09:41:12.541Z",
+    "pendingBreachEventId": null
+  },
+  {
     "id": "sz_trp_1795163081120",
     "userId": "usr_bhoot_live",
     "userName": "bhoot",

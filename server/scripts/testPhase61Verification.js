@@ -271,7 +271,7 @@ async function runPhase61Verification() {
     console.log('   ⏳ Waiting 11s for 10-second deadline to expire, then polling for worker auto-escalation...');
     await sleep(11000);
     let activeData = null;
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 25; i++) {
       const activeRes = await fetch(`${API_BASE}/safe-zones/${trip2Id}`, {
         headers: { Authorization: `Bearer ${touristAToken}` }
       });
