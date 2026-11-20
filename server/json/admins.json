@@ -4,7 +4,7 @@
     "name": "bhoot",
     "email": "bhoot@gmail.com",
     "role": "Explorer User",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bhoot",
+    "avatar": "https://jdjluwufmorxeankmqwj.supabase.co/storage/v1/object/public/avatars/tourist_usr_bhoot_live_1795163110142.png",
     "department": "Tourist Explorer",
     "phone": "+91 98765 43210"
   },
@@ -151,17 +151,6 @@
     "phone": "+919876599999"
   },
   {
-    "id": "usr_1794907506310",
-    "name": "Hacked By User B",
-    "email": "tourist_b_1794907506240@stsms.gov",
-    "password": "$2a$10$cXFQ1dldjDi9APf3IDKDiO8gXLw2l8eiWOegi8qMDnFhaKUGx0PV6",
-    "role": "Explorer User",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bhavna%20Sen",
-    "department": "Tourist Explorer",
-    "createdAt": "2026-11-17T09:25:06.310Z",
-    "phone": "+910000000000"
-  },
-  {
     "id": "usr_1794933686833",
     "name": "Aarav Patel (Verified)",
     "email": "tourist_a_1794933686756@stsms.gov",
@@ -171,17 +160,6 @@
     "department": "Tourist Explorer",
     "createdAt": "2026-11-17T16:41:26.833Z",
     "phone": "+919876599999"
-  },
-  {
-    "id": "usr_1794933686909",
-    "name": "Hacked By User B",
-    "email": "tourist_b_1794933686836@stsms.gov",
-    "password": "$2a$10$b5Kn53PV.pBuRNxMTZxvD.9XBhKaMv25WSIE5T7xbBOqkW6P4VqD6",
-    "role": "Explorer User",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bhavna%20Sen",
-    "department": "Tourist Explorer",
-    "createdAt": "2026-11-17T16:41:26.909Z",
-    "phone": "+910000000000"
   },
   {
     "id": "usr_1794942568604",

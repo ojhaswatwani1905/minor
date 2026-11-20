@@ -310,6 +310,23 @@ export const getActiveSafeZoneTrip = async (req, res, next) => {
 };
 
 /**
+ * 3b. Get Safe Zone Trip by ID
+ */
+export const getSafeZoneTripById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const trips = await readJson('trips');
+    const trip = trips.find(t => t.id === id);
+    if (!trip) {
+      return res.status(404).json({ success: false, message: 'Safe travel zone trip not found.' });
+    }
+    res.json({ success: true, trip });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * 4. Update Tourist Location & Evaluate Geofence Boundary Transition (Server-Side State Machine)
  * Includes GPS accuracy checks, consecutive reading confirmation, and idempotent automatic SOS dispatch.
  */
@@ -404,9 +421,22 @@ export const updateSafeZoneLocation = async (req, res, next) => {
           // Tourist moved outside boundary: enter WARNING state & start 10-second response window
           nextStatus = 'WARNING';
           trip.consecutiveOutsideCount = 1;
-          trip.warningStartedAt = now;
-          trip.warningExpiresAt = new Date(Date.now() + 10000).toISOString();
+          const warningStart = now;
+          const warningExpiry = new Date(Date.now() + 10000).toISOString();
+          trip.warningStartedAt = warningStart;
+          trip.warningExpiresAt = warningExpiry;
           trip.warningAcknowledged = false;
+          trip.escalationProcessed = false;
+          trip.latestTelemetry = {
+            lat: parsedLat,
+            lng: parsedLng,
+            accuracy: parsedAccuracy,
+            battery: parsedBattery,
+            deviceInfo: req.body.deviceInfo || trip.deviceInfo || null,
+            distanceMeters,
+            distanceOutside,
+            timestamp: now
+          };
           transitionEvent = {
             timestamp: now,
             event: 'BOUNDARY_WARNING',
@@ -414,6 +444,7 @@ export const updateSafeZoneLocation = async (req, res, next) => {
             status: nextStatus,
             distanceMeters,
             distanceOutside,
+            warningExpiresAt: warningExpiry,
             note: `Tourist crossed 5km perimeter. Outside by ${distanceOutside}m. 10-second emergency grace countdown initiated.`
           };
         }
@@ -568,7 +599,8 @@ export const updateSafeZoneLocation = async (req, res, next) => {
       distanceMeters,
       distanceFromDestMeters: distanceMeters,
       distanceOutsideBoundaryMeters: distanceOutside,
-      countdownSeconds: nextStatus === 'WARNING' ? 10 : null,
+      countdownSeconds: nextStatus === 'WARNING' && trip.warningExpiresAt ? Math.max(0, Math.ceil((new Date(trip.warningExpiresAt).getTime() - Date.now()) / 1000)) : (nextStatus === 'WARNING' ? 10 : null),
+      warningExpiresAt: trip.warningExpiresAt || null,
       isInsideRadius,
       consecutiveOutsideCount: trip.consecutiveOutsideCount,
       alertDispatched: Boolean(alertCreated),
@@ -583,7 +615,7 @@ export const updateSafeZoneLocation = async (req, res, next) => {
 /**
  * Helper to idempotently create and dispatch a GEOFENCE_BREACH incident to Supabase and Admin
  */
-const dispatchAutomaticGeofenceAlert = async (trip, telemetry) => {
+export const dispatchAutomaticGeofenceAlert = async (trip, telemetry) => {
   const alertId = `alt_geo_${Date.now()}`;
   const now = telemetry.timestamp || new Date().toISOString();
 
@@ -595,7 +627,7 @@ const dispatchAutomaticGeofenceAlert = async (trip, telemetry) => {
     type: 'GEOFENCE_BREACH',
     subtype: 'AUTOMATIC_SAFEZONE_BREACH',
     priority: 'CRITICAL',
-    message: `🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist ${trip.userName} exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Boundary: ${trip.destination} (5 km). Outside by: ${telemetry.distanceOutside != null ? telemetry.distanceOutside + 'm' : 'Outside boundary'}. Coordinates: (${telemetry.lat.toFixed(4)}, ${telemetry.lng.toFixed(4)}). Battery: ${telemetry.battery}%.`,
+    message: `🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Tourist: ${trip.userName}. Destination: ${trip.destination} (5 km boundary). Outside by: ${telemetry.distanceOutside != null ? telemetry.distanceOutside + 'm' : 'Outside boundary'}. Coordinates: (${telemetry.lat.toFixed(4)}, ${telemetry.lng.toFixed(4)}). Battery: ${telemetry.battery}%.`,
     location: {
       lat: telemetry.lat,
       lng: telemetry.lng,
@@ -627,7 +659,7 @@ const dispatchAutomaticGeofenceAlert = async (trip, telemetry) => {
           await supabase.from('trips').insert({
             id: sbTripId,
             user_id: defaultUserId,
-            title: `Safe Zone: ${trip.destination}`,
+            title: `Safe Zone: ${trip.destination} (${trip.userName})`,
             status: 'active',
             start_at: now,
             end_at: new Date(Date.now() + 86400000).toISOString(),
@@ -727,7 +759,7 @@ const dispatchAutomaticGeofenceAlert = async (trip, telemetry) => {
 export const acknowledgeBreachWarning = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { lat, lng, timestamp, note } = req.body;
+    const { lat, lng, timestamp, note, userId } = req.body;
     const trips = await readJson('trips');
     const tripIndex = trips.findIndex(t => t.id === id);
 
@@ -736,6 +768,33 @@ export const acknowledgeBreachWarning = async (req, res, next) => {
     }
 
     const trip = trips[tripIndex];
+
+    // Ownership authorization check
+    const authId = req.user?.id || req.admin?.id || userId;
+    if (authId && trip.userId && authId !== trip.userId && !req.admin) {
+      return res.status(403).json({ success: false, message: 'Not authorized to acknowledge warning for this trip.' });
+    }
+
+    // Check if warning has already been escalated
+    if (trip.escalationProcessed || trip.status === 'BREACHED') {
+      return res.status(409).json({
+        success: false,
+        code: 'ESCALATION_ALREADY_TRIGGERED',
+        message: 'The 10-second emergency grace period has already expired and an emergency alert was dispatched to the Command Center.',
+        trip
+      });
+    }
+
+    // Check if warning expired past deadline
+    if (trip.warningExpiresAt && Date.now() > new Date(trip.warningExpiresAt).getTime()) {
+      return res.status(409).json({
+        success: false,
+        code: 'DEADLINE_EXPIRED',
+        message: 'The 10-second response window has expired.',
+        trip
+      });
+    }
+
     const now = timestamp || new Date().toISOString();
     const prevStatus = trip.status;
 
@@ -744,6 +803,8 @@ export const acknowledgeBreachWarning = async (req, res, next) => {
     trip.warningExpiresAt = null;
     trip.warningAcknowledged = true;
     trip.warningAcknowledgedAt = now;
+    trip.escalationProcessed = false;
+    trip.pendingBreachEventId = null;
     trip.consecutiveOutsideCount = 0;
     trip.status = 'ACTIVE';
 
@@ -791,7 +852,7 @@ export const acknowledgeBreachWarning = async (req, res, next) => {
 export const escalateBreach = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { lat, lng, accuracy, battery, deviceInfo, distanceMeters, distanceOutside, timestamp } = req.body;
+    const { lat, lng, accuracy, battery, deviceInfo, distanceMeters, distanceOutside, timestamp, userId } = req.body;
     const trips = await readJson('trips');
     const tripIndex = trips.findIndex(t => t.id === id);
 
@@ -800,12 +861,31 @@ export const escalateBreach = async (req, res, next) => {
     }
 
     const trip = trips[tripIndex];
+
+    // Ownership authorization check
+    const authId = req.user?.id || req.admin?.id || userId;
+    if (authId && trip.userId && authId !== trip.userId && !req.admin) {
+      return res.status(403).json({ success: false, message: 'Not authorized to escalate breach for this trip.' });
+    }
+
+    // If trip already escalated, return existing alert idempotently
+    if (trip.status === 'BREACHED' && trip.activeAlertId) {
+      return res.json({
+        success: true,
+        isExisting: true,
+        message: 'Safe-Zone breach already active on this trip. Telemetry updated.',
+        alert: { id: trip.activeAlertId },
+        trip
+      });
+    }
+
     const now = timestamp || new Date().toISOString();
 
     trip.status = 'BREACHED';
     trip.breachConfirmedAt = now;
     trip.warningStartedAt = null;
     trip.warningExpiresAt = null;
+    trip.escalationProcessed = true;
 
     if (deviceInfo) {
       trip.deviceInfo = deviceInfo;
@@ -856,6 +936,121 @@ export const escalateBreach = async (req, res, next) => {
 };
 
 /**
+ * 5c. Explicitly report/initiate boundary breach event from mobile or edge service.
+ * Starts authoritative server-side 10-second escalation countdown.
+ */
+export const reportBreachEvent = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { lat, lng, accuracy, batteryLevel, deviceInfo, distanceMeters, distanceOutside, timestamp, userId } = req.body;
+    const trips = await readJson('trips');
+    const tripIndex = trips.findIndex(t => t.id === id);
+
+    if (tripIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Safe travel zone trip not found.' });
+    }
+
+    const trip = trips[tripIndex];
+
+    // Ownership authorization check
+    const authId = req.user?.id || req.admin?.id || userId;
+    if (authId && trip.userId && authId !== trip.userId && !req.admin) {
+      return res.status(403).json({ success: false, message: 'Not authorized to report breach for this Safe Travel Zone trip.' });
+    }
+
+    const now = timestamp || new Date().toISOString();
+
+    // If already in WARNING, return existing deadline without resetting timer
+    if (trip.status === 'WARNING' && trip.warningExpiresAt && !trip.escalationProcessed) {
+      const remainingSeconds = Math.max(0, Math.ceil((new Date(trip.warningExpiresAt).getTime() - Date.now()) / 1000));
+      return res.json({
+        success: true,
+        isExistingWarning: true,
+        eventId: trip.pendingBreachEventId || `evt_breach_${trip.id}`,
+        status: 'WARNING',
+        warningStartedAt: trip.warningStartedAt,
+        warningExpiresAt: trip.warningExpiresAt,
+        deadlineSecondsRemaining: remainingSeconds,
+        trip
+      });
+    }
+
+    // Accuracy check: reject inaccurate fixes (>80m)
+    const parsedAcc = accuracy != null ? parseFloat(accuracy) : 15;
+    if (parsedAcc > 80) {
+      return res.status(400).json({
+        success: false,
+        message: `GPS accuracy too low (${parsedAcc}m > 80m). Boundary breach rejected to prevent false positive.`
+      });
+    }
+
+    const eventId = `evt_breach_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const warningExpiry = new Date(Date.now() + 10000).toISOString();
+
+    trip.status = 'WARNING';
+    trip.warningStartedAt = now;
+    trip.warningExpiresAt = warningExpiry;
+    trip.warningAcknowledged = false;
+    trip.escalationProcessed = false;
+    trip.pendingBreachEventId = eventId;
+    trip.latestTelemetry = {
+      lat: lat != null ? parseFloat(lat) : trip.currentLocation?.lat,
+      lng: lng != null ? parseFloat(lng) : trip.currentLocation?.lng,
+      accuracy: parsedAcc,
+      battery: batteryLevel != null ? parseInt(batteryLevel, 10) : trip.batteryLevel,
+      deviceInfo: deviceInfo || trip.deviceInfo || null,
+      distanceMeters: distanceMeters || trip.distanceFromDestMeters,
+      distanceOutside: distanceOutside || trip.distanceOutsideBoundaryMeters,
+      timestamp: now
+    };
+
+    const auditEntry = {
+      timestamp: now,
+      event: 'BOUNDARY_WARNING_INITIATED',
+      eventId,
+      previousStatus: trip.status,
+      status: 'WARNING',
+      warningExpiresAt: warningExpiry,
+      note: 'Tourist crossed 5km perimeter. 10-second server-side emergency grace countdown initiated.'
+    };
+
+    if (!trip.history) trip.history = [];
+    trip.history.unshift(auditEntry);
+
+    trip.updatedAt = now;
+    trips[tripIndex] = trip;
+    await writeJson('trips', trips);
+
+    res.status(200).json({
+      success: true,
+      eventId,
+      status: 'WARNING',
+      warningStartedAt: now,
+      warningExpiresAt: warningExpiry,
+      deadlineSecondsRemaining: 10,
+      trip
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * 5d. Get diagnostic status of the Server-Side Breach Escalation Worker.
+ */
+export const getEscalationWorkerStatus = async (req, res, next) => {
+  try {
+    const { getBreachWorkerMetrics } = await import('../services/breachEscalationWorker.js');
+    res.json({
+      success: true,
+      worker: getBreachWorkerMetrics()
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * 5. Tourist Confirms Safe ("I Am Safe")
  * Records confirmation in history and alert_events without silently erasing the incident record.
  */
@@ -871,6 +1066,13 @@ export const confirmSafe = async (req, res, next) => {
     }
 
     const trip = trips[tripIndex];
+
+    // Ownership authorization check
+    const authId = req.user?.id || req.admin?.id || req.body?.userId;
+    if (authId && trip.userId && authId !== trip.userId && !req.admin) {
+      return res.status(403).json({ success: false, message: 'Not authorized to confirm safety for this Safe Travel Zone trip.' });
+    }
+
     const now = new Date().toISOString();
     const prevStatus = trip.status;
 
@@ -963,6 +1165,13 @@ export const updateSafeZoneStatus = async (req, res, next) => {
     }
 
     const trip = trips[tripIndex];
+
+    // Ownership authorization check
+    const authId = req.user?.id || req.admin?.id || req.body?.userId;
+    if (authId && trip.userId && authId !== trip.userId && !req.admin) {
+      return res.status(403).json({ success: false, message: 'Not authorized to confirm safety for this Safe Travel Zone trip.' });
+    }
+
     const now = new Date().toISOString();
     let newStatus = trip.status;
 

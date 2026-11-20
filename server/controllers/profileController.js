@@ -8,12 +8,12 @@ import { isSupabaseConfigured, getSupabaseClient } from '../database/supabase.js
 export const saveAvatarToStorage = async (avatarInput, userId) => {
   if (!avatarInput || typeof avatarInput !== 'string') return null;
 
-  // If already an HTTP/HTTPS URL, return it directly
-  if (avatarInput.startsWith('http://') || avatarInput.startsWith('https://')) {
+  // If already stored in our Supabase Storage avatars bucket, return it directly
+  if (avatarInput.includes('supabase.co/storage/v1/object/public/avatars/')) {
     return avatarInput;
   }
 
-  // If base64 data URL
+  // 1. If base64 data URL (e.g. data:image/png;base64,iVBORw0KGgo...)
   if (avatarInput.startsWith('data:image/')) {
     const matches = avatarInput.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
     if (!matches) return null;
@@ -45,6 +45,58 @@ export const saveAvatarToStorage = async (avatarInput, userId) => {
         console.warn('[SUPABASE AVATAR UPLOAD WARNING]', err.message);
       }
     }
+  }
+
+  // 2. If raw base64 string without data prefix (e.g. from react-native ImagePicker base64 output)
+  if (!avatarInput.startsWith('http://') && !avatarInput.startsWith('https://') && avatarInput.length > 100) {
+    try {
+      const buffer = Buffer.from(avatarInput, 'base64');
+      if (buffer.length > 0) {
+        const fileName = `tourist_${userId || 'usr'}_${Date.now()}.png`;
+        if (isSupabaseConfigured()) {
+          const supabase = getSupabaseClient();
+          const { error } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, buffer, { contentType: 'image/png', upsert: true });
+
+          if (!error) {
+            const { data: pubData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+            if (pubData?.publicUrl) return pubData.publicUrl;
+          }
+        }
+      }
+    } catch (b64Err) {}
+  }
+
+  // 3. If remote URL, fetch binary and upload to Supabase Storage avatars bucket for permanent persistence
+  if (avatarInput.startsWith('http://') || avatarInput.startsWith('https://')) {
+    if (isSupabaseConfigured()) {
+      try {
+        const resp = await fetch(avatarInput);
+        if (resp.ok) {
+          const arrayBuf = await resp.arrayBuffer();
+          const buffer = Buffer.from(arrayBuf);
+          const contentType = resp.headers.get('content-type') || 'image/jpeg';
+          const ext = contentType.includes('png') ? 'png' : (contentType.includes('webp') ? 'webp' : 'jpg');
+          const fileName = `tourist_${userId || 'usr'}_${Date.now()}.${ext}`;
+
+          const supabase = getSupabaseClient();
+          const { error } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, buffer, { contentType, upsert: true });
+
+          if (!error) {
+            const { data: pubData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+            if (pubData?.publicUrl) {
+              return pubData.publicUrl;
+            }
+          }
+        }
+      } catch (fErr) {
+        console.warn('[AVATAR REMOTE FETCH TO STORAGE NOTE]', fErr.message);
+      }
+    }
+    return avatarInput;
   }
 
   return avatarInput;
@@ -117,6 +169,11 @@ export const updateProfile = async (req, res, next) => {
   try {
     const authId = req.admin?.id || req.user?.id;
     const authEmail = (req.admin?.email || req.user?.email || '').toLowerCase();
+
+    // A tourist cannot overwrite another tourist's profile details
+    if (req.user?.id && req.body.userId && req.body.userId !== req.user.id && !req.admin) {
+      return res.status(403).json({ success: false, message: "Not authorized to update another tourist's profile." });
+    }
 
     const {
       name,
@@ -242,7 +299,16 @@ export const updateProfile = async (req, res, next) => {
  */
 export const uploadAvatar = async (req, res, next) => {
   try {
-    const authId = req.admin?.id || req.user?.id || 'usr_102';
+    const authId = req.admin?.id || req.user?.id || req.body.userId;
+    if (!authId) {
+      return res.status(401).json({ success: false, message: 'Authentication required to update profile avatar.' });
+    }
+
+    // A tourist cannot overwrite another tourist's profile avatar
+    if (req.user?.id && req.body.userId && req.body.userId !== req.user.id && !req.admin) {
+      return res.status(403).json({ success: false, message: "Not authorized to update another tourist's profile avatar." });
+    }
+
     const { avatarData, avatarUrl, image } = req.body;
     const input = avatarData || avatarUrl || image;
 

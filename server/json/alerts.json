@@ -1,5 +1,57 @@
 [
   {
+    "id": "alt_geo_1795159947867",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "tripId": "sz_trp_1795159929307",
+    "type": "GEOFENCE_BREACH",
+    "subtype": "AUTOMATIC_SAFEZONE_BREACH",
+    "priority": "CRITICAL",
+    "message": "🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist bhoot exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Boundary: Agra Airport (5 km). Outside by: 18811m. Coordinates: (27.3200, 78.1200). Battery: 65%.",
+    "location": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "name": "Automatic Safe-Zone Breach (27.3200, 78.1200)"
+    },
+    "batteryLevel": 65,
+    "deviceInfo": {
+      "platform": "Android",
+      "manufacturer": "Unavailable",
+      "model": "Unavailable",
+      "osVersion": "Unavailable"
+    },
+    "status": "Pending",
+    "source": "app",
+    "timestamp": "2026-11-20T07:32:27.866Z"
+  },
+  {
+    "id": "alt_geo_1795159947195",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "tripId": "sz_trp_1795159929307",
+    "type": "GEOFENCE_BREACH",
+    "subtype": "AUTOMATIC_SAFEZONE_BREACH",
+    "priority": "CRITICAL",
+    "message": "🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist bhoot exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Boundary: Agra Airport (5 km). Outside by: 18811m. Coordinates: (27.3200, 78.1200). Battery: 65%.",
+    "location": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "name": "Automatic Safe-Zone Breach (27.3200, 78.1200)"
+    },
+    "batteryLevel": 65,
+    "deviceInfo": {
+      "manufacturer": "Google",
+      "model": "Pixel 7",
+      "platform": "Android",
+      "androidVersion": "14",
+      "appVersion": "1.0.0",
+      "batteryPercentage": 65
+    },
+    "status": "Pending",
+    "source": "app",
+    "timestamp": "2026-11-20T07:32:16.345Z"
+  },
+  {
     "id": "8528ccb1-62f7-49ac-8dd9-16d19dffa5ad",
     "userId": "usr_1794942568604",
     "userName": "yash randi",

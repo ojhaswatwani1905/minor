@@ -3,9 +3,12 @@ import {
   geocodeDestination,
   createSafeZoneTrip,
   getActiveSafeZoneTrip,
+  getSafeZoneTripById,
   updateSafeZoneLocation,
   acknowledgeBreachWarning,
   escalateBreach,
+  reportBreachEvent,
+  getEscalationWorkerStatus,
   confirmSafe,
   updateSafeZoneStatus,
   getAllSafeZones,
@@ -18,11 +21,16 @@ const router = express.Router();
 // Geocoding query (proxy to OpenStreetMap Nominatim with caching)
 router.get('/geocode', geocodeDestination);
 
+// Escalation Worker Diagnostics
+router.get('/worker-status', getEscalationWorkerStatus);
+
 // Tourist Safe Travel Zone Endpoints
 router.post('/', createSafeZoneTrip);
 router.get('/active', getActiveSafeZoneTrip);
 router.get('/active/:userId', getActiveSafeZoneTrip);
+router.get('/:id', getSafeZoneTripById);
 router.post('/:id/location', updateSafeZoneLocation);
+router.post('/:id/breach', reportBreachEvent);
 router.post('/:id/acknowledge-warning', acknowledgeBreachWarning);
 router.post('/:id/escalate-breach', escalateBreach);
 router.post('/:id/confirm-safe', confirmSafe);

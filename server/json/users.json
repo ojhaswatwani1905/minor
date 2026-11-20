@@ -1,5 +1,54 @@
 [
   {
+    "id": "usr_bhoot_live",
+    "fullName": "bhoot",
+    "email": "bhoot@gmail.com",
+    "phone": "+91 98765 43210",
+    "emergencyContact": "+91 98765 43210",
+    "status": "EMERGENCY",
+    "currentLocation": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "accuracy": 20,
+      "name": "GPS Fix (27.3200, 78.1200)",
+      "elevation": null
+    },
+    "batteryLevel": 65,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of bhoot",
+        "relation": "Family",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-BHOOT-001"
+      }
+    ],
+    "activeTripId": "sz_trp_1795163081120",
+    "lastAlertTimestamp": "2026-11-20T08:25:04.504Z",
+    "lastPing": "2026-11-20T08:24:43.566Z",
+    "source": "Supabase",
+    "activeSafeZone": {
+      "tripId": "sz_trp_1795163081120",
+      "destination": "Agra Airport",
+      "coords": {
+        "lat": 27.1558,
+        "lng": 77.9654
+      },
+      "radiusMeters": 5000,
+      "status": "ACTIVE"
+    },
+    "avatar": "https://jdjluwufmorxeankmqwj.supabase.co/storage/v1/object/public/avatars/tourist_usr_bhoot_live_1795163110142.png",
+    "updatedAt": "2026-11-20T08:25:11.752Z"
+  },
+  {
     "id": "3614e1d0-f867-4734-a245-412e8d1f866f",
     "fullName": "chotu",
     "email": "chotu@gmail.com",
@@ -33,52 +82,6 @@
     "activeTripId": "921898a9-a5f6-4693-9d13-ed61aa26a8cf",
     "source": "Supabase",
     "lastAlertTimestamp": "2026-11-19T10:21:30.879722+00:00"
-  },
-  {
-    "id": "usr_bhoot_live",
-    "fullName": "bhoot",
-    "email": "bhoot@gmail.com",
-    "phone": "+91 98765 43210",
-    "emergencyContact": "+91 98765 43210",
-    "status": "EMERGENCY",
-    "currentLocation": {
-      "name": "🚨 SOS Distress (24.4346, 77.1619)",
-      "lat": 24.4345865,
-      "lng": 77.1618923,
-      "elevation": null
-    },
-    "batteryLevel": 57,
-    "networkSignal": "Mobile GNSS (Distress Beacon)",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Guardian of bhoot",
-        "relation": "Family",
-        "phone": "+91 98765 43210",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Mobile Safety Pass",
-        "status": "Verified",
-        "number": "SP-BHOOT-001"
-      }
-    ],
-    "activeTripId": "e365a2d6-ac2c-42f1-bdc4-a1c31b05d81c",
-    "lastAlertTimestamp": "2026-11-19T09:54:43.458283+00:00",
-    "lastPing": "2026-11-19T17:43:28.011Z",
-    "source": "Supabase",
-    "activeSafeZone": {
-      "tripId": "sz_trp_1795110205275",
-      "destination": "Agra Airport",
-      "coords": {
-        "lat": 27.1558,
-        "lng": 77.9654
-      },
-      "radiusMeters": 5000,
-      "status": "ACTIVE"
-    }
   },
   {
     "id": "usr_1794942568604",
@@ -218,41 +221,6 @@
     "offlineDurationMinutes": 0
   },
   {
-    "id": "usr_1794933686909",
-    "fullName": "Hacked By User B",
-    "email": "tourist_b_1794933686836@stsms.gov",
-    "phone": "+910000000000",
-    "emergencyContact": "+919876500003",
-    "status": "Monitored",
-    "currentLocation": {
-      "name": "Emergency GPS Fix (23.1995, 77.4332)",
-      "lat": 23.1995,
-      "lng": 77.4332,
-      "elevation": null
-    },
-    "batteryLevel": 92,
-    "networkSignal": "Good (5G)",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Primary Guardian",
-        "relation": "Family",
-        "phone": "+919876500003",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Mobile Safety Pass",
-        "status": "Verified",
-        "number": "SP-788991"
-      }
-    ],
-    "activeTripId": null,
-    "lastPing": "2026-11-17T16:41:42.492Z",
-    "updatedAt": "2026-11-17T16:41:43.110Z"
-  },
-  {
     "id": "usr_1794933686833",
     "fullName": "Aarav Patel (Verified)",
     "email": "tourist_a_1794933686756@stsms.gov",
@@ -287,41 +255,6 @@
     "lastPing": "2026-11-17T16:41:39.214Z",
     "bloodGroup": "O+",
     "updatedAt": "2026-11-17T16:41:42.504Z"
-  },
-  {
-    "id": "usr_1794907506310",
-    "fullName": "Hacked By User B",
-    "email": "tourist_b_1794907506240@stsms.gov",
-    "phone": "+910000000000",
-    "emergencyContact": "+919876500003",
-    "status": "Monitored",
-    "currentLocation": {
-      "name": "Emergency GPS Fix (23.1995, 77.4332)",
-      "lat": 23.1995,
-      "lng": 77.4332,
-      "elevation": null
-    },
-    "batteryLevel": 92,
-    "networkSignal": "Good (5G)",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Primary Guardian",
-        "relation": "Family",
-        "phone": "+919876500003",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Mobile Safety Pass",
-        "status": "Verified",
-        "number": "SP-308833"
-      }
-    ],
-    "activeTripId": null,
-    "lastPing": "2026-11-17T09:25:20.761Z",
-    "updatedAt": "2026-11-17T09:25:21.392Z"
   },
   {
     "id": "usr_1794907506236",

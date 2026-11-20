@@ -103,13 +103,15 @@ export const mapAlertFromDb = (row) => {
   let userName = null;
 
   if (row.message) {
-    const sosMatch = row.message.match(/triggered by\s+([^!]+)/i);
-    const breachMatch = row.message.match(/confirmed for\s+([^!]+)/i);
-    const byMatch = row.message.match(/by\s+([^!]+)/i);
-    const forMatch = row.message.match(/for\s+([^!]+)/i);
-    if (sosMatch) userName = sosMatch[1].trim();
+    const touristMatch = row.message.match(/Tourist:\s*([^.!]+?)(?:\.|$)/i);
+    const sosMatch = row.message.match(/triggered by\s+([^!.]+)/i);
+    const breachMatch = row.message.match(/confirmed for\s+([^!.]+)/i);
+    const byMatch = row.message.match(/\bby\s+([A-Za-z0-9_ -]+)[!.]/i);
+    const forMatch = row.message.match(/\bfor\s+([A-Za-z0-9_ -]+)[!.]/i);
+    if (touristMatch) userName = touristMatch[1].trim();
+    else if (sosMatch) userName = sosMatch[1].trim();
     else if (breachMatch) userName = breachMatch[1].trim();
-    else if (byMatch) userName = byMatch[1].trim();
+    else if (byMatch && !byMatch[1].toLowerCase().includes('outside') && !byMatch[1].includes('m')) userName = byMatch[1].trim();
     else if (forMatch) userName = forMatch[1].trim();
   }
 

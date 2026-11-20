@@ -77,7 +77,7 @@ export const VERIFIED_DESTINATION_IMAGES = [
   }
 ];
 
-export const NEUTRAL_DESTINATION_PLACEHOLDER = 'https://images.unsplash.com/photo-1508873696983-2df5293cb395?w=800&q=80';
+export const NEUTRAL_DESTINATION_PLACEHOLDER = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80';
 
 export const getDestinationImageUrl = (destinationName) => {
   if (!destinationName || typeof destinationName !== 'string') {

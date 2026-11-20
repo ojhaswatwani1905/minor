@@ -666,7 +666,85 @@ Verified via automated end-to-end integration test suite `server/scripts/testPha
 
 ---
 
-## 14. Brain Maintenance Rules
+## 14. Phase 6.1: Real-Device Safety Validation & Server-Side Emergency Escalation Engine
+
+### 14.1 Mission & Architectural Core Problem Solved
+Prior to Phase 6.1, safe-zone breach escalation relied in part on a client-side JavaScript countdown in `stsms-mobile` backed by `AsyncStorage`. If an Android physical phone was suspended by Android Doze mode, locked, killed by Low Memory Killer (LMK), or experienced an app crash while outside the 5 km boundary, the escalation could stall or fail to reach the Admin Command Center.
+
+Phase 6.1 transitions the emergency escalation lifecycle to an **authoritative, server-side asynchronous scheduler**:
+- When a confirmed breach is reported, the backend establishes an authoritative server deadline: `warningExpiresAt = now + 10s`.
+- If the tourist acknowledges ("I AM SAFE") within 10s, the warning is cancelled, status resets to `ACTIVE`, and zero SOS alerts are dispatched.
+- If 10 seconds elapse with **no response from the mobile device** (e.g. phone died, app suspended, screen locked, app killed), the backend **autonomously detects the expired deadline and escalates directly to an emergency incident (`AUTOMATIC_SAFEZONE_BREACH`)**.
+
+### 14.2 Autonomous Server-Side Escalation Worker (`server/services/breachEscalationWorker.js`)
+- Runs a 1,000ms loop initialized on server boot (`startBreachEscalationWorker()`).
+- Evaluates trips where `status === 'WARNING'`, `warningExpiresAt <= now`, `warningAcknowledged !== true`, and `escalationProcessed !== true`.
+- Atomically marks `escalationProcessed = true` and `status = 'BREACHED'` before dispatching the incident to avoid concurrency races.
+- Dispatches emergency incident: `AUTOMATIC_SAFEZONE_BREACH` with full device intelligence, GPS coordinates, and exact required incident description:
+  > `"🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds."`
+- Tracks live worker metrics: `heartbeat`, `lastProcessedTime`, `pendingBreachEventsCount`, `totalEscalatedCount`, `failedEscalationsCount`.
+- Exposed at `GET /api/safe-zones/worker-status` and integrated into `GET /api/health`.
+
+### 14.3 Backend Restart & Render Deployment Recovery
+- In-memory `setTimeout` is explicitly rejected as a production mechanism.
+- All pending breach events, warning start times, and expiration deadlines are persisted in the transactional database.
+- On server restart or Render deployment, `startBreachEscalationWorker()` executes an immediate sweep (`checkExpiredBreachWarnings()`) upon startup, instantly recovering any deadlines that expired while the server was restarting or updating.
+
+### 14.4 Idempotency & Duplicate Incident Prevention
+- If the mobile app wakes up late and attempts to escalate an already-escalated trip, `escalateBreach` returns `isExisting: true` with HTTP 200, updating telemetry on the existing incident without creating duplicates.
+- If a tourist attempts to tap "I AM SAFE" after the 10-second deadline has already expired and an emergency alert was created, the backend rejects it with `HTTP 409 Conflict` (`ESCALATION_ALREADY_TRIGGERED` / `DEADLINE_EXPIRED`).
+
+### 14.5 Real Supabase Storage Avatar Binary Upload
+- Enhanced `server/controllers/profileController.js` to accept raw base64 or binary image buffers from React Native `ImagePicker`.
+- Uploads directly to Supabase Storage bucket `avatars` with file key `tourist_{userId}_{timestamp}.png`.
+- Returns verified public HTTPS URL (`https://jdjluwufmorxeankmqwj.supabase.co/storage/v1/object/public/avatars/...`), verified to return HTTP 200 `image/png`.
+- Persists to `users.json`, `admins.json`, and Supabase `profiles.medical_info.avatar_url`.
+
+### 14.6 Security & Cross-Tourist Authorization Hardening
+- Fixed authorization middleware (`server/middlewares/authMiddleware.js`): `req.admin` is only set for genuine admin roles (`Super Admin`, `Admin`, `Safety Officer`); normal tourists have `req.admin = null`.
+- Added cross-tourist authorization guards in `safeZoneController.js` and `profileController.js`:
+  - Tourist B cannot acknowledge or modify Tourist A's safe-zone trip (`HTTP 403 Forbidden`).
+  - Tourist B cannot update Tourist A's profile or overwrite Tourist A's avatar picture (`HTTP 403 Forbidden`).
+
+### 14.7 Verified Destination Images & Neutral Fallback
+- `Agra Airport` -> `https://images.unsplash.com/photo-1542296332-2e4473faf563?w=800&q=80` (HTTP 200 `image/jpeg`)
+- `Taj Mahal` -> `https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80` (HTTP 200 `image/jpeg`)
+- `Sanchi Stupa` -> `https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=800&q=80` (HTTP 200 `image/jpeg`)
+- `Rohtang Pass` -> `https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80` (HTTP 200 `image/jpeg`)
+- `Solang Valley` -> `https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=800&q=80` (HTTP 200 `image/jpeg`)
+- Neutral Fallback (Unlisted Trails) -> `https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80` (HTTP 200 `image/jpeg`, Alpine Ridge)
+
+### 14.8 Phase 6.1 Verification Test Results (22/22 PASSED — 100%)
+Verified via automated test suite `server/scripts/testPhase61Verification.js`:
+
+| Scenario | Test Scope | Result | Details |
+|---|---|---|---|
+| **1** | Agra Airport Image Resolution | **PASS** | HTTP 200 `image/jpeg`, verified terminal tarmac. |
+| **2** | Taj Mahal Image Resolution | **PASS** | HTTP 200 `image/jpeg`, verified white marble mausoleum. |
+| **3** | Sanchi Stupa Image Resolution | **PASS** | HTTP 200 `image/jpeg`, verified Great Stupa monument. |
+| **4** | Rohtang Pass Image Resolution | **PASS** | HTTP 200 `image/jpeg`, verified high-altitude pass. |
+| **5** | Solang Valley Image Resolution | **PASS** | HTTP 200 `image/jpeg`, verified alpine valley. |
+| **6** | Unlisted Ridge Neutral Fallback | **PASS** | HTTP 200 `image/jpeg`, verified alpine trail fallback. |
+| **7** | Safe Zone Trip Creation | **PASS** | 5 km radius boundary, status `ACTIVE`, destination image bound. |
+| **8** | Inside Boundary Location Ping | **PASS** | GPS at 45m distance maintains `ACTIVE` status. |
+| **9** | Boundary Breach Warning Initiation | **PASS** | Status `WARNING`, authoritative 10s server deadline set. |
+| **10** | "I AM SAFE" Warning Acknowledgment | **PASS** | Resets status to `ACTIVE`, cancels timer, zero SOS alerts created. |
+| **11** | Mobile Termination / Closure Simulation | **PASS** | Trip 2 enters `WARNING`; zero client requests sent after breach. |
+| **12** | Autonomous Server-Side Escalation | **PASS** | Worker autonomously detects expired 10s deadline, escalates to `BREACHED` with active alert. |
+| **13** | Admin Incident Telemetry Delivery | **PASS** | Incident contains exact required description, tourist identity `bhoot`, and hardware telemetry. |
+| **14** | Late Acknowledgment Rejection | **PASS** | "I AM SAFE" after 10s deadline rejected with `HTTP 409 Conflict`. |
+| **15** | Idempotent Duplicate Protection | **PASS** | Repeated breach escalation returns `isExisting: true` with zero duplicate alert. |
+| **16** | Supabase Storage Avatar Upload | **PASS** | Uploaded to bucket `avatars` returning public URL. |
+| **17** | Avatar Public HTTPS Retrieval | **PASS** | Publicly accessible over HTTPS with HTTP 200 `image/png`. |
+| **18** | Avatar Retrieval Persistence | **PASS** | Stored avatar URL persists across profile retrieval sessions. |
+| **19** | Anti-Tamper: Safe-Zone Modification | **PASS** | Tourist B cannot acknowledge Tourist A's trip (`HTTP 403 Forbidden`). |
+| **20** | Anti-Tamper: Profile Overwrite | **PASS** | Tourist B cannot overwrite Tourist A's avatar (`HTTP 403 Forbidden`). |
+| **21** | Escalation Worker Diagnostics | **PASS** | `/api/safe-zones/worker-status` returns `status: 'active'`, heartbeat, metrics. |
+| **22** | System Health Integration | **PASS** | `/api/health` reports `status: 'ok'` and `escalationWorker.status: 'active'`. |
+
+---
+
+## 15. Brain Maintenance Rules
 
 Every future task and engineer MUST follow this workflow:
 1. **Read `docs/STSMS_BRAIN.md` first.**

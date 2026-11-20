@@ -15,6 +15,7 @@ import hazardRoutes from './routes/hazardRoutes.js';
 import safeZoneRoutes from './routes/safeZoneRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { startDeadManSwitchWorker } from './services/deadManSwitchService.js';
+import { startBreachEscalationWorker, getBreachWorkerMetrics } from './services/breachEscalationWorker.js';
 import { importAndMergeOpenData } from './scripts/importOpenData.js';
 import { isSupabaseConfigured } from './database/supabase.js';
 
@@ -51,7 +52,8 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptimeSeconds: Math.floor(process.uptime()),
     environment: process.env.NODE_ENV || 'development',
-    database: isSupabaseConfigured() ? 'Supabase PostgreSQL (Connected)' : 'Local JSON Fallback'
+    database: isSupabaseConfigured() ? 'Supabase PostgreSQL (Connected)' : 'Local JSON Fallback',
+    escalationWorker: getBreachWorkerMetrics()
   });
 });
 
@@ -88,6 +90,9 @@ app.listen(PORT, '0.0.0.0', () => {
 
   // Start Dead Man's Switch Cloud Automated Dispatcher Loop
   startDeadManSwitchWorker();
+
+  // Start Server-Side Safe-Zone 10s Breach Escalation Worker Loop
+  startBreachEscalationWorker();
 
   console.log(`====================================================`);
 });

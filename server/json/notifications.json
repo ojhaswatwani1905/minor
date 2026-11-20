@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "id": "notif_esc_1795163104502",
+    "title": "AUTOMATIC SAFE-ZONE BREACH: bhoot",
+    "message": "Tourist bhoot exited the 5 km safety boundary around Agra Airport and did not acknowledge within 10 seconds.",
+    "timestamp": "2026-11-20T08:25:04.502Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
+    "id": "notif_esc_1795162432062",
+    "title": "AUTOMATIC SAFE-ZONE BREACH: bhoot",
+    "message": "Tourist bhoot exited the 5 km safety boundary around Agra Airport and did not acknowledge within 10 seconds.",
+    "timestamp": "2026-11-20T08:13:52.062Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
+    "id": "notif_esc_1795161970581",
+    "title": "AUTOMATIC SAFE-ZONE BREACH: bhoot",
+    "message": "Tourist bhoot exited the 5 km safety boundary around Agra Airport and did not acknowledge within 10 seconds.",
+    "timestamp": "2026-11-20T08:06:10.581Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
+    "id": "notif_esc_1795161784597",
+    "title": "AUTOMATIC SAFE-ZONE BREACH: bhoot",
+    "message": "Tourist bhoot exited the 5 km safety boundary around Agra Airport and did not acknowledge within 10 seconds.",
+    "timestamp": "2026-11-20T08:03:04.597Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
+    "id": "notif_esc_1795159954226",
+    "title": "AUTOMATIC SAFE-ZONE BREACH: bhoot",
+    "message": "Tourist bhoot exited the 5 km safety boundary around Agra Airport and did not acknowledge within 10 seconds.",
+    "timestamp": "2026-11-20T07:32:34.226Z",
+    "read": false,
+    "type": "EMERGENCY"
+  }
+]
