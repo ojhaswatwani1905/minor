@@ -24,6 +24,10 @@ router.get('/geocode', geocodeDestination);
 // Escalation Worker Diagnostics
 router.get('/worker-status', getEscalationWorkerStatus);
 
+// Admin Command Portal Endpoints (Protected with JWT authentication)
+router.get('/all', protect, getAllSafeZones);
+router.get('/incidents', protect, getGeofenceIncidents);
+
 // Tourist Safe Travel Zone Endpoints
 router.post('/', createSafeZoneTrip);
 router.get('/active', getActiveSafeZoneTrip);
@@ -35,10 +39,6 @@ router.post('/:id/acknowledge-warning', acknowledgeBreachWarning);
 router.post('/:id/escalate-breach', escalateBreach);
 router.post('/:id/confirm-safe', confirmSafe);
 router.post('/:id/status', updateSafeZoneStatus);
-
-// Admin Command Portal Endpoints (Protected with JWT authentication)
-router.get('/all', protect, getAllSafeZones);
-router.get('/incidents', protect, getGeofenceIncidents);
 
 export default router;
 
