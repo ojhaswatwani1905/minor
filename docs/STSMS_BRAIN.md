@@ -905,40 +905,77 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 
 ---
 
-### 15.10 Phase 7.3 — Production Activation & End-to-End Release Verification Status
+### 15.10 Phase 7.3 — Production Activation & Supabase Schema Audit Status
 
-#### 1. Live Supabase Migration Probe (`public.deadman_sessions`)
-- **Status:** `NOT APPLIED` (Verified via PostgREST probe: `code: "PGRST205"`, "Could not find table 'public.deadman_sessions' in schema cache").
-- **Migration SQL:** `server/database/deadman_switch_schema.sql` (Ready for execution in Supabase Dashboard SQL Editor).
+#### 1. Live Supabase Project & Schema Audit (`jdjluwufmorxeankmqwj`)
+- **Project Reference:** `jdjluwufmorxeankmqwj` (Host: `https://jdjluwufmorxeankmqwj.supabase.co`)
+- **Connection Health:** PostgREST active, service-role authenticated.
+- **Existing Tables Audit:**
+  - `public.profiles`: **EXISTS** (1 row; columns: `id`, `phone`, `full_name`, `language`, `medical_info`, `consent_at`, `created_at`)
+  - `public.trips`: **EXISTS** (84 rows; columns: `id`, `user_id`, `title`, `status`, `start_at`, `end_at`, `buffer_m`, `current_state`, `paused_until`, `last_ping_at`, `last_recorded_at`, `last_location`, `last_lat`, `last_lon`, `last_battery`, `created_at`)
+  - `public.alerts`: **EXISTS** (51 rows; columns: `id`, `trip_id`, `user_id`, `state`, `status`, `source`, `location`, `lat`, `lon`, `battery`, `message`, `raised_at`, `updated_at`, `acknowledged_by`, `acknowledged_at`, `resolved_at`, `resolution`)
+  - `public.route_hazards`: **NOT FOUND** (`PGRST205`)
+  - `public.route_recommendations`: **NOT FOUND** (`PGRST205`)
+  - `public.deadman_sessions`: **NOT APPLIED** (`code: "PGRST205"`, "Could not find table 'public.deadman_sessions' in schema cache")
+- **Migration SQL:** `server/database/deadman_switch_schema.sql` (Hardened with `DROP POLICY IF EXISTS` for 100% idempotency).
 - **Production Safe Failure:** Verified in code (`deadManDb.js` and `deadManController.js`). In `NODE_ENV=production`, backend refuses silent JSON fallback and returns `HTTP 503 DATABASE_UNAVAILABLE` (`durablePersistence: false`).
 
-#### 2. GitHub Authentication & Remote Sync State
-- **Status:** `PENDING AUTHENTICATION`
+#### 2. Detailed Column & Constraint Audit for `deadman_sessions`
+- `id`: TEXT PRIMARY KEY
+- `user_id`: TEXT NOT NULL (Supports Supabase auth UUIDs and STSMS application IDs)
+- `user_name`: TEXT NOT NULL
+- `user_phone`: TEXT NULL
+- `interval_seconds`: INT NOT NULL DEFAULT 900 CHECK (interval_seconds >= 10)
+- `status`: TEXT NOT NULL DEFAULT 'ACTIVE'
+- `started_at`: TIMESTAMPTZ NOT NULL DEFAULT NOW()
+- `last_check_in_at`: TIMESTAMPTZ NOT NULL DEFAULT NOW()
+- `next_deadline_at`: TIMESTAMPTZ NOT NULL
+- `paused_at`: TIMESTAMPTZ NULL
+- `paused_remaining_ms`: BIGINT NULL
+- `escalation_processed`: BOOLEAN NOT NULL DEFAULT FALSE
+- `escalation_incident_id`: TEXT NULL
+- `escalated_at`: TIMESTAMPTZ NULL
+- `last_known_location`: JSONB NULL
+- `hardware_telemetry`: JSONB NULL
+- `history`: JSONB DEFAULT '[]'::jsonb
+- `created_at`: TIMESTAMPTZ DEFAULT NOW()
+- `updated_at`: TIMESTAMPTZ DEFAULT NOW()
+- **Indexes:**
+  - `deadman_status_deadline_idx`: Partial index on `(status, next_deadline_at) WHERE escalation_processed = FALSE` (Worker atomic claiming optimization)
+  - `deadman_user_idx`: On `(user_id)` (Session superseding and retrieval)
+  - `deadman_created_idx`: On `(created_at DESC)` (Admin inspection)
+- **RLS Policies:**
+  - `service_role`: Full read/write bypass for backend server processes.
+  - `authenticated`: Strictly scoped to `auth.uid()::text = user_id` for SELECT, INSERT, UPDATE.
+
+#### 3. GitHub Authentication & Remote Sync State
+- **Status:** `BLOCKED` (Keyring token expired)
 - **Remote main Hash:** `7ce9d18a3cc7724af0f7cdfa1f7440e605ed4bac`
 - **Local Commits Pending Push:**
   - `ac9d1d0`: Phase 7 Universal GPS & Dead Man's Switch
   - `20137ac`: Phase 7.1 Database Persistence & Security Hardening
   - `e8b42e9`: Phase 7.2 Durable Outbox Escalation, Production Safe Failure & APK Release Hardening
+  - `c87eb6b`: Phase 7.3 Schema Idempotency & Live Database Audit
 - **Authentication Blocker:** GitHub CLI credential helper reports `The token in keyring is invalid`. Re-authentication via `gh auth login -h github.com` required in terminal.
 
-#### 3. Render Production Deployment State
+#### 4. Render Production Deployment State
 - **URL:** `https://stsms-backend.onrender.com/api/health`
 - **Status:** Active & Healthy (HTTP 200, Uptime tracking, Database: Supabase PostgreSQL Connected).
-- **Active Deployed Commit:** `7ce9d18` (Auto-redeploy will trigger on Render once GitHub push succeeds).
+- **Active Deployed Commit:** `7ce9d18` (`/api/deadman/all` returns 404 until GitHub push triggers auto-deploy of `c87eb6b`).
 
-#### 4. Standalone Release APK & Production Config
+#### 5. Standalone Release APK & Production Config
 - **Path:** `STSMS-release.apk` (71,804,201 bytes / 68.5 MB)
 - **SHA-256:** `16ad6e872dc499eb0eefa172fcce5b83d9363f66a3116ec94a0d0ba87d759875`
 - **Package:** `com.stsms.tourist`
 - **Production API URL:** `https://stsms-backend.onrender.com/api` (All environments in `eas.json` set to production HTTPS; zero private LAN URLs).
 - **Interval Hardening:** Production release strictly enforces minimum 15-minute interval (`60s (Test)` hidden via `__DEV__`).
 
-#### 5. Admin Safe Travel Zones Resilience
+#### 6. Admin Safe Travel Zones Resilience
 - **Page Component:** `src/pages/SafeZonePage.jsx`
 - **Enhancement:** Migrated to `Promise.allSettled()` to guarantee that telemetry syncs independently even during momentary backend or proxy restarts.
 
-#### 6. Regression Results
-- **96 / 96 Automated Tests Passed (100%)** across all 4 regression suites.
+#### 7. Regression Results
+- **96 / 96 Automated Tests Passed (100%)** across all 4 regression suites (`testAtomicEscalationOutbox.js`, `testPhase7Verification.js`, `testPhase61Verification.js`, `testSosAndProfileLifecycle.js`).
 
 ---
 
