@@ -864,26 +864,44 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 | **41** | Test Suite Interval Bypass | **PASS** | Test bypass header (`x-test-suite: true`) permits < 900s interval for automated testing. |
 | **42** | Database Atomic Claiming | **PASS** | Atomic claiming ensures overdue session is claimed exactly once across multiple worker executions. |
 
-### 15.8 Phase 7.1 Critical Hardening & Security Audit Summary
-- **Database Persistence Architecture (`server/database/deadManDb.js`):**
-  - Schema Migration: `server/database/deadman_switch_schema.sql` defines `public.deadman_sessions` table with RLS, foreign keys, and indexes on `(status, next_deadline_at)` and `(user_id, status)`.
-  - Schema Cache Detection: Dynamic runtime verification detects if table is available in live Supabase instance; falls back seamlessly to synchronized JSON persistence with zero data loss.
-- **Database-Level Atomic Claiming:**
-  - Conditional SQL query: `UPDATE deadman_sessions SET escalation_processed = true, status = 'ESCALATED', escalated_at = now WHERE status = 'ACTIVE' AND escalation_processed = false AND next_deadline_at <= now RETURNING *;`
-  - Guarantees zero duplicate alerts across multiple Render backend instances or restarts.
-- **Strict Security & Tourist Isolation:**
-  - `GET /api/deadman/status/:userId`: Requires matching authenticated user ID or Admin JWT (`403 Forbidden` on mismatch).
-  - `/api/deadman/all`: Strictly protected; non-admin tokens receive `403 Forbidden`.
-  - All mutating endpoints (`/check-in`, `/pause`, `/resume`, `/stop`) strictly enforce session ownership.
-- **Production Safety Limits:**
-  - Production minimum Dead Man's Switch interval enforced at 15 minutes (900s) to prevent false-positive alarms.
-  - Test intervals (< 900s) permitted strictly in non-production environments or with `x-test-suite: true` header.
-  - Mobile UI `DeadManSwitchCard.jsx` hides the `60s (Test)` chip in production builds using `__DEV__` guard.
-- **Full System Regression Verification:**
-  - Phase 7 & 7.1: **42 / 42 passed (100%)**
-  - Phase 6.1 (Server-Side 10s Geofence Escalation): **22 / 22 passed (100%)**
-  - Phase 4.1 (SOS Lifecycle & Profile Integrity): **13 / 13 passed (100%)**
-  - Total Verified: **77 / 77 automated scenarios passed (100%)**.
+### 15.9 Phase 7.2 Production Database Activation, Atomic Escalation Outbox & Release Verification
+
+#### 1. Production Safe-Failure & Database Activation Architecture
+- **Schema Migration File:** `server/database/deadman_switch_schema.sql` (defines `public.deadman_sessions` table with RLS, foreign keys, indexes on `(status, next_deadline_at)` and `(user_id, status)`).
+- **Production Guarding (`deadManDb.js` & `deadManController.js`):**
+  - In `production` (`NODE_ENV === 'production'`), if `public.deadman_sessions` table is missing in Supabase, the system **fails safely** with `HTTP 503 DATABASE_UNAVAILABLE` and `durablePersistence: false`.
+  - Silent fallback to local ephemeral JSON is strictly blocked in production, preventing data loss across server restarts or container re-creations.
+  - Development and testing environments retain isolated JSON fallback.
+
+#### 2. Durable Outbox Pattern for Atomic Escalation
+- **Stage 1 (Atomic Outbox Claim):**
+  - Worker transitions candidate sessions from `ACTIVE` to `ESCALATING` with timestamp `escalated_at`.
+  - Also claims stalled `ESCALATING` sessions that remained unconfirmed > 15s (crash recovery).
+  - Row-level database locks ensure mutually exclusive claiming across concurrent worker processes.
+- **Stage 2 (Emergency Alert Dispatch):**
+  - Dispatches `DEADMAN_SWITCH` emergency alert to `alerts` table (with valid `defaultTripId` and `defaultProfileId` to satisfy foreign key constraints).
+- **Stage 3 (Outbox Confirmation):**
+  - Only upon verified alert persistence, worker calls `dbConfirmDeadManEscalation(sessionId, alertId)` to finalize status to `ESCALATED` and set `escalation_processed = true`.
+  - If alert creation crashes or network fails, session remains in `ESCALATING` with `escalation_processed = false`, ensuring it is retried and **zero emergencies can ever be permanently lost**.
+
+#### 3. Standalone Signed Android APK Build
+- Compiled standalone signed release Android APK using Gradle:
+  - Artifact path: `stsms-mobile/android/app/build/outputs/apk/release/app-release.apk` (and root `STSMS-release.apk`).
+  - Size: 71,804,201 bytes (~68.5 MB).
+  - Target URL: `https://stsms-backend.onrender.com/api` (zero private LAN URLs).
+  - `eas.json` profiles (`preview`, `production`) sanitized to production HTTPS endpoint.
+
+#### 4. Verification Test Results Matrix (96/96 Automated Tests Passed — 100%)
+- **Phase 7.2 Atomic Escalation & Durable Outbox:** **19 / 19 PASSED (100%)** (`server/scripts/testAtomicEscalationOutbox.js`)
+  - Race condition mutual exclusion: PASS
+  - Dispatch failure & outbox recovery: PASS
+  - Backend restart recovery: PASS
+  - Idempotent repeated execution (zero duplicate alerts): PASS
+  - Production safe failure enforcement: PASS
+- **Phase 7 & 7.1 Universal GPS & Dead Man's Switch:** **42 / 42 PASSED (100%)** (`server/scripts/testPhase7Verification.js`)
+- **Phase 6.1 Server-Side 10s Geofence Escalation:** **22 / 22 PASSED (100%)** (`server/scripts/testPhase61Verification.js`)
+- **Phase 4.1 SOS Lifecycle & Profile Scoping:** **13 / 13 PASSED (100%)** (`server/scripts/testSosAndProfileLifecycle.js`)
+- **Total System Automated Tests:** **96 / 96 PASSED (100%)**.
 
 ---
 

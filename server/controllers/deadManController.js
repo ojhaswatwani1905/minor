@@ -93,6 +93,14 @@ export const startDeadManSession = async (req, res, next) => {
 
     const savedSession = await dbCreateSession(newSessionData);
 
+    if (savedSession.error === 'DATABASE_UNAVAILABLE') {
+      return res.status(503).json({
+        success: false,
+        message: savedSession.message,
+        durablePersistence: false
+      });
+    }
+
     console.log(`[DEAD MAN SWITCH] Tourist ${userName} (${userId}) started session ${sessionId} with interval ${interval}s. Deadline: ${nextDeadlineAt}`);
 
     res.status(201).json({
@@ -193,6 +201,14 @@ export const checkInDeadMan = async (req, res, next) => {
       hardwareTelemetry
     });
 
+    if (result.error === 'DATABASE_UNAVAILABLE') {
+      return res.status(503).json({
+        success: false,
+        message: result.message,
+        durablePersistence: false
+      });
+    }
+
     if (result.notFound) {
       return res.status(404).json({
         success: false,
@@ -246,6 +262,10 @@ export const pauseDeadManSession = async (req, res, next) => {
 
     const result = await dbPauseSession(sessionId, userId);
 
+    if (result.error === 'DATABASE_UNAVAILABLE') {
+      return res.status(503).json({ success: false, message: result.message, durablePersistence: false });
+    }
+
     if (result.notFound) {
       return res.status(404).json({ success: false, message: 'Active Dead Man\'s Switch session not found.' });
     }
@@ -277,6 +297,10 @@ export const resumeDeadManSession = async (req, res, next) => {
     const userId = bodyUserId || req.user?.id;
 
     const result = await dbResumeSession(sessionId, userId);
+
+    if (result.error === 'DATABASE_UNAVAILABLE') {
+      return res.status(503).json({ success: false, message: result.message, durablePersistence: false });
+    }
 
     if (result.notFound) {
       return res.status(404).json({ success: false, message: 'Paused Dead Man\'s Switch session not found.' });
@@ -310,6 +334,10 @@ export const stopDeadManSession = async (req, res, next) => {
     const userId = bodyUserId || req.user?.id;
 
     const result = await dbStopSession(sessionId, userId);
+
+    if (result.error === 'DATABASE_UNAVAILABLE') {
+      return res.status(503).json({ success: false, message: result.message, durablePersistence: false });
+    }
 
     if (result.notFound) {
       return res.status(404).json({ success: false, message: 'Active Dead Man\'s Switch session not found.' });

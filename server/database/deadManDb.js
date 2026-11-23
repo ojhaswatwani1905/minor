@@ -4,6 +4,7 @@ import { readJson, writeJson } from '../utils/jsonDb.js';
 const SESSIONS_FILE = 'deadman_sessions';
 let tableAvailabilityChecked = false;
 let isTableAvailableInDb = false;
+let jsonClaimMutex = Promise.resolve();
 
 /**
  * Checks if public.deadman_sessions table exists in Supabase schema cache.
@@ -45,7 +46,7 @@ export const checkDeadManTableAvailability = async () => {
 export const isDbAuthoritative = () => isTableAvailableInDb;
 
 /**
- * Helper: Read fallback JSON sessions
+ * Helper: Read fallback JSON sessions (Development & testing only)
  */
 const getJsonSessions = async () => {
   const sessions = await readJson(SESSIONS_FILE);
@@ -109,6 +110,7 @@ const mapSessionFromDb = (row) => ({
 /**
  * 1. Create a new Dead Man's Switch session
  * Atomically supersedes previous active sessions for this tourist.
+ * In production: fails safely if PostgreSQL is unavailable (no silent JSON fallback).
  */
 export const dbCreateSession = async (sessionData) => {
   const nowIso = new Date().toISOString();
@@ -137,7 +139,7 @@ export const dbCreateSession = async (sessionData) => {
 
       if (!error && data) {
         const mapped = mapSessionFromDb(data);
-        // Synchronize to JSON fallback
+        // Synchronize to JSON fallback for local tooling
         try {
           const sessions = await getJsonSessions();
           sessions.unshift(mapped);
@@ -151,7 +153,16 @@ export const dbCreateSession = async (sessionData) => {
     }
   }
 
-  // Fallback / Synchronized JSON write
+  // Production requirement: Never silently fall back to JSON in production
+  if (process.env.NODE_ENV === 'production' && !isTableAvailableInDb) {
+    console.error('[DEAD MAN DB CRITICAL ERROR] Production PostgreSQL table public.deadman_sessions is missing or unavailable. Failing safely without durable persistence.');
+    return {
+      error: 'DATABASE_UNAVAILABLE',
+      message: 'Production database table public.deadman_sessions is not available in Supabase. Silent fallback to JSON is disabled in production to protect data integrity.'
+    };
+  }
+
+  // Fallback / Synchronized JSON write (development / testing only)
   const sessions = await getJsonSessions();
   sessions.forEach(s => {
     if (s.userId === sessionData.userId && (s.status === 'ACTIVE' || s.status === 'PAUSED')) {
@@ -184,8 +195,8 @@ export const dbGetSessionForUser = async (userId, sessionId = null) => {
 
       const { data, error } = await query.limit(5);
       if (!error && data && data.length > 0) {
-        // Prefer active, paused, or escalated
-        const active = data.find(r => r.status === 'ACTIVE' || r.status === 'PAUSED' || r.status === 'ESCALATED') || data[0];
+        // Prefer active, paused, escalating, or escalated
+        const active = data.find(r => r.status === 'ACTIVE' || r.status === 'PAUSED' || r.status === 'ESCALATING' || r.status === 'ESCALATED') || data[0];
         return mapSessionFromDb(active);
       }
     } catch (dbErr) {
@@ -193,14 +204,18 @@ export const dbGetSessionForUser = async (userId, sessionId = null) => {
     }
   }
 
-  // Fallback to JSON
+  if (process.env.NODE_ENV === 'production' && !isTableAvailableInDb) {
+    return null;
+  }
+
+  // Fallback to JSON (non-production)
   const sessions = await getJsonSessions();
   if (sessionId) {
     const found = sessions.find(s => s.id === sessionId);
     if (found) return found;
   }
   if (userId) {
-    const userSession = sessions.find(s => s.userId === userId && (s.status === 'ACTIVE' || s.status === 'PAUSED' || s.status === 'ESCALATED')) ||
+    const userSession = sessions.find(s => s.userId === userId && (s.status === 'ACTIVE' || s.status === 'PAUSED' || s.status === 'ESCALATING' || s.status === 'ESCALATED')) ||
       sessions.find(s => s.userId === userId);
     if (userSession) return userSession;
   }
@@ -281,6 +296,13 @@ export const dbCheckInSession = async (sessionId, userId, updateData = {}) => {
     }
   }
 
+  if (process.env.NODE_ENV === 'production' && !isTableAvailableInDb) {
+    return {
+      error: 'DATABASE_UNAVAILABLE',
+      message: 'Production database table public.deadman_sessions is unavailable.'
+    };
+  }
+
   // Fallback JSON update
   const sessions = await getJsonSessions();
   const idx = sessions.findIndex(s => s.id === current.id);
@@ -341,6 +363,10 @@ export const dbPauseSession = async (sessionId, userId) => {
     }
   }
 
+  if (process.env.NODE_ENV === 'production' && !isTableAvailableInDb) {
+    return { error: 'DATABASE_UNAVAILABLE', message: 'Production database unavailable.' };
+  }
+
   // JSON fallback
   const sessions = await getJsonSessions();
   const idx = sessions.findIndex(s => s.id === current.id);
@@ -394,6 +420,10 @@ export const dbResumeSession = async (sessionId, userId) => {
     }
   }
 
+  if (process.env.NODE_ENV === 'production' && !isTableAvailableInDb) {
+    return { error: 'DATABASE_UNAVAILABLE', message: 'Production database unavailable.' };
+  }
+
   // JSON fallback
   const sessions = await getJsonSessions();
   const idx = sessions.findIndex(s => s.id === current.id);
@@ -441,6 +471,10 @@ export const dbStopSession = async (sessionId, userId) => {
     }
   }
 
+  if (process.env.NODE_ENV === 'production' && !isTableAvailableInDb) {
+    return { error: 'DATABASE_UNAVAILABLE', message: 'Production database unavailable.' };
+  }
+
   // JSON fallback
   const sessions = await getJsonSessions();
   const idx = sessions.findIndex(s => s.id === current.id);
@@ -470,16 +504,24 @@ export const dbGetAllSessions = async () => {
       }
     } catch (e) {}
   }
+
+  if (process.env.NODE_ENV === 'production' && !isTableAvailableInDb) {
+    return [];
+  }
+
   return await getJsonSessions();
 };
 
 /**
- * 8. Database-Level Atomic Claiming of Expired Sessions (Worker Loop)
+ * 8. Database-Level Atomic Claiming of Expired Sessions (Worker Loop - Phase 1 Outbox Claim)
  * Guarantees across multiple server/worker instances that an expired deadline
- * is claimed exactly ONCE using conditional SQL UPDATE:
- * WHERE status = 'ACTIVE' AND escalation_processed = FALSE AND next_deadline_at <= now
+ * is claimed exactly ONCE by transitioning status to 'ESCALATING'.
+ * Also recovers stalled 'ESCALATING' sessions if a previous worker crashed or failed
+ * alert creation (> 15 seconds ago).
  */
 export const dbClaimExpiredDeadManSessions = async (nowIso) => {
+  const retryThresholdIso = new Date(new Date(nowIso).getTime() - 15000).toISOString();
+
   // If PostgreSQL deadman_sessions table is active, execute atomic conditional update
   if (isTableAvailableInDb) {
     try {
@@ -487,14 +529,11 @@ export const dbClaimExpiredDeadManSessions = async (nowIso) => {
       const { data, error } = await supabase
         .from('deadman_sessions')
         .update({
-          escalation_processed: true,
-          status: 'ESCALATED',
+          status: 'ESCALATING',
           escalated_at: nowIso,
           updated_at: nowIso
         })
-        .eq('status', 'ACTIVE')
-        .eq('escalation_processed', false)
-        .lte('next_deadline_at', nowIso)
+        .or(`and(status.eq.ACTIVE,next_deadline_at.lte.${nowIso}),and(status.eq.ESCALATING,escalation_processed.eq.false,escalated_at.lte.${retryThresholdIso})`)
         .select('*');
 
       if (!error && Array.isArray(data) && data.length > 0) {
@@ -505,32 +544,78 @@ export const dbClaimExpiredDeadManSessions = async (nowIso) => {
     }
   }
 
-  // Synchronized fallback on JSON sessions
-  const sessions = await getJsonSessions();
-  const claimedSessions = [];
-  const now = new Date(nowIso).getTime();
+  // Synchronized fallback on JSON sessions (non-production only)
+  // Serialized via async mutex to guarantee atomic mutual exclusion across concurrent worker calls
+  return jsonClaimMutex = jsonClaimMutex.then(async () => {
+    const sessions = await getJsonSessions();
+    const claimedSessions = [];
+    const now = new Date(nowIso).getTime();
 
-  for (let session of sessions) {
-    if (
-      session.status === 'ACTIVE' &&
-      session.nextDeadlineAt &&
-      !session.escalationProcessed
-    ) {
-      const deadlineTime = new Date(session.nextDeadlineAt).getTime();
-      if (now >= deadlineTime) {
-        // Atomic in-memory claim flag
-        session.escalationProcessed = true;
-        session.status = 'ESCALATED';
+    for (let session of sessions) {
+      const isOverdueActive = session.status === 'ACTIVE' && session.nextDeadlineAt && !session.escalationProcessed && now >= new Date(session.nextDeadlineAt).getTime();
+      const isStalledEscalating = session.status === 'ESCALATING' && !session.escalationProcessed && (now - new Date(session.escalatedAt || 0).getTime() >= 15000);
+
+      if (isOverdueActive || isStalledEscalating) {
+        session.status = 'ESCALATING';
         session.escalatedAt = nowIso;
         session.updatedAt = nowIso;
         claimedSessions.push(session);
       }
     }
+
+    if (claimedSessions.length > 0) {
+      await saveJsonSessions(sessions);
+    }
+
+    return claimedSessions;
+  });
+};
+
+/**
+ * 9. Confirm Dead Man Escalation (Worker Loop - Phase 2 Outbox Confirmation)
+ * Permanently marks session as 'ESCALATED' with escalation_processed = true
+ * ONLY AFTER the emergency incident has been successfully created and recorded.
+ */
+export const dbConfirmDeadManEscalation = async (sessionId, alertId, nowIso) => {
+  if (isTableAvailableInDb) {
+    try {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase
+        .from('deadman_sessions')
+        .update({
+          status: 'ESCALATED',
+          escalation_processed: true,
+          escalation_incident_id: alertId,
+          updated_at: nowIso
+        })
+        .eq('id', sessionId)
+        .select('*')
+        .single();
+
+      if (!error && data) {
+        return mapSessionFromDb(data);
+      }
+    } catch (err) {
+      console.warn('[DEAD MAN DB CONFIRM ESCALATION ERROR]', err.message);
+    }
   }
 
-  if (claimedSessions.length > 0) {
+  // Fallback JSON confirmation
+  const sessions = await getJsonSessions();
+  const idx = sessions.findIndex(s => s.id === sessionId);
+  if (idx !== -1) {
+    sessions[idx].status = 'ESCALATED';
+    sessions[idx].escalationProcessed = true;
+    sessions[idx].escalationIncidentId = alertId;
+    sessions[idx].updatedAt = nowIso;
+    if (!sessions[idx].history) sessions[idx].history = [];
+    sessions[idx].history.unshift({
+      timestamp: nowIso,
+      event: 'DEADLINE_EXPIRED_ESCALATED',
+      alertId
+    });
     await saveJsonSessions(sessions);
+    return sessions[idx];
   }
-
-  return claimedSessions;
+  return null;
 };

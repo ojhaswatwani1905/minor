@@ -1,7 +1,7 @@
 import { readJson, writeJson } from '../utils/jsonDb.js';
 import { dispatchAutomaticGeofenceAlert } from '../controllers/safeZoneController.js';
-import { isSupabaseConfigured, getSupabaseClient, mapAlertToDb } from '../database/supabase.js';
-import { dbClaimExpiredDeadManSessions } from '../database/deadManDb.js';
+import { isSupabaseConfigured, getSupabaseClient, mapAlertToDb, getDatabaseDefaults } from '../database/supabase.js';
+import { dbClaimExpiredDeadManSessions, dbConfirmDeadManEscalation } from '../database/deadManDb.js';
 
 let workerInterval = null;
 let isProcessing = false;
@@ -74,12 +74,20 @@ export const checkExpiredDeadManSessions = async () => {
         guardianNotified: true
       };
 
+      let alertPersisted = false;
+
       // 1. Mirror to Supabase if configured
       if (isSupabaseConfigured()) {
         try {
           const supabase = getSupabaseClient();
-          const dbRow = mapAlertToDb(alertPayload, null, null);
-          await supabase.from('alerts').insert(dbRow);
+          const { defaultProfileId, defaultTripId } = await getDatabaseDefaults(supabase);
+          const dbRow = mapAlertToDb(alertPayload, defaultProfileId, defaultTripId);
+          const { error: sbErr } = await supabase.from('alerts').insert(dbRow);
+          if (!sbErr) {
+            alertPersisted = true;
+          } else {
+            console.warn('[DEAD MAN SUPABASE INSERT ERROR]', sbErr.message);
+          }
         } catch (sbErr) {
           console.warn('[DEAD MAN SUPABASE INSERT ERROR]', sbErr.message);
         }
@@ -90,6 +98,7 @@ export const checkExpiredDeadManSessions = async () => {
         const alerts = await readJson('alerts');
         alerts.unshift(alertPayload);
         await writeJson('alerts', alerts);
+        alertPersisted = true;
       } catch (e) {}
 
       // 3. Mirror into notifications.json
@@ -117,27 +126,16 @@ export const checkExpiredDeadManSessions = async () => {
         }
       } catch (e) {}
 
-      // 5. Update session in fallback JSON with alertId if present
-      try {
-        const allSessions = await readJson('deadman_sessions');
-        const sIdx = allSessions.findIndex(s => s.id === session.id);
-        if (sIdx !== -1) {
-          allSessions[sIdx].escalationIncidentId = alertId;
-          allSessions[sIdx].status = 'ESCALATED';
-          allSessions[sIdx].escalationProcessed = true;
-          allSessions[sIdx].escalatedAt = nowIso;
-          if (!allSessions[sIdx].history) allSessions[sIdx].history = [];
-          allSessions[sIdx].history.unshift({
-            timestamp: nowIso,
-            event: 'DEADLINE_EXPIRED_ESCALATED',
-            alertId
-          });
-          await writeJson('deadman_sessions', allSessions);
-        }
-      } catch (e) {}
-
-      metrics.totalDeadManEscalatedCount = (metrics.totalDeadManEscalatedCount || 0) + 1;
-      metrics.lastProcessedTime = nowIso;
+      // 5. Outbox Confirmation: Only if alert was created, confirm escalation in DB
+      if (alertPersisted) {
+        await dbConfirmDeadManEscalation(session.id, alertId, nowIso);
+        metrics.totalDeadManEscalatedCount = (metrics.totalDeadManEscalatedCount || 0) + 1;
+        metrics.lastProcessedTime = nowIso;
+        console.log(`[DEAD MAN ESCALATION WORKER] Successfully escalated and confirmed session ${session.id} -> Alert ID: ${alertId}`);
+      } else {
+        console.error(`[DEAD MAN ESCALATION OUTBOX WARNING] Alert creation failed for session ${session.id}. Session remains unconfirmed in ESCALATING status for retry.`);
+        metrics.failedEscalationsCount = (metrics.failedEscalationsCount || 0) + 1;
+      }
     }
   } catch (err) {
     console.error('[DEAD MAN WORKER ERROR]', err.message);

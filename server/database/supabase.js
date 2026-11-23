@@ -153,6 +153,32 @@ export const mapAlertFromDb = (row) => {
 };
 
 /**
+ * Retrieves valid fallback IDs from Supabase to satisfy PostgreSQL foreign key & not-null constraints.
+ */
+export const getDatabaseDefaults = async (supabaseClient = null) => {
+  let defaultProfileId = null;
+  let defaultTripId = null;
+  const supabase = supabaseClient || (isSupabaseConfigured() ? getSupabaseClient() : null);
+  if (!supabase) return { defaultProfileId, defaultTripId };
+
+  try {
+    const { data: profiles } = await supabase.from('profiles').select('id').limit(1);
+    if (profiles && profiles.length > 0) {
+      defaultProfileId = profiles[0].id;
+    }
+  } catch (e) {}
+
+  try {
+    const { data: trips } = await supabase.from('trips').select('id').limit(1);
+    if (trips && trips.length > 0) {
+      defaultTripId = trips[0].id;
+    }
+  } catch (e) {}
+
+  return { defaultProfileId, defaultTripId };
+};
+
+/**
  * Maps incoming API alert payload to Supabase SQL column schema.
  */
 export const mapAlertToDb = (payload, defaultUserId, defaultTripId) => {
