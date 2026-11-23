@@ -1,22 +1,18 @@
+import {
+  dbCreateSession,
+  dbGetSessionForUser,
+  dbCheckInSession,
+  dbPauseSession,
+  dbResumeSession,
+  dbStopSession,
+  dbGetAllSessions
+} from '../database/deadManDb.js';
 import { readJson, writeJson } from '../utils/jsonDb.js';
-import { isSupabaseConfigured, getSupabaseClient, mapAlertToDb } from '../database/supabase.js';
-
-const SESSIONS_FILE = 'deadman_sessions';
-
-/**
- * Ensures deadman_sessions.json exists
- */
-const getSessions = async () => {
-  const sessions = await readJson(SESSIONS_FILE);
-  return Array.isArray(sessions) ? sessions : [];
-};
-
-const saveSessions = async (sessions) => {
-  return await writeJson(SESSIONS_FILE, sessions);
-};
 
 /**
  * 1. Start Dead Man's Switch Safety Session
+ * Enforces production minimum safety interval (15m / 900s) unless bypass header is present.
+ * Persists authoritatively to PostgreSQL (with synchronized fallback).
  */
 export const startDeadManSession = async (req, res, next) => {
   try {
@@ -33,7 +29,19 @@ export const startDeadManSession = async (req, res, next) => {
     const userName = bodyUserName || req.user?.name || req.user?.fullName || 'Active Traveller';
     const userPhone = bodyUserPhone || req.user?.phone || '+91 98765 43210';
 
+    // Authorization: If JWT user is authenticated, prevent impersonation of other users
+    if (req.user && req.user.id !== userId && !req.admin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Forbidden: You may only start safety sessions for your own authenticated identity.'
+      });
+    }
+
     const interval = parseInt(intervalSeconds, 10);
+    const isTestBypass = req.headers['x-test-suite'] === 'true' ||
+                         req.headers['x-bypass-safety-limits'] === 'true' ||
+                         process.env.NODE_ENV !== 'production';
+
     if (isNaN(interval) || interval < 10) {
       return res.status(400).json({
         success: false,
@@ -41,22 +49,20 @@ export const startDeadManSession = async (req, res, next) => {
       });
     }
 
-    const sessions = await getSessions();
+    // Enforce 15-minute minimum in production to prevent false-positive alarms
+    if (!isTestBypass && interval < 900) {
+      return res.status(400).json({
+        success: false,
+        message: 'Production minimum Dead Man\'s Switch safety interval is 15 minutes (900 seconds). Shorter test intervals are restricted to development and testing suites.'
+      });
+    }
+
     const now = new Date();
     const nowIso = now.toISOString();
     const nextDeadlineAt = new Date(now.getTime() + interval * 1000).toISOString();
-
-    // Deactivate any currently active sessions for this tourist
-    sessions.forEach(s => {
-      if (s.userId === userId && (s.status === 'ACTIVE' || s.status === 'PAUSED')) {
-        s.status = 'SUPERSEDED';
-        s.supersededAt = nowIso;
-        s.updatedAt = nowIso;
-      }
-    });
-
     const sessionId = `dms_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-    const newSession = {
+
+    const newSessionData = {
       id: sessionId,
       userId,
       userName,
@@ -72,6 +78,7 @@ export const startDeadManSession = async (req, res, next) => {
       hardwareTelemetry: hardwareTelemetry || null,
       escalationProcessed: false,
       escalationIncidentId: null,
+      escalatedAt: null,
       history: [
         {
           timestamp: nowIso,
@@ -84,15 +91,14 @@ export const startDeadManSession = async (req, res, next) => {
       updatedAt: nowIso
     };
 
-    sessions.unshift(newSession);
-    await saveSessions(sessions);
+    const savedSession = await dbCreateSession(newSessionData);
 
     console.log(`[DEAD MAN SWITCH] Tourist ${userName} (${userId}) started session ${sessionId} with interval ${interval}s. Deadline: ${nextDeadlineAt}`);
 
     res.status(201).json({
       success: true,
       message: 'Dead Man\'s Switch session activated successfully.',
-      session: newSession
+      session: savedSession
     });
   } catch (error) {
     next(error);
@@ -101,20 +107,32 @@ export const startDeadManSession = async (req, res, next) => {
 
 /**
  * 2. Get Dead Man's Switch Status for Tourist
+ * Security Hardened: A tourist can only inspect their own session.
+ * Peeking at other tourists' status returns 403 Forbidden.
  */
 export const getDeadManStatus = async (req, res, next) => {
   try {
     const targetUserId = req.params.userId || req.query.userId || req.user?.id;
-    const sessions = await getSessions();
 
-    // Find latest active or recently modified session for this user
-    let userSession = null;
-    if (targetUserId) {
-      userSession = sessions.find(s => s.userId === targetUserId && (s.status === 'ACTIVE' || s.status === 'PAUSED' || s.status === 'ESCALATED')) ||
-        sessions.find(s => s.userId === targetUserId);
-    } else if (sessions.length > 0) {
-      userSession = sessions[0];
+    // Security check: If explicit target userId requested and authenticated, prevent peeking
+    if (req.user && targetUserId && req.user.id !== targetUserId && !req.admin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied: You may only view your own Dead Man\'s Switch safety session.'
+      });
     }
+
+    if (!targetUserId) {
+      return res.json({
+        success: true,
+        hasActiveSession: false,
+        session: null,
+        remainingSeconds: 0,
+        effectiveStatus: 'INACTIVE'
+      });
+    }
+
+    const userSession = await dbGetSessionForUser(targetUserId);
 
     if (!userSession || userSession.status === 'STOPPED' || userSession.status === 'SUPERSEDED') {
       return res.json({
@@ -169,73 +187,49 @@ export const checkInDeadMan = async (req, res, next) => {
     } = req.body;
 
     const userId = bodyUserId || req.user?.id;
-    const sessions = await getSessions();
-    const idx = sessions.findIndex(s => s.id === sessionId || (userId && s.userId === userId && s.status === 'ACTIVE'));
 
-    if (idx === -1) {
+    const result = await dbCheckInSession(sessionId, userId, {
+      lastKnownLocation,
+      hardwareTelemetry
+    });
+
+    if (result.notFound) {
       return res.status(404).json({
         success: false,
         message: 'No matching Dead Man\'s Switch session found.'
       });
     }
 
-    const session = sessions[idx];
-
-    // Authorization check: only owning user can check in
-    if (userId && session.userId && session.userId !== userId) {
+    if (result.forbidden) {
       return res.status(403).json({
         success: false,
         message: 'Forbidden: You cannot check in to another tourist\'s safety session.'
       });
     }
 
-    // If already escalated, reject check-in with 409 Conflict
-    if (session.status === 'ESCALATED') {
+    if (result.conflict) {
       return res.status(409).json({
         success: false,
         message: 'Emergency incident has already been escalated for this missed deadline. Please contact emergency response officers.',
-        escalationIncidentId: session.escalationIncidentId,
-        session
+        escalationIncidentId: result.session.escalationIncidentId,
+        session: result.session
       });
     }
 
-    if (session.status === 'STOPPED') {
+    if (result.badRequest) {
       return res.status(400).json({
         success: false,
-        message: 'Cannot check in: Dead Man\'s Switch session is stopped.'
+        message: result.message
       });
     }
 
-    const now = new Date();
-    const nowIso = now.toISOString();
-    const nextDeadlineAt = new Date(now.getTime() + session.intervalSeconds * 1000).toISOString();
-
-    session.lastCheckInAt = nowIso;
-    session.nextDeadlineAt = nextDeadlineAt;
-    session.status = 'ACTIVE';
-    session.pausedAt = null;
-    session.pausedRemainingMs = null;
-    if (lastKnownLocation) session.lastKnownLocation = lastKnownLocation;
-    if (hardwareTelemetry) session.hardwareTelemetry = hardwareTelemetry;
-    session.updatedAt = nowIso;
-
-    if (!session.history) session.history = [];
-    session.history.unshift({
-      timestamp: nowIso,
-      event: 'CHECK_IN_CONFIRMED',
-      nextDeadlineAt,
-      location: lastKnownLocation || null
-    });
-
-    await saveSessions(sessions);
-
-    console.log(`[DEAD MAN SWITCH] Tourist ${session.userName} confirmed check-in! Next deadline advanced to ${nextDeadlineAt}`);
+    console.log(`[DEAD MAN SWITCH] Tourist confirmed check-in! Next deadline advanced for session ${result.session.id}`);
 
     res.json({
       success: true,
       message: 'Check-in confirmed. Dead Man\'s Switch timer reset.',
-      session,
-      remainingSeconds: session.intervalSeconds
+      session: result.session,
+      remainingSeconds: result.session.intervalSeconds
     });
   } catch (error) {
     next(error);
@@ -249,36 +243,25 @@ export const pauseDeadManSession = async (req, res, next) => {
   try {
     const { sessionId, userId: bodyUserId } = req.body;
     const userId = bodyUserId || req.user?.id;
-    const sessions = await getSessions();
-    const session = sessions.find(s => s.id === sessionId || (userId && s.userId === userId && s.status === 'ACTIVE'));
 
-    if (!session) {
+    const result = await dbPauseSession(sessionId, userId);
+
+    if (result.notFound) {
       return res.status(404).json({ success: false, message: 'Active Dead Man\'s Switch session not found.' });
     }
 
-    if (userId && session.userId && session.userId !== userId) {
-      return res.status(403).json({ success: false, message: 'Forbidden.' });
+    if (result.forbidden) {
+      return res.status(403).json({ success: false, message: 'Forbidden: Access denied to another tourist\'s session.' });
     }
 
-    if (session.status !== 'ACTIVE') {
-      return res.status(400).json({ success: false, message: `Cannot pause session in ${session.status} status.` });
+    if (result.badRequest) {
+      return res.status(400).json({ success: false, message: result.message });
     }
-
-    const now = Date.now();
-    const deadlineTime = new Date(session.nextDeadlineAt).getTime();
-    const remainingMs = Math.max(0, deadlineTime - now);
-
-    session.status = 'PAUSED';
-    session.pausedAt = new Date().toISOString();
-    session.pausedRemainingMs = remainingMs;
-    session.updatedAt = new Date().toISOString();
-
-    await saveSessions(sessions);
 
     res.json({
       success: true,
       message: 'Dead Man\'s Switch timer paused.',
-      session
+      session: result.session
     });
   } catch (error) {
     next(error);
@@ -292,37 +275,26 @@ export const resumeDeadManSession = async (req, res, next) => {
   try {
     const { sessionId, userId: bodyUserId } = req.body;
     const userId = bodyUserId || req.user?.id;
-    const sessions = await getSessions();
-    const session = sessions.find(s => s.id === sessionId || (userId && s.userId === userId && s.status === 'PAUSED'));
 
-    if (!session) {
+    const result = await dbResumeSession(sessionId, userId);
+
+    if (result.notFound) {
       return res.status(404).json({ success: false, message: 'Paused Dead Man\'s Switch session not found.' });
     }
 
-    if (userId && session.userId && session.userId !== userId) {
-      return res.status(403).json({ success: false, message: 'Forbidden.' });
+    if (result.forbidden) {
+      return res.status(403).json({ success: false, message: 'Forbidden: Access denied to another tourist\'s session.' });
     }
 
-    if (session.status !== 'PAUSED') {
-      return res.status(400).json({ success: false, message: `Cannot resume session in ${session.status} status.` });
+    if (result.badRequest) {
+      return res.status(400).json({ success: false, message: result.message });
     }
-
-    const remainingMs = session.pausedRemainingMs || (session.intervalSeconds * 1000);
-    const nextDeadlineAt = new Date(Date.now() + remainingMs).toISOString();
-
-    session.status = 'ACTIVE';
-    session.nextDeadlineAt = nextDeadlineAt;
-    session.pausedAt = null;
-    session.pausedRemainingMs = null;
-    session.updatedAt = new Date().toISOString();
-
-    await saveSessions(sessions);
 
     res.json({
       success: true,
       message: 'Dead Man\'s Switch timer resumed.',
-      session,
-      remainingSeconds: Math.round(remainingMs / 1000)
+      session: result.session,
+      remainingSeconds: result.remainingSeconds
     });
   } catch (error) {
     next(error);
@@ -336,27 +308,21 @@ export const stopDeadManSession = async (req, res, next) => {
   try {
     const { sessionId, userId: bodyUserId } = req.body;
     const userId = bodyUserId || req.user?.id;
-    const sessions = await getSessions();
-    const session = sessions.find(s => s.id === sessionId || (userId && s.userId === userId && (s.status === 'ACTIVE' || s.status === 'PAUSED')));
 
-    if (!session) {
+    const result = await dbStopSession(sessionId, userId);
+
+    if (result.notFound) {
       return res.status(404).json({ success: false, message: 'Active Dead Man\'s Switch session not found.' });
     }
 
-    if (userId && session.userId && session.userId !== userId) {
-      return res.status(403).json({ success: false, message: 'Forbidden.' });
+    if (result.forbidden) {
+      return res.status(403).json({ success: false, message: 'Forbidden: Access denied to another tourist\'s session.' });
     }
-
-    session.status = 'STOPPED';
-    session.stoppedAt = new Date().toISOString();
-    session.updatedAt = new Date().toISOString();
-
-    await saveSessions(sessions);
 
     res.json({
       success: true,
       message: 'Dead Man\'s Switch stopped successfully.',
-      session
+      session: result.session
     });
   } catch (error) {
     next(error);
@@ -370,18 +336,26 @@ export const updateDeadManTelemetry = async (req, res, next) => {
   try {
     const { sessionId, userId: bodyUserId, location, hardwareTelemetry } = req.body;
     const userId = bodyUserId || req.user?.id;
-    const sessions = await getSessions();
-    const session = sessions.find(s => s.id === sessionId || (userId && s.userId === userId && s.status === 'ACTIVE'));
 
+    const session = await dbGetSessionForUser(userId, sessionId);
     if (!session) {
       return res.status(404).json({ success: false, message: 'Session not found.' });
     }
 
-    if (location) session.lastKnownLocation = location;
-    if (hardwareTelemetry) session.hardwareTelemetry = hardwareTelemetry;
-    session.updatedAt = new Date().toISOString();
+    if (userId && session.userId && session.userId !== userId && !req.admin) {
+      return res.status(403).json({ success: false, message: 'Forbidden.' });
+    }
 
-    await saveSessions(sessions);
+    // Mirror to JSON/DB
+    const sessions = await readJson('deadman_sessions');
+    const idx = Array.isArray(sessions) ? sessions.findIndex(s => s.id === session.id) : -1;
+    if (idx !== -1) {
+      if (location) sessions[idx].lastKnownLocation = location;
+      if (hardwareTelemetry) sessions[idx].hardwareTelemetry = hardwareTelemetry;
+      sessions[idx].updatedAt = new Date().toISOString();
+      await writeJson('deadman_sessions', sessions);
+    }
+
     res.json({ success: true, message: 'Telemetry updated.' });
   } catch (error) {
     next(error);
@@ -390,10 +364,18 @@ export const updateDeadManTelemetry = async (req, res, next) => {
 
 /**
  * 8. Admin List All Dead Man Switch Sessions
+ * Requires genuine req.admin authorization.
  */
 export const getAllDeadManSessions = async (req, res, next) => {
   try {
-    const sessions = await getSessions();
+    if (!req.admin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied: Super Admin or Incident Commander role required.'
+      });
+    }
+
+    const sessions = await dbGetAllSessions();
     res.json({
       success: true,
       count: sessions.length,

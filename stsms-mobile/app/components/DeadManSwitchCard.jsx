@@ -14,7 +14,7 @@ import { useTheme } from '../context/ThemeContext';
 import { RADIUS, SHADOWS } from '../constants/theme';
 
 const INTERVAL_PRESETS = [
-  { label: '60s (Test)', seconds: 60 },
+  ...(__DEV__ ? [{ label: '60s (Test)', seconds: 60 }] : []),
   { label: '15m', seconds: 900 },
   { label: '30m', seconds: 1800 },
   { label: '1h', seconds: 3600 },
@@ -630,3 +630,4 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
 });
+

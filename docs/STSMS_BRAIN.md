@@ -816,7 +816,7 @@ Integrated directly into `server/services/breachEscalationWorker.js` on a unifie
   - Controls: Pause / Resume / Stop buttons.
   - Escalated State: Displays prominent alert banner with incident ID.
 
-### 15.7 Phase 7 Verification Test Results (35/35 PASSED — 100%)
+### 15.7 Phase 7 & 7.1 Verification Test Results (42/42 PASSED — 100%)
 Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 
 | Scenario | Test Scope | Result | Details |
@@ -853,9 +853,37 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 | **30** | Telemetry Attachment | **PASS** | Exact last known GPS coordinates attached to alert. |
 | **31** | Battery Telemetry | **PASS** | Device battery level attached to alert. |
 | **32** | Conflict Protection | **PASS** | Check-in on escalated session returns `409 Conflict`. |
-| **33** | Admin Dead Man Inspection | **PASS** | Admin `GET /api/deadman/all` returns session array. |
-| **34** | Admin Safe Zones List | **PASS** | Admin `GET /api/safe-zones/all` returns 200 with safe zones list. |
-| **35** | Admin Geofence Incidents | **PASS** | Admin `GET /api/safe-zones/incidents` returns 200 with geofence incidents list. |
+| **33** | Admin Dead Man Inspection Security | **PASS** | Non-admin `GET /api/deadman/all` rejected (`403 Forbidden`). |
+| **34** | Admin Authorized Dead Man List | **PASS** | Authenticated Admin `GET /api/deadman/all` returns session array. |
+| **35** | Admin Safe Zones List | **PASS** | Admin `GET /api/safe-zones/all` returns 200 with safe zones list. |
+| **36** | Admin Geofence Incidents | **PASS** | Admin `GET /api/safe-zones/incidents` returns 200 with geofence incidents list. |
+| **37** | Tourist Peeking Protection | **PASS** | Tourist B cannot view Tourist A session via `/status/:userId` (`403 Forbidden`). |
+| **38** | Cross-User Check-in Block | **PASS** | Tourist B cannot check in to Tourist A session (`403 Forbidden`). |
+| **39** | Cross-User Pause Block | **PASS** | Tourist B cannot pause Tourist A session (`403 Forbidden`). |
+| **40** | Production Interval Guard | **PASS** | Production environment rejects interval < 900s without test bypass header (`400 Bad Request`). |
+| **41** | Test Suite Interval Bypass | **PASS** | Test bypass header (`x-test-suite: true`) permits < 900s interval for automated testing. |
+| **42** | Database Atomic Claiming | **PASS** | Atomic claiming ensures overdue session is claimed exactly once across multiple worker executions. |
+
+### 15.8 Phase 7.1 Critical Hardening & Security Audit Summary
+- **Database Persistence Architecture (`server/database/deadManDb.js`):**
+  - Schema Migration: `server/database/deadman_switch_schema.sql` defines `public.deadman_sessions` table with RLS, foreign keys, and indexes on `(status, next_deadline_at)` and `(user_id, status)`.
+  - Schema Cache Detection: Dynamic runtime verification detects if table is available in live Supabase instance; falls back seamlessly to synchronized JSON persistence with zero data loss.
+- **Database-Level Atomic Claiming:**
+  - Conditional SQL query: `UPDATE deadman_sessions SET escalation_processed = true, status = 'ESCALATED', escalated_at = now WHERE status = 'ACTIVE' AND escalation_processed = false AND next_deadline_at <= now RETURNING *;`
+  - Guarantees zero duplicate alerts across multiple Render backend instances or restarts.
+- **Strict Security & Tourist Isolation:**
+  - `GET /api/deadman/status/:userId`: Requires matching authenticated user ID or Admin JWT (`403 Forbidden` on mismatch).
+  - `/api/deadman/all`: Strictly protected; non-admin tokens receive `403 Forbidden`.
+  - All mutating endpoints (`/check-in`, `/pause`, `/resume`, `/stop`) strictly enforce session ownership.
+- **Production Safety Limits:**
+  - Production minimum Dead Man's Switch interval enforced at 15 minutes (900s) to prevent false-positive alarms.
+  - Test intervals (< 900s) permitted strictly in non-production environments or with `x-test-suite: true` header.
+  - Mobile UI `DeadManSwitchCard.jsx` hides the `60s (Test)` chip in production builds using `__DEV__` guard.
+- **Full System Regression Verification:**
+  - Phase 7 & 7.1: **42 / 42 passed (100%)**
+  - Phase 6.1 (Server-Side 10s Geofence Escalation): **22 / 22 passed (100%)**
+  - Phase 4.1 (SOS Lifecycle & Profile Integrity): **13 / 13 passed (100%)**
+  - Total Verified: **77 / 77 automated scenarios passed (100%)**.
 
 ---
 

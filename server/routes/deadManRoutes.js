@@ -9,21 +9,24 @@ import {
   updateDeadManTelemetry,
   getAllDeadManSessions
 } from '../controllers/deadManController.js';
-import { protect } from '../middlewares/authMiddleware.js';
+import { protect, optionalProtect } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-// Admin inspection
+// Admin inspection: strictly protected with Admin role check
 router.get('/all', protect, getAllDeadManSessions);
 
+// Targeted tourist status check: strictly protected (only owning tourist or admin can inspect)
+router.get('/status/:userId', protect, getDeadManStatus);
+
 // Tourist lifecycle endpoints
-router.post('/start', startDeadManSession);
-router.get('/status', getDeadManStatus);
-router.get('/status/:userId', getDeadManStatus);
-router.post('/check-in', checkInDeadMan);
-router.post('/pause', pauseDeadManSession);
-router.post('/resume', resumeDeadManSession);
-router.post('/stop', stopDeadManSession);
-router.post('/telemetry', updateDeadManTelemetry);
+router.post('/start', optionalProtect, startDeadManSession);
+router.get('/status', optionalProtect, getDeadManStatus);
+router.post('/check-in', optionalProtect, checkInDeadMan);
+router.post('/pause', optionalProtect, pauseDeadManSession);
+router.post('/resume', optionalProtect, resumeDeadManSession);
+router.post('/stop', optionalProtect, stopDeadManSession);
+router.post('/telemetry', optionalProtect, updateDeadManTelemetry);
 
 export default router;
+

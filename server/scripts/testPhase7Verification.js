@@ -249,6 +249,7 @@ async function runTests() {
   // -------------------------------------------------------------
   let autoEscalatedSessionId = null;
   const testEscalateUserId = `usr_escalate_${Date.now()}`;
+  let escalatedSession = null;
   {
     // Create a session with an expired deadline (in past)
     const expiredDeadline = new Date(Date.now() - 2000).toISOString();
@@ -289,6 +290,7 @@ async function runTests() {
 
     const updatedSessions = await readJson('deadman_sessions');
     const escalated = updatedSessions.find(s => s.id === autoEscalatedSessionId);
+    escalatedSession = escalated;
 
     assert(escalated != null && escalated.status === 'ESCALATED', '24. Expired deadline detected and atomically escalated by backend worker');
     assert(escalated.escalationProcessed === true, '25. escalationProcessed flag set to prevent race conditions & duplicate dispatch');
@@ -324,12 +326,26 @@ async function runTests() {
   // -------------------------------------------------------------
   console.log('\n--- Section D: Admin Command Center Endpoints ---');
   {
+    // Non-admin without req.admin
     const { req, res, next, getResult } = createMockReqRes({
-      query: {}
+      query: {},
+      user: { id: 'usr_tourist_1', role: 'tourist' }
     });
     await getAllDeadManSessions(req, res, next);
     const { status, data } = getResult();
-    assert(status === 200 && data.success && Array.isArray(data.sessions), '33. Admin GET /api/deadman/all returns session array');
+    assert(status === 403 && !data.success, '33. Non-admin GET /api/deadman/all returns 403 Forbidden');
+  }
+
+  {
+    // Admin with req.admin
+    const { req, res, next, getResult } = createMockReqRes({
+      query: {},
+      user: { id: 'usr_admin_1', role: 'Super Admin' }
+    });
+    req.admin = { id: 'usr_admin_1', role: 'Super Admin' };
+    await getAllDeadManSessions(req, res, next);
+    const { status, data } = getResult();
+    assert(status === 200 && data.success && Array.isArray(data.sessions), '34. Authenticated Admin GET /api/deadman/all returns session array');
   }
 
   {
@@ -338,7 +354,7 @@ async function runTests() {
     });
     await getAllSafeZones(req, res, next);
     const { status, data } = getResult();
-    assert(status === 200 && data.success && Array.isArray(data.safeZones), '34. Admin GET /api/safe-zones/all returns 200 with safe zones list');
+    assert(status === 200 && data.success && Array.isArray(data.safeZones), '35. Admin GET /api/safe-zones/all returns 200 with safe zones list');
   }
 
   {
@@ -347,7 +363,99 @@ async function runTests() {
     });
     await getGeofenceIncidents(req, res, next);
     const { status, data } = getResult();
-    assert(status === 200 && data.success && Array.isArray(data.incidents), '35. Admin GET /api/safe-zones/incidents returns 200 with geofence incidents list');
+    assert(status === 200 && data.success && Array.isArray(data.incidents), '36. Admin GET /api/safe-zones/incidents returns 200 with geofence incidents list');
+  }
+
+  // -------------------------------------------------------------
+  // Test 12: Phase 7.1 Security Audit & Interval Hardening
+  // -------------------------------------------------------------
+  console.log('\n--- Section E: Phase 7.1 Security Audit & Interval Hardening ---');
+  // 1. Tourist B attempting to inspect Tourist A's status
+  {
+    const { req, res, next, getResult } = createMockReqRes({
+      params: { userId: testUserId },
+      user: { id: testOtherUserId, role: 'tourist' }
+    });
+    await getDeadManStatus(req, res, next);
+    const { status, data } = getResult();
+    assert(status === 403 && !data.success, '37. Tourist B cannot view Tourist A session via /status/:userId (403 Forbidden)');
+  }
+
+  // 2. Tourist B attempting to check-in to Tourist A's session
+  {
+    const { req, res, next, getResult } = createMockReqRes({
+      body: {
+        sessionId: activeSessionId,
+        userId: testOtherUserId
+      },
+      user: { id: testOtherUserId, role: 'tourist' }
+    });
+    await checkInDeadMan(req, res, next);
+    const { status, data } = getResult();
+    assert(status === 403 && !data.success, '38. Tourist B cannot check in to Tourist A session (403 Forbidden)');
+  }
+
+  // 3. Tourist B attempting to pause Tourist A's session
+  {
+    const { req, res, next, getResult } = createMockReqRes({
+      body: {
+        sessionId: activeSessionId,
+        userId: testOtherUserId
+      },
+      user: { id: testOtherUserId, role: 'tourist' }
+    });
+    await pauseDeadManSession(req, res, next);
+    const { status, data } = getResult();
+    assert(status === 403 && !data.success, '39. Tourist B cannot pause Tourist A session (403 Forbidden)');
+  }
+
+  // 4. Production interval enforcement: < 900s without test bypass header
+  {
+    const oldNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    const { req, res, next, getResult } = createMockReqRes({
+      body: {
+        userId: `usr_prod_test_${Date.now()}`,
+        userName: 'Prod Test User',
+        intervalSeconds: 60 // 1 minute in production without bypass header
+      },
+      headers: {} // No x-test-suite header
+    });
+    await startDeadManSession(req, res, next);
+    process.env.NODE_ENV = oldNodeEnv;
+    const { status, data } = getResult();
+    assert(status === 400 && !data.success, '40. Production environment rejects interval < 900s without test bypass header (400 Bad Request)');
+  }
+
+  // 5. Production interval enforcement: < 900s WITH x-test-suite bypass header succeeds
+  {
+    const oldNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    const { req, res, next, getResult } = createMockReqRes({
+      body: {
+        userId: `usr_prod_bypass_${Date.now()}`,
+        userName: 'Prod Bypass Test',
+        intervalSeconds: 60
+      },
+      headers: { 'x-test-suite': 'true' }
+    });
+    await startDeadManSession(req, res, next);
+    process.env.NODE_ENV = oldNodeEnv;
+    const { status, data } = getResult();
+    assert(status === 201 && data.success, '41. Production environment allows < 900s interval when x-test-suite: true header is present');
+  }
+
+  // 6. Database atomic claiming: Second check does NOT claim or duplicate escalation
+  {
+    const initialAlerts = await readJson('alerts');
+    const countBefore = initialAlerts.filter(a => a.id === escalatedSession.escalationIncidentId).length;
+
+    // Run escalation check second time
+    await checkExpiredDeadManSessions();
+
+    const alertsAfter = await readJson('alerts');
+    const countAfter = alertsAfter.filter(a => a.id === escalatedSession.escalationIncidentId).length;
+    assert(countBefore === 1 && countAfter === 1, '42. Atomic claiming prevents duplicate escalation: session is escalated exactly once');
   }
 
   console.log('\n===============================================================');
