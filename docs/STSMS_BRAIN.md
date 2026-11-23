@@ -944,9 +944,10 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
   - `deadman_status_deadline_idx`: Partial index on `(status, next_deadline_at) WHERE escalation_processed = FALSE` (Worker atomic claiming optimization)
   - `deadman_user_idx`: On `(user_id)` (Session superseding and retrieval)
   - `deadman_created_idx`: On `(created_at DESC)` (Admin inspection)
-- **RLS Policies:**
-  - `service_role`: Full read/write bypass for backend server processes.
-  - `authenticated`: Strictly scoped to `auth.uid()::text = user_id` for SELECT, INSERT, UPDATE.
+- **RLS Policies (Zero-Trust Backend Authoritative Architecture):**
+  - `service_role`: Full read/write access explicitly granted for backend server operations and automated worker escalation loops (`breachEscalationWorker.js`, `deadManSwitchService.js`).
+  - `authenticated` (Read-Only Least Privilege): Direct client database writes (`INSERT`, `UPDATE`, `DELETE`) are strictly PROHIBITED to prevent tampering with deadlines, countdowns, escalation locks, or incident references. Only read-only `SELECT` is permitted, strictly scoped to the tourist's own rows (`auth.uid()::text = user_id`).
+  - Mobile Application Isolation: Confirmed `stsms-mobile` communicates 100% exclusively through authenticated backend REST APIs (`/api/deadman/...`). Direct Supabase client writes do not exist.
 
 #### 3. GitHub Authentication & Remote Sync State
 - **Status:** `BLOCKED` (Keyring token expired)

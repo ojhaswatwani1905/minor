@@ -40,7 +40,9 @@ CREATE INDEX IF NOT EXISTS deadman_created_idx
 -- 3. Row Level Security (RLS)
 ALTER TABLE public.deadman_sessions ENABLE ROW LEVEL SECURITY;
 
--- Service role policy (backend operations bypass RLS)
+-- Backend Service Role Policy:
+-- All write operations (INSERT, UPDATE, DELETE) and authoritative state transitions
+-- are strictly restricted to the backend service role.
 DROP POLICY IF EXISTS "Allow service_role full access to deadman_sessions" ON public.deadman_sessions;
 CREATE POLICY "Allow service_role full access to deadman_sessions" 
   ON public.deadman_sessions
@@ -49,7 +51,11 @@ CREATE POLICY "Allow service_role full access to deadman_sessions"
   USING (true) 
   WITH CHECK (true);
 
--- Authenticated tourist policies: tourists can only inspect & modify their own sessions
+-- Authenticated Tourist Policy (Read-Only Least Privilege):
+-- Mobile tourists access Dead Man's Switch exclusively through backend REST APIs.
+-- To protect against client-side tampering with deadlines, escalation states,
+-- or incident references, direct database writes (INSERT, UPDATE, DELETE) are PROHIBITED.
+-- Only read-only SELECT is permitted, strictly scoped to the tourist's own rows.
 DROP POLICY IF EXISTS "Allow authenticated read own deadman_sessions" ON public.deadman_sessions;
 CREATE POLICY "Allow authenticated read own deadman_sessions" 
   ON public.deadman_sessions
@@ -57,16 +63,6 @@ CREATE POLICY "Allow authenticated read own deadman_sessions"
   TO authenticated 
   USING (auth.uid()::text = user_id);
 
+-- Clean up any legacy or overly permissive write policies
 DROP POLICY IF EXISTS "Allow authenticated insert own deadman_sessions" ON public.deadman_sessions;
-CREATE POLICY "Allow authenticated insert own deadman_sessions" 
-  ON public.deadman_sessions
-  FOR INSERT 
-  TO authenticated 
-  WITH CHECK (auth.uid()::text = user_id);
-
 DROP POLICY IF EXISTS "Allow authenticated update own deadman_sessions" ON public.deadman_sessions;
-CREATE POLICY "Allow authenticated update own deadman_sessions" 
-  ON public.deadman_sessions
-  FOR UPDATE 
-  TO authenticated 
-  USING (auth.uid()::text = user_id);
