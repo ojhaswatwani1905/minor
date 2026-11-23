@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../components/Header';
 import { Button } from '../components/Button';
+import { DeadManSwitchCard } from '../components/DeadManSwitchCard';
 import { useTheme } from '../context/ThemeContext';
 import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
 
@@ -113,6 +114,11 @@ export const SafetyMonitoringScreen = ({
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* ========================================================
+            DEAD MAN'S SWITCH SAFETY SYSTEM
+            ======================================================== */}
+        <DeadManSwitchCard batteryLevel={batteryLevel} />
 
         {/* ========================================================
             BACKGROUND SENSORS & SAFETY SHIELD DIAGNOSTICS

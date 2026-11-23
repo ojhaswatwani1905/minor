@@ -27,6 +27,8 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
 
   if (!alertDetail) return null;
 
+  const isDeadMan = alertDetail.type === 'DEADMAN_SWITCH' || alertDetail.type === "Dead Man's Switch Dispatch";
+
   const handleStatusSubmit = async (e) => {
     e.preventDefault();
     if (!newStatus && !newNote) return;
@@ -157,7 +159,7 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
             <div className="flex items-center justify-between">
               <p className="font-bold text-white/70 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
                 {hasCoords ? <MapPin className="w-3.5 h-3.5 text-honey" /> : <MapPinOff className="w-3.5 h-3.5 text-amber-400" />}
-                GPS Location
+                {isDeadMan ? 'LAST KNOWN LOCATION' : 'GPS Location'}
               </p>
               {hasCoords && (
                 <a
@@ -182,6 +184,21 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
                 </p>
                 {alertDetail.location?.name && (
                   <p className="text-white/80 text-[11px] mt-1">{alertDetail.location.name}</p>
+                )}
+                {isDeadMan && (alertDetail.missedDeadline || alertDetail.deadManSession?.nextDeadlineAt) && (
+                  <p className="text-amber-400 font-bold text-[11px] mt-1">
+                    Missed Deadline: {new Date(alertDetail.missedDeadline || alertDetail.deadManSession.nextDeadlineAt).toLocaleString()}
+                  </p>
+                )}
+                {isDeadMan && (alertDetail.lastCheckIn || alertDetail.deadManSession?.lastCheckInAt) && (
+                  <p className="text-white/70 text-[11px]">
+                    Last Check-in: {new Date(alertDetail.lastCheckIn || alertDetail.deadManSession.lastCheckInAt).toLocaleString()}
+                  </p>
+                )}
+                {isDeadMan && alertDetail.deadManSession?.id && (
+                  <p className="text-white/50 font-mono text-[10px]">
+                    Session ID: {alertDetail.deadManSession.id}
+                  </p>
                 )}
               </div>
             ) : (

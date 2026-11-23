@@ -1,5 +1,175 @@
 [
   {
+    "id": "alt_dms_1795453627503_xr4d",
+    "userId": "usr_p7_1795453589867",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T17:07:07.503Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-23T17:06:37.141Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795453596937_fowf",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-23T17:06:37.142Z",
+      "nextDeadlineAt": "2026-11-23T17:07:07.143Z"
+    },
+    "missedDeadline": "2026-11-23T17:07:07.143Z",
+    "lastCheckIn": "2026-11-23T17:06:37.142Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (10:37:07 PM). Last known check-in: 10:36:37 PM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795453597150_ywrt",
+    "userId": "usr_escalate_1795453597148",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T17:06:37.150Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-23T17:06:17.148Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795453597148",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T17:06:17.148Z",
+      "nextDeadlineAt": "2026-11-23T17:06:35.148Z"
+    },
+    "missedDeadline": "2026-11-23T17:06:35.148Z",
+    "lastCheckIn": "2026-11-23T17:06:17.148Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (10:36:35 PM). Last known check-in: 10:36:17 PM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795453552416_ymbq",
+    "userId": "usr_p7_1795453514919",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T17:05:52.416Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-23T17:05:22.326Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795453522122_rb3y",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-23T17:05:22.328Z",
+      "nextDeadlineAt": "2026-11-23T17:05:52.331Z"
+    },
+    "missedDeadline": "2026-11-23T17:05:52.331Z",
+    "lastCheckIn": "2026-11-23T17:05:22.328Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (10:35:52 PM). Last known check-in: 10:35:22 PM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795453522383_bdr1",
+    "userId": "usr_escalate_1795453522336",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T17:05:22.383Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-23T17:05:02.336Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795453522336",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T17:05:02.336Z",
+      "nextDeadlineAt": "2026-11-23T17:05:20.336Z"
+    },
+    "missedDeadline": "2026-11-23T17:05:20.336Z",
+    "lastCheckIn": "2026-11-23T17:05:02.336Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (10:35:20 PM). Last known check-in: 10:35:02 PM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795453522338_ruca",
+    "userId": "usr_escalate_1795453522336",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T17:05:22.338Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-23T17:05:02.336Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795453522336",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T17:05:02.336Z",
+      "nextDeadlineAt": "2026-11-23T17:05:20.336Z"
+    },
+    "missedDeadline": "2026-11-23T17:05:20.336Z",
+    "lastCheckIn": "2026-11-23T17:05:02.336Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (10:35:20 PM). Last known check-in: 10:35:02 PM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
     "id": "alt_geo_1795159947867",
     "userId": "usr_bhoot_live",
     "userName": "bhoot",

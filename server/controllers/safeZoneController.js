@@ -104,6 +104,79 @@ export const geocodeDestination = async (req, res, next) => {
 };
 
 /**
+ * 1b. Reverse Geocoding API: Converts coordinates (lat, lng) into human-readable address.
+ * Queries OpenStreetMap Nominatim reverse geocode with caching, 4-second timeout, and graceful fallback.
+ */
+export const reverseGeocodeDestination = async (req, res, next) => {
+  try {
+    const lat = parseFloat(req.query.lat);
+    const lng = parseFloat(req.query.lng || req.query.lon);
+
+    if (isNaN(lat) || lat < -90 || lat > 90 || isNaN(lng) || lng < -180 || lng > 180) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid coordinates (lat: -90 to 90, lng: -180 to 180) are required.'
+      });
+    }
+
+    const cacheKey = `rev_${lat.toFixed(4)}_${lng.toFixed(4)}`;
+    if (geocodeCache.has(cacheKey)) {
+      return res.json({ success: true, source: 'cache', location: geocodeCache.get(cacheKey) });
+    }
+
+    try {
+      const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 4000);
+
+      const resp = await fetch(url, {
+        headers: {
+          'User-Agent': 'STSMS-SafeTravelZone-EmergencyMonitoring/1.0 (admin@stsms.gov)'
+        },
+        signal: ctrl.signal
+      });
+      clearTimeout(tid);
+
+      if (resp.ok) {
+        const item = await resp.json();
+        if (item && item.display_name) {
+          const addr = item.address || {};
+          const shortName = addr.amenity || addr.building || addr.road || addr.suburb || addr.town || addr.city || addr.village || item.name || `Point (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+          const result = {
+            name: shortName,
+            displayName: item.display_name,
+            lat,
+            lng,
+            type: item.type || item.class || 'point_of_interest',
+            address: addr
+          };
+          geocodeCache.set(cacheKey, result);
+          return res.json({ success: true, source: 'nominatim', location: result });
+        }
+      }
+    } catch (netErr) {
+      console.warn('[REVERSE GEOCODE OSM WARNING]', netErr.message);
+    }
+
+    // Graceful fallback for offline / remote / mountains / oceans
+    const fallbackLocation = {
+      name: `Custom Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
+      displayName: `Geographical Point: ${lat.toFixed(5)}° N, ${lng.toFixed(5)}° E`,
+      lat,
+      lng,
+      type: 'custom_gps_point',
+      address: {
+        note: 'Direct GPS Coordinate Fix (Reverse Geocode Unavailable)'
+      }
+    };
+    geocodeCache.set(cacheKey, fallbackLocation);
+    res.json({ success: true, source: 'fallback', location: fallbackLocation });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * 2. Create and Activate a Safe Travel Zone Trip
  */
 export const createSafeZoneTrip = async (req, res, next) => {
@@ -129,16 +202,15 @@ export const createSafeZoneTrip = async (req, res, next) => {
       notes
     } = req.body;
 
-    const destinationName = rawDestName || altDestName;
     const destinationLat = rawDestLat ?? destinationCoordinates?.lat;
     const destinationLng = rawDestLng ?? destinationCoordinates?.lng;
     const currentLat = rawCurrLat ?? userLocation?.lat;
     const currentLng = rawCurrLng ?? userLocation?.lng;
 
-    if (!destinationName || destinationLat == null || destinationLng == null) {
+    if (destinationLat == null || destinationLng == null) {
       return res.status(400).json({
         success: false,
-        message: 'Destination name and valid coordinates (lat/lng) are required.'
+        message: 'Valid destination coordinates (lat/lng) are required.'
       });
     }
 
@@ -150,6 +222,8 @@ export const createSafeZoneTrip = async (req, res, next) => {
         message: 'Invalid destination coordinates. Latitude must be between -90 and 90, Longitude between -180 and 180.'
       });
     }
+
+    const destinationName = (rawDestName || altDestName || '').trim() || `Custom Location (${destLat.toFixed(4)}, ${destLng.toFixed(4)})`;
 
     const radius = Math.max(500, Math.min(50000, parseInt(radiusMeters, 10) || 5000));
     const now = new Date().toISOString();

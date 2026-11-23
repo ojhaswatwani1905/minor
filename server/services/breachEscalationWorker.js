@@ -1,20 +1,155 @@
 import { readJson, writeJson } from '../utils/jsonDb.js';
 import { dispatchAutomaticGeofenceAlert } from '../controllers/safeZoneController.js';
-import { isSupabaseConfigured, getSupabaseClient } from '../database/supabase.js';
+import { isSupabaseConfigured, getSupabaseClient, mapAlertToDb } from '../database/supabase.js';
 
 let workerInterval = null;
 let isProcessing = false;
 
 const metrics = {
   status: 'stopped',
-  workerName: 'STSMS Cloud Safe-Zone Breach Escalation Engine',
+  workerName: 'STSMS Cloud Safe-Zone & Dead-Man Escalation Engine',
   intervalMs: 1000,
   heartbeat: null,
   lastProcessedTime: null,
   pendingBreachEventsCount: 0,
   totalEscalatedCount: 0,
+  totalDeadManEscalatedCount: 0,
   failedEscalationsCount: 0,
   lastError: null
+};
+
+/**
+ * Evaluates active Dead Man's Switch sessions.
+ * If nextDeadlineAt is reached without a check-in,
+ * automatically dispatches a DEADMAN_SWITCH emergency alert.
+ */
+export const checkExpiredDeadManSessions = async () => {
+  try {
+    const sessions = await readJson('deadman_sessions');
+    if (!Array.isArray(sessions) || sessions.length === 0) return;
+
+    const now = Date.now();
+    let modified = false;
+
+    for (let session of sessions) {
+      if (
+        session.status === 'ACTIVE' &&
+        session.nextDeadlineAt &&
+        !session.escalationProcessed
+      ) {
+        const deadlineTime = new Date(session.nextDeadlineAt).getTime();
+        if (now >= deadlineTime) {
+          console.log(`[DEAD MAN ESCALATION WORKER] Deadline expired for session ${session.id} (${session.userName})! Server-side auto-escalating to Admin Command Center...`);
+
+          // Atomically claim session
+          session.escalationProcessed = true;
+          session.status = 'ESCALATED';
+          session.escalatedAt = new Date().toISOString();
+
+          const alertId = `alt_dms_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+          session.escalationIncidentId = alertId;
+
+          const location = session.lastKnownLocation ? {
+            lat: session.lastKnownLocation.lat,
+            lng: session.lastKnownLocation.lng,
+            name: session.lastKnownLocation.name || `Last Known GPS Fix (${session.lastKnownLocation.lat?.toFixed(4)}, ${session.lastKnownLocation.lng?.toFixed(4)})`,
+            accuracy: session.lastKnownLocation.accuracy || 15,
+            timestamp: session.lastKnownLocation.timestamp || session.lastCheckInAt
+          } : null;
+
+          const alertPayload = {
+            id: alertId,
+            userId: session.userId,
+            userName: session.userName,
+            type: 'DEADMAN_SWITCH',
+            priority: 'CRITICAL',
+            status: 'Pending',
+            timestamp: new Date().toISOString(),
+            location,
+            batteryLevel: session.hardwareTelemetry?.batteryLevel ?? 75,
+            networkStatus: session.hardwareTelemetry?.networkSignal || 'Cellular GNSS',
+            deviceInfo: {
+              model: session.hardwareTelemetry?.deviceModel || 'Mobile Device',
+              platform: 'Android',
+              source: 'deadman_switch_engine'
+            },
+            deadManSession: {
+              id: session.id,
+              intervalSeconds: session.intervalSeconds,
+              lastCheckInAt: session.lastCheckInAt,
+              nextDeadlineAt: session.nextDeadlineAt
+            },
+            missedDeadline: session.nextDeadlineAt,
+            lastCheckIn: session.lastCheckInAt,
+            message: `🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist ${session.userName} missed safe check-in deadline (${new Date(session.nextDeadlineAt).toLocaleTimeString()}). Last known check-in: ${new Date(session.lastCheckInAt).toLocaleTimeString()}.`,
+            guardianPhone: session.userPhone || '+91 98765 43210',
+            guardianNotified: true
+          };
+
+          // 1. Mirror to Supabase if configured
+          if (isSupabaseConfigured()) {
+            try {
+              const supabase = getSupabaseClient();
+              const dbRow = mapAlertToDb(alertPayload, null, null);
+              await supabase.from('alerts').insert(dbRow);
+            } catch (sbErr) {
+              console.warn('[DEAD MAN SUPABASE INSERT ERROR]', sbErr.message);
+            }
+          }
+
+          // 2. Mirror into JSON alerts
+          try {
+            const alerts = await readJson('alerts');
+            alerts.unshift(alertPayload);
+            await writeJson('alerts', alerts);
+          } catch (e) {}
+
+          // 3. Mirror into notifications.json
+          try {
+            const notifs = await readJson('notifications');
+            notifs.unshift({
+              id: `notif_dms_${Date.now()}`,
+              title: `DEAD MAN SWITCH ESCALATED: ${session.userName}`,
+              message: `Missed check-in deadline (${new Date(session.nextDeadlineAt).toLocaleTimeString()}). Emergency dispatch activated!`,
+              timestamp: new Date().toISOString(),
+              read: false,
+              type: 'EMERGENCY'
+            });
+            await writeJson('notifications', notifs);
+          } catch (e) {}
+
+          // 4. Update tourist status in users.json to EMERGENCY
+          try {
+            const users = await readJson('users');
+            const uIdx = users.findIndex(u => u.id === session.userId || u.fullName === session.userName);
+            if (uIdx !== -1) {
+              users[uIdx].status = 'EMERGENCY';
+              users[uIdx].lastAlertTimestamp = new Date().toISOString();
+              await writeJson('users', users);
+            }
+          } catch (e) {}
+
+          // Append to history
+          if (!session.history) session.history = [];
+          session.history.unshift({
+            timestamp: new Date().toISOString(),
+            event: 'DEADLINE_EXPIRED_ESCALATED',
+            alertId
+          });
+
+          modified = true;
+          metrics.totalDeadManEscalatedCount = (metrics.totalDeadManEscalatedCount || 0) + 1;
+          metrics.lastProcessedTime = new Date().toISOString();
+        }
+      }
+    }
+
+    if (modified) {
+      await writeJson('deadman_sessions', sessions);
+    }
+  } catch (err) {
+    console.error('[DEAD MAN WORKER ERROR]', err.message);
+  }
 };
 
 /**
@@ -134,6 +269,9 @@ export const checkExpiredBreachWarnings = async () => {
     if (tripsModified) {
       await writeJson('trips', trips);
     }
+
+    // Evaluate Dead Man's Switch session deadlines concurrently
+    await checkExpiredDeadManSessions();
   } catch (err) {
     metrics.lastError = err.message;
     console.error('[BREACH ESCALATION WORKER ERROR]', err.message);

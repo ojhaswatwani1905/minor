@@ -744,7 +744,122 @@ Verified via automated test suite `server/scripts/testPhase61Verification.js`:
 
 ---
 
-## 15. Brain Maintenance Rules
+## 15. Phase 7: Universal GPS Location Selection & Dead Man's Switch Emergency System
+
+Phase 7 implements two major core safety systems:
+1. **Universal Location Selection**: Complete elimination of rigid predefined destination restrictions. Tourists can select ANY geographical point on Earth (hotel, train station, airport, college, hospital, remote mountain point, or arbitrary map tap).
+2. **Authoritative Dead Man's Switch**: An independent emergency countdown safety system with backend-authoritative deadlines (`nextDeadlineAt`), periodic check-ins ("I AM SAFE"), and an autonomous 1000ms background worker auto-dispatching `DEADMAN_SWITCH` critical incidents to the Admin Command Center if deadlines are missed.
+
+### 15.1 Universal Location Selection Architecture
+- **Coordinates as Primary Source of Truth**: Destination coordinates (`destinationCoords: { lat, lng }`) are authoritative. Predefined lists are no longer mandatory.
+- **Interactive Map Picker (Mobile App)**:
+  - Built with Leaflet.js rendered inside `react-native-webview` (`DestinationSelectionModal.jsx`).
+  - Interactive map allows panning, zooming, and tapping anywhere to place/move the destination pin.
+  - Draggable pin (`marker.on('dragend')`) with dynamic 5 km circular geofence (`L.circle`) that moves with the pin.
+  - "Use Current Location" button immediately snaps pin and 5 km circle to tourist's active GPS fix.
+- **Reverse Geocoding Proxy**:
+  - `GET /api/safe-zones/reverse-geocode?lat=...&lng=...` queries OpenStreetMap Nominatim with memory caching and a 4-second timeout.
+  - Graceful Fallback: If reverse geocoding times out, is offline, or hits unmapped mountain/ocean coordinates, it automatically falls back to `Custom Location (lat, lng)` and `Geographical Point: <lat>° N, <lng>° E`.
+- **Arbitrary Destination Safe Zone Activation**:
+  - `POST /api/safe-zones`: Accepts arbitrary `destinationLat` and `destinationLng` without requiring a predefined destination name. If no label is typed, it auto-generates a clean coordinate label.
+
+### 15.2 Dead Man's Switch Data Model & Persistence
+Stored in `server/json/deadman_sessions.json` and mirrored to Supabase `alerts` when escalated.
+- `id`: Unique session ID (`dms_<timestamp>_<random>`)
+- `userId`: Tourist ID
+- `userName`: Tourist Full Name
+- `userPhone`: Emergency phone contact
+- `intervalSeconds`: Check-in interval (e.g. 60s for testing, 900s for 15m, 1800s for 30m, 3600s for 1h, 7200s for 2h)
+- `status`: `ACTIVE` | `PAUSED` | `STOPPED` | `ESCALATED` | `SUPERSEDED`
+- `startedAt`: ISO timestamp
+- `lastCheckInAt`: ISO timestamp (updated on check-in)
+- `nextDeadlineAt`: ISO timestamp (`lastCheckInAt + intervalSeconds * 1000`)
+- `pausedAt` / `pausedRemainingMs`: Preserved remaining time during pauses
+- `lastKnownLocation`: `{ lat, lng, accuracy, name, timestamp }`
+- `hardwareTelemetry`: `{ batteryLevel, networkSignal, deviceModel }`
+- `escalationProcessed`: Atomic boolean claim flag to prevent duplicate dispatches
+- `escalationIncidentId`: Linked alert ID once escalated
+
+### 15.3 Dead Man's Switch API Endpoints
+- `POST /api/deadman/start`: Starts session, validates minimum 10s interval, sets `nextDeadlineAt`, returns session.
+- `GET /api/deadman/status` and `GET /api/deadman/status/:userId`: Computes `remainingSeconds` dynamically from authoritative server time; returns `effectiveStatus` (`ACTIVE`, `CHECK-IN REQUIRED`, `OVERDUE`, `PAUSED`, `EMERGENCY ESCALATED`).
+- `POST /api/deadman/check-in`: Authenticated; resets timer, advances `nextDeadlineAt`, updates location. Rejects with `HTTP 409 Conflict` if session was already escalated to prevent race conditions.
+- `POST /api/deadman/pause`: Freezes countdown, stores `pausedRemainingMs`.
+- `POST /api/deadman/resume`: Recalculates `nextDeadlineAt` from preserved remaining time.
+- `POST /api/deadman/stop`: Sets status to `STOPPED`.
+- `POST /api/deadman/telemetry`: Updates background location/battery without touching deadlines.
+- `GET /api/deadman/all`: Admin inspection endpoint protected by JWT.
+
+### 15.4 Server-Side 1,000ms Escalation Engine
+Integrated directly into `server/services/breachEscalationWorker.js` on a unified 1,000ms loop:
+1. Concurrently evaluates expired Safe Travel Zone geofence warnings (10s) and expired Dead Man's Switch deadlines (`Date.now() >= nextDeadlineAt`).
+2. Atomically marks `session.escalationProcessed = true` and `session.status = 'ESCALATED'`.
+3. Auto-dispatches emergency incident:
+   - Alert Type: `DEADMAN_SWITCH`
+   - Priority: `CRITICAL`
+   - Location: Exact `lastKnownLocation` (`lat`, `lng`, accuracy, timestamp).
+   - Hardware: Device model, battery level, network signal.
+   - Tourist status updated to `EMERGENCY` in `users.json`.
+   - Notification created in `notifications.json`.
+   - Dispatched to `alerts.json` and Supabase `alerts` table.
+
+### 15.5 Admin Command Center Integration
+- `src/components/Emergency/AlertCard.jsx` and `src/components/Emergency/AlertDetailModal.jsx`:
+  - When `alert.type === 'DEADMAN_SWITCH'`, GPS section is labeled as **`LAST KNOWN LOCATION`** with exact coordinates and timestamp.
+  - Displays Missed Deadline timestamp, Last Check-in timestamp, and Dead Man Session ID.
+  - All existing Admin Command Center layout, colors, navigation, and styling strictly preserved.
+
+### 15.6 Mobile App Dead Man's Switch UI
+- `DeadManSwitchCard.jsx`: Pastel pink card mounted on `HomeScreen.jsx` and `SafetyMonitoringScreen.jsx`.
+  - Inactive State: Interval selector chips (60s test, 15m, 30m, 1h, 2h) + "Activate Dead Man's Switch" CTA.
+  - Active State: Prominent `mm:ss` countdown timer, deadline info, and big **"I AM SAFE (CHECK-IN)"** button.
+  - Controls: Pause / Resume / Stop buttons.
+  - Escalated State: Displays prominent alert banner with incident ID.
+
+### 15.7 Phase 7 Verification Test Results (35/35 PASSED — 100%)
+Verified via automated test suite `server/scripts/testPhase7Verification.js`:
+
+| Scenario | Test Scope | Result | Details |
+|---|---|---|---|
+| **1** | Reverse Geocode Known Point | **PASS** | Resolved coordinates (`lat=27.1751, lng=78.0421`). |
+| **2** | Reverse Geocode Exact Match | **PASS** | Returned coordinates match exact requested lat/lng. |
+| **3** | Remote Mountain Fallback | **PASS** | Gracefully handles unmapped mountain coordinate. |
+| **4** | Fallback Display Name | **PASS** | Human-readable `displayName` populated in fallback mode. |
+| **5** | Arbitrary Safe Zone Creation | **PASS** | Created with custom lat/lng coordinates without predefined list. |
+| **6** | Coordinates Source of Truth | **PASS** | Destination coordinates match exact source of truth. |
+| **7** | Fallback Label Generation | **PASS** | Clean coordinate label generated automatically. |
+| **8** | Geofence Radius | **PASS** | Safe perimeter radius set to 5000m (5 km). |
+| **9** | Start Dead Man Session | **PASS** | Starts session and creates persistent record. |
+| **10** | Initial Session Status | **PASS** | Session status initialized to `ACTIVE`. |
+| **11** | Interval Record | **PASS** | Check-in interval recorded accurately (30s). |
+| **12** | Authoritative Deadline | **PASS** | `nextDeadlineAt` calculated in future (`now + 30s`). |
+| **13** | Status Query Endpoint | **PASS** | `getDeadManStatus` retrieves active tourist session. |
+| **14** | Dynamic Countdown | **PASS** | `remainingSeconds` computed dynamically from authoritative deadline. |
+| **15** | Status Classification | **PASS** | `effectiveStatus` accurately reflects countdown state. |
+| **16** | "I AM SAFE" Check-in | **PASS** | Tourist check-in confirmed successfully. |
+| **17** | Deadline Advancement | **PASS** | `nextDeadlineAt` advanced into future on check-in. |
+| **18** | Location Telemetry Update | **PASS** | Last known GPS fix updated during check-in. |
+| **19** | Session Pause | **PASS** | Status frozen to `PAUSED`. |
+| **20** | Remaining Time Preservation | **PASS** | Remaining milliseconds saved in `pausedRemainingMs`. |
+| **21** | Session Resume | **PASS** | Restores `ACTIVE` status. |
+| **22** | Deadline Recalculation | **PASS** | `nextDeadlineAt` recalculated from preserved remaining time. |
+| **23** | Anti-Tamper Security | **PASS** | Cross-tourist check-in attempt blocked (`HTTP 403 Forbidden`). |
+| **24** | Worker Auto-Escalation | **PASS** | Expired deadline detected and escalated by 1000ms worker. |
+| **25** | Atomic Claiming | **PASS** | `escalationProcessed: true` prevents race conditions / duplicates. |
+| **26** | Linked Incident ID | **PASS** | Emergency alert incident ID linked to session. |
+| **27** | Alert DB Persistence | **PASS** | `DEADMAN_SWITCH` alert stored in alerts database. |
+| **28** | Alert Type Verification | **PASS** | Alert type labeled `DEADMAN_SWITCH`. |
+| **29** | Alert Priority | **PASS** | Emergency alert priority set to `CRITICAL`. |
+| **30** | Telemetry Attachment | **PASS** | Exact last known GPS coordinates attached to alert. |
+| **31** | Battery Telemetry | **PASS** | Device battery level attached to alert. |
+| **32** | Conflict Protection | **PASS** | Check-in on escalated session returns `409 Conflict`. |
+| **33** | Admin Dead Man Inspection | **PASS** | Admin `GET /api/deadman/all` returns session array. |
+| **34** | Admin Safe Zones List | **PASS** | Admin `GET /api/safe-zones/all` returns 200 with safe zones list. |
+| **35** | Admin Geofence Incidents | **PASS** | Admin `GET /api/safe-zones/incidents` returns 200 with geofence incidents list. |
+
+---
+
+## 16. Brain Maintenance Rules
 
 Every future task and engineer MUST follow this workflow:
 1. **Read `docs/STSMS_BRAIN.md` first.**

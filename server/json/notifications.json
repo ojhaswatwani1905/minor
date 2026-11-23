@@ -1,5 +1,53 @@
 [
   {
+    "id": "notif_dms_1795453627519",
+    "title": "DEAD MAN SWITCH ESCALATED: Phase 7 Test Tourist",
+    "message": "Missed check-in deadline (10:37:07 PM). Emergency dispatch activated!",
+    "timestamp": "2026-11-23T17:07:07.519Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
+    "id": "notif_dms_1795453597182",
+    "title": "DEAD MAN SWITCH ESCALATED: Overdue Test Traveller",
+    "message": "Missed check-in deadline (10:36:35 PM). Emergency dispatch activated!",
+    "timestamp": "2026-11-23T17:06:37.182Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
+    "id": "notif_dms_1795453552427",
+    "title": "DEAD MAN SWITCH ESCALATED: Phase 7 Test Tourist",
+    "message": "Missed check-in deadline (10:35:52 PM). Emergency dispatch activated!",
+    "timestamp": "2026-11-23T17:05:52.427Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
+    "id": "notif_dms_1795453522440",
+    "title": "DEAD MAN SWITCH ESCALATED: Overdue Test Traveller",
+    "message": "Missed check-in deadline (10:35:20 PM). Emergency dispatch activated!",
+    "timestamp": "2026-11-23T17:05:22.440Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
+    "id": "notif_dms_1795453522396",
+    "title": "DEAD MAN SWITCH ESCALATED: Overdue Test Traveller",
+    "message": "Missed check-in deadline (10:35:20 PM). Emergency dispatch activated!",
+    "timestamp": "2026-11-23T17:05:22.396Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
+    "id": "notif_esc_1795168870724",
+    "title": "AUTOMATIC SAFE-ZONE BREACH: bhoot",
+    "message": "Tourist bhoot exited the 5 km safety boundary around Agra Airport and did not acknowledge within 10 seconds.",
+    "timestamp": "2026-11-20T10:01:10.724Z",
+    "read": false,
+    "type": "EMERGENCY"
+  },
+  {
     "id": "notif_esc_1795167909210",
     "title": "AUTOMATIC SAFE-ZONE BREACH: bhoot",
     "message": "Tourist bhoot exited the 5 km safety boundary around Agra Airport and did not acknowledge within 10 seconds.",

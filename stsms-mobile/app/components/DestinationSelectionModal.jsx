@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,15 +8,16 @@ import {
   ActivityIndicator,
   Modal,
   StyleSheet,
-  Image,
+  Dimensions,
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { safeZoneService } from '../services/safeZoneService';
 import { useTheme } from '../context/ThemeContext';
-import { RADIUS, SHADOWS, TYPOGRAPHY } from '../constants/theme';
+import { RADIUS, SHADOWS } from '../constants/theme';
 import { getDestinationImageUrl } from '../utils/destinationImages';
 
-// Popular heritage & transit destinations with verified imagery
+// Verified fallback reference destinations
 const POPULAR_DESTINATIONS = [
   {
     name: 'Agra Airport',
@@ -76,92 +77,175 @@ export const DestinationSelectionModal = ({
   userGuardianPhone = '+91 98765 43210',
 }) => {
   const { colors } = useTheme();
+  const webViewRef = useRef(null);
+
+  // Default coordinate: current GPS fix or Agra Airport
+  const defaultLat = currentCoords?.lat ?? 27.1558;
+  const defaultLng = currentCoords?.lng ?? 77.9654;
+
+  const [selectedCoords, setSelectedCoords] = useState({ lat: defaultLat, lng: defaultLng });
+  const [resolvedAddress, setResolvedAddress] = useState('Current Selected Point');
+  const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState(POPULAR_DESTINATIONS);
+  const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedDestination, setSelectedDestination] = useState(null);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [guardianPhone, setGuardianPhone] = useState(userGuardianPhone);
+  const [customLabel, setCustomLabel] = useState('');
   const [isActivating, setIsActivating] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [zoomLevel, setZoomLevel] = useState(1);
 
-  // Load search results or suggestions
+  // When modal becomes visible, initialize coordinates
   useEffect(() => {
-    if (visible && !selectedDestination) {
-      loadSuggestions('');
+    if (visible) {
+      const lat = currentCoords?.lat ?? 27.1558;
+      const lng = currentCoords?.lng ?? 77.9654;
+      setSelectedCoords({ lat, lng });
+      performReverseGeocode(lat, lng);
     }
   }, [visible]);
 
-  const loadSuggestions = async (q) => {
-    setIsSearching(true);
-    setErrorMessage('');
+  // Reverse Geocoding helper with graceful fallback
+  const performReverseGeocode = async (lat, lng) => {
+    setIsReverseGeocoding(true);
     try {
-      const res = await safeZoneService.geocode(q);
-      if (res.success && Array.isArray(res.results) && res.results.length > 0) {
-        const enriched = res.results.map((item) => ({
-          ...item,
-          imageUrl: item.imageUrl || getDestinationImageUrl(item.name || item.displayName),
-        }));
-        setSearchResults(enriched);
+      const res = await safeZoneService.reverseGeocode(lat, lng);
+      if (res.success && res.location) {
+        const name = res.location.name || res.location.displayName || `Custom Point (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+        setResolvedAddress(name);
+        if (!customLabel) {
+          setCustomLabel(name);
+        }
       } else {
-        setSearchResults(POPULAR_DESTINATIONS);
+        setResolvedAddress(`Custom Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+      }
+    } catch (err) {
+      setResolvedAddress(`Custom Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+    } finally {
+      setIsReverseGeocoding(false);
+    }
+  };
+
+  // Place search
+  const handleSearchChange = async (text) => {
+    setSearchQuery(text);
+    const trimmed = text.trim();
+    if (trimmed.length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+    setShowSearchResults(true);
+    try {
+      const res = await safeZoneService.geocode(trimmed);
+      if (res.success && Array.isArray(res.results)) {
+        setSearchResults(res.results);
+      } else {
+        setSearchResults(
+          POPULAR_DESTINATIONS.filter(
+            (p) =>
+              p.name.toLowerCase().includes(trimmed.toLowerCase()) ||
+              p.displayName.toLowerCase().includes(trimmed.toLowerCase())
+          )
+        );
       }
     } catch (e) {
-      setSearchResults(POPULAR_DESTINATIONS);
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleSearchChange = (text) => {
-    setSearchQuery(text);
-    const trimmed = text.trim();
-    if (trimmed.length >= 2) {
-      loadSuggestions(trimmed);
-    } else if (trimmed.length === 0) {
-      setSearchResults(POPULAR_DESTINATIONS);
+  // Select place from search results
+  const handleSelectSearchResult = (item) => {
+    const lat = item.lat;
+    const lng = item.lng;
+    setSelectedCoords({ lat, lng });
+    setResolvedAddress(item.name || item.displayName || `Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+    setCustomLabel(item.name || item.displayName);
+    setShowSearchResults(false);
+    setSearchQuery('');
+
+    // Update WebView map position
+    if (webViewRef.current) {
+      webViewRef.current.injectJavaScript(`window.setMapPosition && window.setMapPosition(${lat}, ${lng}); true;`);
     }
   };
 
-  const handleSelectDestination = (item) => {
-    setSelectedDestination(item);
+  // User taps "Use My Current Location"
+  const handleUseCurrentLocation = () => {
+    if (!currentCoords?.lat || !currentCoords?.lng) {
+      setErrorMessage('GPS Location not acquired yet. Please ensure GPS is enabled.');
+      return;
+    }
+    const lat = currentCoords.lat;
+    const lng = currentCoords.lng;
+    setSelectedCoords({ lat, lng });
+    performReverseGeocode(lat, lng);
+    setCustomLabel('Current GPS Location');
     setErrorMessage('');
+
+    if (webViewRef.current) {
+      webViewRef.current.injectJavaScript(`window.setMapPosition && window.setMapPosition(${lat}, ${lng}); true;`);
+    }
   };
 
-  const calculateDistanceToDest = () => {
-    if (!selectedDestination || !currentCoords?.lat || !currentCoords?.lng) {
-      return 2300; // Default simulated 2.3km for preview if coords pending
+  // Message from Leaflet WebView (map click or marker drag)
+  const handleWebViewMessage = (event) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === 'LOCATION_SELECTED' && data.lat != null && data.lng != null) {
+        const lat = parseFloat(data.lat);
+        const lng = parseFloat(data.lng);
+        setSelectedCoords({ lat, lng });
+        performReverseGeocode(lat, lng);
+        setCustomLabel('');
+        setErrorMessage('');
+      }
+    } catch (e) {}
+  };
+
+  // Calculate distance from user's current GPS fix to the chosen safe-zone center
+  const calculateDistance = () => {
+    if (!currentCoords?.lat || !currentCoords?.lng || !selectedCoords?.lat || !selectedCoords?.lng) {
+      return null;
     }
     const R = 6371000;
     const toRad = (x) => (x * Math.PI) / 180;
-    const dLat = toRad(selectedDestination.lat - currentCoords.lat);
-    const dLon = toRad(selectedDestination.lng - currentCoords.lng);
+    const dLat = toRad(selectedCoords.lat - currentCoords.lat);
+    const dLon = toRad(selectedCoords.lng - currentCoords.lng);
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(toRad(currentCoords.lat)) *
-        Math.cos(toRad(selectedDestination.lat)) *
+        Math.cos(toRad(selectedCoords.lat)) *
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return Math.round(R * c);
   };
 
-  const distanceMeters = calculateDistanceToDest();
-  const distKm = (distanceMeters / 1000).toFixed(1);
+  const distMeters = calculateDistance();
+  const distKm = distMeters != null ? (distMeters / 1000).toFixed(1) : null;
 
+  // Confirm and activate Safe Travel Zone
   const handleConfirmActivation = async () => {
-    if (!selectedDestination) return;
+    if (!selectedCoords?.lat || !selectedCoords?.lng) return;
     setIsActivating(true);
     setErrorMessage('');
 
+    const finalDestName = (customLabel || resolvedAddress || '').trim() || `Custom Location (${selectedCoords.lat.toFixed(4)}, ${selectedCoords.lng.toFixed(4)})`;
+
     try {
       const payload = {
-        destinationName: selectedDestination.name,
-        destinationLat: selectedDestination.lat,
-        destinationLng: selectedDestination.lng,
+        destinationName: finalDestName,
+        destinationLat: selectedCoords.lat,
+        destinationLng: selectedCoords.lng,
         radiusMeters: 5000,
-        imageUrl: selectedDestination.imageUrl || getDestinationImageUrl(selectedDestination.name),
+        imageUrl: getDestinationImageUrl(finalDestName),
         currentLat: currentCoords?.lat || null,
         currentLng: currentCoords?.lng || null,
         currentAccuracy: currentCoords?.accuracy || null,
@@ -183,17 +267,131 @@ export const DestinationSelectionModal = ({
   };
 
   const handleClose = () => {
-    setSelectedDestination(null);
     setIsPreviewMode(false);
     setSearchQuery('');
+    setShowSearchResults(false);
     setErrorMessage('');
     onClose();
+  };
+
+  // Generate Interactive Leaflet Picker HTML
+  const generatePickerHtml = () => {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body, html, #map { margin: 0; padding: 0; width: 100%; height: 100%; background: #FFF0F5; overflow: hidden; }
+    .leaflet-control-attribution, .leaflet-control-zoom { display: none !important; }
+    .custom-marker {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .marker-pin {
+      width: 26px;
+      height: 26px;
+      border-radius: 50% 50% 50% 0;
+      background: #FF5E7E;
+      position: absolute;
+      transform: rotate(-45deg);
+      left: 50%;
+      top: 50%;
+      margin: -22px 0 0 -13px;
+      box-shadow: 0 4px 12px rgba(255, 94, 126, 0.45);
+      border: 2px solid #FFFFFF;
+    }
+    .marker-pin::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      margin: 6px 0 0 6px;
+      background: #FFFFFF;
+      position: absolute;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([${selectedCoords.lat}, ${selectedCoords.lng}], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+    var circle = L.circle([${selectedCoords.lat}, ${selectedCoords.lng}], {
+      radius: 5000,
+      color: '#FF5E7E',
+      weight: 2.5,
+      dashArray: '6, 6',
+      fillColor: '#FF5E7E',
+      fillOpacity: 0.16
+    }).addTo(map);
+
+    var markerIcon = L.divIcon({
+      className: 'custom-marker',
+      html: '<div class="marker-pin"></div>',
+      iconSize: [36, 36],
+      iconAnchor: [18, 36]
+    });
+
+    var marker = L.marker([${selectedCoords.lat}, ${selectedCoords.lng}], {
+      icon: markerIcon,
+      draggable: true
+    }).addTo(map);
+
+    function notifyPosition(lat, lng) {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'LOCATION_SELECTED',
+          lat: lat,
+          lng: lng
+        }));
+      }
+    }
+
+    marker.on('drag', function(e) {
+      var p = e.target.getLatLng();
+      circle.setLatLng(p);
+    });
+
+    marker.on('dragend', function(e) {
+      var p = e.target.getLatLng();
+      circle.setLatLng(p);
+      notifyPosition(p.lat, p.lng);
+    });
+
+    map.on('click', function(e) {
+      var lat = e.latlng.lat;
+      var lng = e.latlng.lng;
+      marker.setLatLng([lat, lng]);
+      circle.setLatLng([lat, lng]);
+      notifyPosition(lat, lng);
+    });
+
+    window.setMapPosition = function(lat, lng) {
+      marker.setLatLng([lat, lng]);
+      circle.setLatLng([lat, lng]);
+      map.setView([lat, lng], 13, { animate: true });
+    };
+
+    window.zoomIn = function() { map.zoomIn(); };
+    window.zoomOut = function() { map.zoomOut(); };
+  </script>
+</body>
+</html>
+    `;
   };
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={handleClose}>
       <View style={[styles.container, { backgroundColor: colors.background || '#FFF0F5' }]}>
-        {/* Header */}
+        {/* Top Header */}
         <View style={[styles.headerRow, { borderBottomColor: colors.cardBorder || '#F6DFE6' }]}>
           <TouchableOpacity
             onPress={isPreviewMode ? () => setIsPreviewMode(false) : handleClose}
@@ -202,30 +400,30 @@ export const DestinationSelectionModal = ({
             <Ionicons name="chevron-back" size={20} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            {isPreviewMode ? 'Safe Zone Preview' : 'Select Destination'}
+            {isPreviewMode ? 'Confirm Safe Zone' : 'Universal Location Picker'}
           </Text>
           <View style={{ width: 38 }} />
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          {!!errorMessage && (
-            <View style={styles.errorBanner}>
-              <Ionicons name="alert-circle" size={18} color="#FF3B69" style={{ marginRight: 6 }} />
-              <Text style={styles.errorText}>{errorMessage}</Text>
-            </View>
-          )}
+        {!!errorMessage && (
+          <View style={styles.errorBanner}>
+            <Ionicons name="alert-circle" size={18} color="#FF3B69" style={{ marginRight: 6 }} />
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        )}
 
-          {!isPreviewMode ? (
-            /* ========================================================
-               STAGE 1: SELECT DESTINATION (Matching Reference Screen 4)
-               ======================================================== */
-            <View>
-              {/* Search Bar */}
+        {!isPreviewMode ? (
+          /* ========================================================
+             STAGE 1: INTERACTIVE MAP & SEARCH PICKER
+             ======================================================== */
+          <View style={{ flex: 1 }}>
+            {/* Search Bar */}
+            <View style={styles.searchSection}>
               <View style={[styles.searchBar, { backgroundColor: colors.card || '#FFFFFF', borderColor: colors.cardBorder || '#F6DFE6' }, SHADOWS.soft]}>
                 <Ionicons name="search" size={18} color={colors.primary} style={{ marginRight: 10 }} />
                 <TextInput
                   style={[styles.searchInput, { color: colors.text }]}
-                  placeholder="Search destination (e.g. Sanchi, Bhojpur)"
+                  placeholder="Search hotel, station, campus, village, mountain..."
                   placeholderTextColor={colors.inputPlaceholder || '#A0ABC0'}
                   value={searchQuery}
                   onChangeText={handleSearchChange}
@@ -240,211 +438,210 @@ export const DestinationSelectionModal = ({
                 ) : null}
               </View>
 
-              {/* Popular Destinations Grid / Horizontal scroll */}
-              <Text style={[styles.sectionHeading, { color: colors.text }]}>Popular Destinations</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.popularRow}>
-                {POPULAR_DESTINATIONS.map((dest) => {
-                  const isSelected = selectedDestination?.name === dest.name;
-                  return (
-                    <TouchableOpacity
-                      key={dest.name}
-                      style={[
-                        styles.popularCard,
-                        { backgroundColor: colors.card || '#FFFFFF', borderColor: isSelected ? colors.primary : colors.cardBorder || '#F6DFE6' },
-                        isSelected && { borderWidth: 2 },
-                        SHADOWS.card,
-                      ]}
-                      onPress={() => handleSelectDestination(dest)}
-                      activeOpacity={0.8}
-                    >
-                      <Image source={{ uri: dest.imageUrl }} style={styles.popularImage} />
-                      <View style={styles.popularInfo}>
-                        <Text style={[styles.popularName, { color: colors.text }]} numberOfLines={1}>
-                          {dest.name}
-                        </Text>
-                        <Text style={[styles.popularType, { color: colors.textSecondary }]}>
-                          {dest.type}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
+              {/* Quick Actions Bar */}
+              <View style={styles.quickActionsRow}>
+                <TouchableOpacity
+                  style={[styles.useGpsBtn, { backgroundColor: '#E8FDF5', borderColor: '#A7F3D0' }]}
+                  onPress={handleUseCurrentLocation}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="locate" size={16} color="#059669" />
+                  <Text style={styles.useGpsText}>Use Current Location</Text>
+                </TouchableOpacity>
 
-              {/* Selected Location Card */}
-              {selectedDestination && (
-                <View style={styles.selectedSection}>
-                  <Text style={[styles.sectionHeading, { color: colors.text }]}>Selected Location</Text>
-                  <View style={[styles.selectedCard, { backgroundColor: colors.cardWarm || '#FFFBF7', borderColor: colors.cardBorder || '#F6DFE6' }, SHADOWS.card]}>
-                    <View style={styles.selectedPinBadge}>
-                      <Ionicons name="location" size={24} color="#FF5E7E" />
-                    </View>
-                    <View style={{ flex: 1, marginLeft: 12 }}>
-                      <Text style={[styles.selectedDestName, { color: colors.text }]}>{selectedDestination.name}</Text>
-                      <Text style={[styles.selectedDestCoords, { color: colors.textSecondary }]}>
-                        Lat: {selectedDestination.lat?.toFixed(4)}, Lng: {selectedDestination.lng?.toFixed(4)}
-                      </Text>
-                    </View>
-                  </View>
-
-                  {/* Safe Zone Radius Card */}
-                  <Text style={[styles.sectionHeading, { color: colors.text, marginTop: 14 }]}>Safe Zone Radius</Text>
-                  <View style={[styles.radiusCard, { backgroundColor: colors.cardWarm || '#FFFBF7', borderColor: colors.cardBorder || '#F6DFE6' }]}>
-                    <View style={styles.radiusLeft}>
-                      <Ionicons name="radio-button-on" size={20} color={colors.primary} />
-                      <Text style={[styles.radiusText, { color: colors.text }]}>5 km (Recommended)</Text>
-                    </View>
-                    <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
-                  </View>
-
-                  {/* Guardian Phone Setup */}
-                  <View style={[styles.guardianCard, { backgroundColor: colors.card || '#FFFFFF', borderColor: colors.cardBorder || '#F6DFE6' }]}>
-                    <Text style={[styles.guardianLabel, { color: colors.textSecondary }]}>
-                      GUARDIAN PHONE FOR AUTOMATIC SMS ALERTS
-                    </Text>
-                    <TextInput
-                      style={[styles.guardianInput, { color: colors.text }]}
-                      value={guardianPhone}
-                      onChangeText={setGuardianPhone}
-                      placeholder="+91 98765 43210"
-                      placeholderTextColor={colors.inputPlaceholder}
-                      keyboardType="phone-pad"
-                    />
-                  </View>
-
-                  {/* Create Safe Zone CTA */}
-                  <TouchableOpacity
-                    style={[styles.primaryCTA, SHADOWS.glowCoral]}
-                    onPress={() => setIsPreviewMode(true)}
-                    activeOpacity={0.85}
-                  >
-                    <Text style={styles.primaryCTAText}>Create Safe Zone</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {/* All Search Results List */}
-              {!selectedDestination && (
-                <View style={{ marginTop: 16 }}>
-                  <Text style={[styles.sectionHeading, { color: colors.text }]}>All Destinations</Text>
-                  {searchResults.map((item, idx) => (
-                    <TouchableOpacity
-                      key={`${item.name}-${idx}`}
-                      style={[styles.resultCard, { backgroundColor: colors.card || '#FFFFFF', borderColor: colors.cardBorder || '#F6DFE6' }, SHADOWS.soft]}
-                      onPress={() => handleSelectDestination(item)}
-                      activeOpacity={0.8}
-                    >
-                      <View style={styles.resultPin}>
-                        <Ionicons name="pin" size={20} color={colors.primary} />
-                      </View>
-                      <View style={{ flex: 1, marginLeft: 12 }}>
-                        <Text style={[styles.resultName, { color: colors.text }]}>{item.name}</Text>
-                        <Text style={[styles.resultSubtitle, { color: colors.textSecondary }]} numberOfLines={1}>
-                          {item.displayName || 'India Safe Corridor'}
-                        </Text>
-                        <Text style={[styles.resultCoords, { color: colors.textMuted }]}>
-                          Lat: {item.lat?.toFixed(4)} • Lng: {item.lng?.toFixed(4)}
-                        </Text>
-                      </View>
-                      <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
-          ) : (
-            /* ========================================================
-               STAGE 2: SAFE ZONE PREVIEW (Matching Reference Screen 5)
-               ======================================================== */
-            <View>
-              {/* Map Preview Canvas */}
-              <View style={[styles.mapCanvasContainer, SHADOWS.card]}>
-                {/* Background topographic map rendering representation */}
-                <View style={styles.mapCanvas}>
-                  {/* Circular Safe Zone Radius 5km */}
-                  <View style={[styles.geofenceCircle5km, { transform: [{ scale: zoomLevel }] }]}>
-                    <View style={styles.radiusPillBadge}>
-                      <Text style={styles.radiusPillText}>Radius: 5 km</Text>
-                    </View>
-                    {/* Destination Center Pin */}
-                    <View style={styles.centerPinMarker}>
-                      <Ionicons name="location" size={32} color="#FF5E7E" />
-                      <Text style={styles.centerPinLabel}>{selectedDestination.name}</Text>
-                    </View>
-
-                    {/* Tourist Live Marker */}
-                    <View style={styles.touristPreviewMarker}>
-                      <View style={styles.touristDotPulse} />
-                      <Text style={styles.touristPreviewLabel}>You ({distKm} km)</Text>
-                    </View>
-                  </View>
-
-                  {/* Zoom Controls */}
-                  <View style={styles.zoomControls}>
-                    <TouchableOpacity
-                      style={styles.zoomBtn}
-                      onPress={() => setZoomLevel((z) => Math.min(1.4, z + 0.15))}
-                    >
-                      <Text style={styles.zoomBtnText}>+</Text>
-                    </TouchableOpacity>
-                    <View style={styles.zoomDivider} />
-                    <TouchableOpacity
-                      style={styles.zoomBtn}
-                      onPress={() => setZoomLevel((z) => Math.max(0.7, z - 0.15))}
-                    >
-                      <Text style={styles.zoomBtnText}>-</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {/* Center Crosshair Button */}
-                  <TouchableOpacity
-                    style={styles.crosshairBtn}
-                    onPress={() => setZoomLevel(1)}
-                  >
-                    <Ionicons name="locate" size={20} color="#1E293B" />
-                  </TouchableOpacity>
+                <View style={styles.hintBadge}>
+                  <Text style={styles.hintText}>Tap or drag pin anywhere</Text>
                 </View>
               </View>
 
-              {/* Bottom Destination Summary Card */}
-              <View style={[styles.previewBottomCard, { backgroundColor: colors.cardWarm || '#FFFBF7', borderColor: colors.cardBorder || '#F6DFE6' }, SHADOWS.card]}>
-                <View style={styles.previewBottomRow}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.previewBottomName, { color: colors.text }]}>{selectedDestination.name}</Text>
-                    <Text style={[styles.previewBottomCoords, { color: colors.textSecondary }]}>
-                      {selectedDestination.lat?.toFixed(4)}, {selectedDestination.lng?.toFixed(4)}
-                    </Text>
-                  </View>
-                  <View style={styles.safeZoneMintBadge}>
-                    <Text style={styles.safeZoneMintBadgeText}>Safe Zone: 5 km</Text>
-                  </View>
+              {/* Autocomplete Search Dropdown */}
+              {showSearchResults && searchResults.length > 0 && (
+                <View style={[styles.searchDropdown, { backgroundColor: colors.card || '#FFFFFF', borderColor: colors.cardBorder || '#F6DFE6' }, SHADOWS.card]}>
+                  <ScrollView style={{ maxHeight: 200 }} keyboardShouldPersistTaps="handled">
+                    {searchResults.map((item, idx) => (
+                      <TouchableOpacity
+                        key={`${item.name}-${idx}`}
+                        style={[styles.dropdownItem, { borderBottomColor: colors.cardBorder || '#F6DFE6' }]}
+                        onPress={() => handleSelectSearchResult(item)}
+                      >
+                        <Ionicons name="pin" size={16} color={colors.primary} style={{ marginRight: 8, marginTop: 2 }} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.dropdownTitle, { color: colors.text }]} numberOfLines={1}>
+                            {item.name}
+                          </Text>
+                          <Text style={[styles.dropdownSub, { color: colors.textSecondary }]} numberOfLines={1}>
+                            {item.displayName || `${item.lat?.toFixed(4)}, ${item.lng?.toFixed(4)}`}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
                 </View>
+              )}
+            </View>
 
-                {/* Explanation */}
-                <View style={styles.previewInfoBox}>
-                  <Ionicons name="shield-checkmark" size={16} color="#06D6A0" style={{ marginRight: 6 }} />
-                  <Text style={styles.previewInfoText}>
-                    Automatic boundary protection begins when you enter the 5 km perimeter.
-                  </Text>
-                </View>
+            {/* Interactive Leaflet Map Picker View */}
+            <View style={styles.mapContainer}>
+              <WebView
+                ref={webViewRef}
+                originWhitelist={['*']}
+                source={{ html: generatePickerHtml() }}
+                onMessage={handleWebViewMessage}
+                style={styles.webView}
+                javaScriptEnabled={true}
+                domStorageEnabled={true}
+              />
 
-                {/* Activate Safe Zone Button */}
+              {/* Map Zoom Controls Overlay */}
+              <View style={styles.mapControlsOverlay}>
                 <TouchableOpacity
-                  style={[styles.primaryCTA, SHADOWS.glowCoral]}
-                  onPress={handleConfirmActivation}
-                  disabled={isActivating}
-                  activeOpacity={0.85}
+                  style={styles.mapControlBtn}
+                  onPress={() => webViewRef.current?.injectJavaScript('window.zoomIn && window.zoomIn(); true;')}
                 >
-                  {isActivating ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
-                  ) : (
-                    <Text style={styles.primaryCTAText}>Activate Safe Zone</Text>
-                  )}
+                  <Ionicons name="add" size={20} color="#192E2A" />
+                </TouchableOpacity>
+                <View style={styles.mapControlDivider} />
+                <TouchableOpacity
+                  style={styles.mapControlBtn}
+                  onPress={() => webViewRef.current?.injectJavaScript('window.zoomOut && window.zoomOut(); true;')}
+                >
+                  <Ionicons name="remove" size={20} color="#192E2A" />
                 </TouchableOpacity>
               </View>
+
+              {/* 5 km Radius Tag */}
+              <View style={styles.radiusPill}>
+                <Ionicons name="radio" size={13} color="#FF5E7E" />
+                <Text style={styles.radiusPillText}>5.0 km Perimeter</Text>
+              </View>
             </View>
-          )}
-        </ScrollView>
+
+            {/* Bottom Coordinate & Address Card */}
+            <View style={[styles.bottomCard, { backgroundColor: colors.cardWarm || '#FFFBF7', borderTopColor: colors.cardBorder || '#F6DFE6' }, SHADOWS.card]}>
+              <View style={styles.locationHeader}>
+                <View style={styles.pinCircle}>
+                  <Ionicons name="location" size={22} color="#FF5E7E" />
+                </View>
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={[styles.locationName, { color: colors.text }]} numberOfLines={1}>
+                      {resolvedAddress}
+                    </Text>
+                    {isReverseGeocoding && <ActivityIndicator size="small" color="#FF5E7E" />}
+                  </View>
+                  <Text style={[styles.coordsText, { color: colors.textSecondary }]}>
+                    Lat: {selectedCoords.lat.toFixed(5)}° • Lng: {selectedCoords.lng.toFixed(5)}°
+                  </Text>
+                </View>
+                {distKm != null && (
+                  <View style={styles.distPill}>
+                    <Text style={styles.distPillText}>{distKm} km away</Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Set Safe Zone CTA */}
+              <TouchableOpacity
+                style={[styles.primaryCTA, SHADOWS.glowCoral]}
+                onPress={() => setIsPreviewMode(true)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.primaryCTAText}>Review & Set 5 km Safe Travel Zone</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          /* ========================================================
+             STAGE 2: CONFIRMATION & GUARDIAN SETUP
+             ======================================================== */
+          <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+            {/* Location Summary Card */}
+            <View style={[styles.previewCard, { backgroundColor: colors.cardWarm || '#FFFBF7', borderColor: colors.cardBorder || '#F6DFE6' }, SHADOWS.card]}>
+              <View style={styles.previewHeader}>
+                <View style={styles.pinCircle}>
+                  <Ionicons name="shield-checkmark" size={24} color="#06D6A0" />
+                </View>
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  <Text style={[styles.previewTitle, { color: colors.text }]}>
+                    5.0 km Safe Travel Zone
+                  </Text>
+                  <Text style={[styles.previewCoords, { color: colors.textSecondary }]}>
+                    Center: {selectedCoords.lat.toFixed(5)}°, {selectedCoords.lng.toFixed(5)}°
+                  </Text>
+                </View>
+              </View>
+
+              {/* Custom Destination Name / Tag Input */}
+              <View style={{ marginTop: 14 }}>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>ZONE LABEL / DESTINATION NAME</Text>
+                <TextInput
+                  style={[styles.textInput, { color: colors.text, borderColor: colors.cardBorder || '#F6DFE6', backgroundColor: '#FFFFFF' }]}
+                  value={customLabel}
+                  onChangeText={setCustomLabel}
+                  placeholder={resolvedAddress}
+                  placeholderTextColor={colors.inputPlaceholder}
+                />
+              </View>
+
+              {/* Safety Parameters Overview */}
+              <View style={styles.safetyGrid}>
+                <View style={styles.safetyItem}>
+                  <Ionicons name="radio-outline" size={18} color="#FF5E7E" />
+                  <Text style={styles.safetyValue}>5.0 km</Text>
+                  <Text style={styles.safetyLabel}>Perimeter Radius</Text>
+                </View>
+
+                <View style={styles.safetyItem}>
+                  <Ionicons name="timer-outline" size={18} color="#FF9F1C" />
+                  <Text style={styles.safetyValue}>10s Grace</Text>
+                  <Text style={styles.safetyLabel}>Warning Window</Text>
+                </View>
+
+                <View style={styles.safetyItem}>
+                  <Ionicons name="shield-outline" size={18} color="#06D6A0" />
+                  <Text style={styles.safetyValue}>Cloud-Escalated</Text>
+                  <Text style={styles.safetyLabel}>Background Watch</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Guardian Phone Setup */}
+            <View style={[styles.guardianCard, { backgroundColor: colors.card || '#FFFFFF', borderColor: colors.cardBorder || '#F6DFE6' }, SHADOWS.card]}>
+              <Text style={[styles.guardianLabel, { color: colors.textSecondary }]}>
+                EMERGENCY GUARDIAN PHONE (AUTOMATED SMS ALERT)
+              </Text>
+              <TextInput
+                style={[styles.guardianInput, { color: colors.text }]}
+                value={guardianPhone}
+                onChangeText={setGuardianPhone}
+                placeholder="+91 98765 43210"
+                placeholderTextColor={colors.inputPlaceholder}
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            {/* Activate CTA */}
+            <TouchableOpacity
+              style={[styles.primaryCTA, SHADOWS.glowCoral, isActivating && { opacity: 0.7 }]}
+              onPress={handleConfirmActivation}
+              disabled={isActivating}
+              activeOpacity={0.85}
+            >
+              {isActivating ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.primaryCTAText}>Activate 5 km Safe Travel Zone</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.backToMapBtn, { borderColor: colors.cardBorder || '#F6DFE6' }]}
+              onPress={() => setIsPreviewMode(false)}
+            >
+              <Text style={[styles.backToMapText, { color: colors.textSecondary }]}>Modify Selected Location</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        )}
       </View>
     </Modal>
   );
@@ -459,101 +656,180 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: 50,
+    paddingTop: 54,
     paddingBottom: 14,
     borderBottomWidth: 1,
   },
   backBtn: {
     width: 38,
     height: 38,
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
   },
   headerTitle: {
-    ...TYPOGRAPHY.h2,
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '800',
-  },
-  scrollContent: {
-    padding: 18,
-    paddingBottom: 40,
+    letterSpacing: -0.3,
   },
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFEAEF',
+    backgroundColor: '#FFE5EC',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginHorizontal: 16,
+    marginTop: 8,
     borderRadius: RADIUS.md,
-    padding: 12,
-    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#FFD1DC',
+    borderColor: '#FFB3C6',
   },
   errorText: {
-    color: '#FF3B69',
-    fontSize: 13,
+    color: '#D90429',
+    fontSize: 12,
     fontWeight: '600',
     flex: 1,
+  },
+  searchSection: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    zIndex: 10,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: RADIUS.pill,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 11,
     borderWidth: 1.5,
-    marginBottom: 18,
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  sectionHeading: {
-    fontSize: 15,
-    fontWeight: '800',
-    marginBottom: 12,
-    letterSpacing: -0.2,
-  },
-  popularRow: {
-    marginBottom: 20,
-  },
-  popularCard: {
-    width: 145,
-    borderRadius: RADIUS.lg,
-    overflow: 'hidden',
-    borderWidth: 1.5,
-    marginRight: 12,
-  },
-  popularImage: {
-    width: '100%',
-    height: 95,
-  },
-  popularInfo: {
-    padding: 10,
-  },
-  popularName: {
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '600',
   },
-  popularType: {
-    fontSize: 11,
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  selectedSection: {
-    marginTop: 8,
-  },
-  selectedCard: {
+  quickActionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  useGpsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: RADIUS.pill,
+    borderWidth: 1,
+    gap: 6,
+  },
+  useGpsText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#059669',
+  },
+  hintBadge: {
+    paddingHorizontal: 8,
+  },
+  hintText: {
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '500',
+  },
+  searchDropdown: {
+    position: 'absolute',
+    top: 60,
+    left: 16,
+    right: 16,
     borderRadius: RADIUS.lg,
     borderWidth: 1.5,
-    marginBottom: 10,
+    overflow: 'hidden',
+    zIndex: 50,
   },
-  selectedPinBadge: {
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+  },
+  dropdownTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  dropdownSub: {
+    fontSize: 11,
+    marginTop: 1,
+  },
+  mapContainer: {
+    flex: 1,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  webView: {
+    flex: 1,
+    backgroundColor: '#FFF0F5',
+  },
+  mapControlsOverlay: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  mapControlBtn: {
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mapControlDivider: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+  },
+  radiusPill: {
+    position: 'absolute',
+    top: 14,
+    left: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: RADIUS.pill,
+    borderWidth: 1,
+    borderColor: '#FFD1DC',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  radiusPillText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FF5E7E',
+  },
+  bottomCard: {
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 28,
+    borderTopWidth: 1,
+  },
+  locationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  pinCircle: {
     width: 44,
     height: 44,
     borderRadius: 22,
@@ -561,38 +837,105 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  selectedDestName: {
-    fontSize: 16,
+  locationName: {
+    fontSize: 15,
     fontWeight: '800',
   },
-  selectedDestCoords: {
-    fontSize: 12,
-    fontWeight: '500',
+  coordsText: {
+    fontSize: 11,
+    fontFamily: 'monospace',
+    fontWeight: '600',
     marginTop: 2,
   },
-  radiusCard: {
-    flexDirection: 'row',
+  distPill: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: RADIUS.pill,
+  },
+  distPillText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#475569',
+  },
+  primaryCTA: {
+    backgroundColor: '#FF5E7E',
+    borderRadius: RADIUS.pill,
+    paddingVertical: 15,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 14,
-    borderRadius: RADIUS.lg,
+    justifyContent: 'center',
+  },
+  primaryCTAText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+  previewCard: {
+    padding: 16,
+    borderRadius: RADIUS.xl,
     borderWidth: 1.5,
     marginBottom: 16,
   },
-  radiusLeft: {
+  previewHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
-  radiusText: {
-    fontSize: 14,
-    fontWeight: '700',
+  previewTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  previewCoords: {
+    fontSize: 11,
+    fontFamily: 'monospace',
+    marginTop: 2,
+  },
+  inputLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  textInput: {
+    fontSize: 13,
+    fontWeight: '600',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+  },
+  safetyGrid: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    marginTop: 18,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: '#F1E1E6',
+  },
+  safetyItem: {
+    alignItems: 'center',
+  },
+  safetyValue: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#192E2A',
+    marginTop: 4,
+  },
+  safetyLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#64748B',
+    marginTop: 2,
   },
   guardianCard: {
-    padding: 14,
-    borderRadius: RADIUS.lg,
+    padding: 16,
+    borderRadius: RADIUS.xl,
     borderWidth: 1.5,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   guardianLabel: {
     fontSize: 10,
@@ -605,228 +948,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     paddingVertical: 4,
   },
-  primaryCTA: {
-    backgroundColor: '#FF5E7E',
-    borderRadius: RADIUS.pill,
-    paddingVertical: 16,
+  backToMapBtn: {
+    marginTop: 12,
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 6,
-  },
-  primaryCTAText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  resultCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1.5,
-    marginBottom: 10,
-  },
-  resultPin: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: '#FFE8EE',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  resultName: {
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  resultSubtitle: {
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  resultCoords: {
-    fontSize: 10,
-    fontWeight: '500',
-    marginTop: 2,
-  },
-
-  // Preview Map Styles
-  mapCanvasContainer: {
-    borderRadius: RADIUS.xl,
-    overflow: 'hidden',
-    height: 340,
-    backgroundColor: '#E8F5E9',
-    position: 'relative',
-    borderWidth: 1.5,
-    borderColor: '#F6DFE6',
-    marginBottom: 16,
-  },
-  mapCanvas: {
-    flex: 1,
-    backgroundColor: '#F3FBF5',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  geofenceCircle5km: {
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    backgroundColor: 'rgba(255, 94, 126, 0.18)',
-    borderWidth: 2,
-    borderColor: '#FF5E7E',
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  radiusPillBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 12,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
     borderRadius: RADIUS.pill,
     borderWidth: 1,
-    borderColor: '#FFD1DC',
   },
-  radiusPillText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#FF5E7E',
-  },
-  centerPinMarker: {
-    alignItems: 'center',
-  },
-  centerPinLabel: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#1E293B',
-    marginTop: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  touristPreviewMarker: {
-    position: 'absolute',
-    bottom: 30,
-    left: 45,
-    alignItems: 'center',
-  },
-  touristDotPulse: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#32ADE6',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  touristPreviewLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#1E293B',
-    marginTop: 2,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: 4,
-  },
-  zoomControls: {
-    position: 'absolute',
-    right: 14,
-    top: 100,
-    backgroundColor: '#FFFFFF',
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  zoomBtn: {
-    width: 34,
-    height: 34,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  zoomBtnText: {
-    fontSize: 18,
+  backToMapText: {
+    fontSize: 13,
     fontWeight: '700',
-    color: '#1E293B',
-  },
-  zoomDivider: {
-    height: 1,
-    backgroundColor: '#E2E8F0',
-  },
-  crosshairBtn: {
-    position: 'absolute',
-    right: 14,
-    bottom: 20,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  previewBottomCard: {
-    borderRadius: RADIUS.xl,
-    padding: 18,
-    borderWidth: 1.5,
-  },
-  previewBottomRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  previewBottomName: {
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  previewBottomCoords: {
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  safeZoneMintBadge: {
-    backgroundColor: '#E8FDF5',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: RADIUS.pill,
-    borderWidth: 1,
-    borderColor: '#B2F5EA',
-  },
-  safeZoneMintBadgeText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#06D6A0',
-  },
-  previewInfoBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 10,
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
-    borderColor: '#F6DFE6',
-    marginBottom: 16,
-  },
-  previewInfoText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#64748B',
-    flex: 1,
   },
 });

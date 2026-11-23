@@ -21,6 +21,7 @@ import { locationService } from '../services/locationService';
 import { safeZoneService } from '../services/safeZoneService';
 import { DestinationSelectionModal } from '../components/DestinationSelectionModal';
 import { SafeZoneStatusCard } from '../components/SafeZoneStatusCard';
+import { DeadManSwitchCard } from '../components/DeadManSwitchCard';
 import { TripStatusCard } from '../components/TripStatusCard';
 import { SosButton } from '../components/SosButton';
 import { EmergencyModal } from '../components/EmergencyModal';
@@ -444,6 +445,14 @@ export const HomeScreen = ({
             );
             setIsEmergencyModalOpen(true);
           }}
+        />
+
+        {/* ========================================================
+            DEAD MAN'S SWITCH AUTOMATED CHECK-IN SAFETY SYSTEM
+            ======================================================== */}
+        <DeadManSwitchCard
+          currentCoords={gpsLocation}
+          batteryLevel={batteryLevel}
         />
 
         {/* ========================================================

@@ -61,12 +61,16 @@ export const mapAlertFromDb = (row) => {
   else if (row.status === 'false_alarm') status = 'False Alarm';
 
   // State mapping: normal | warning | deviation | unresponsive | sos
+  const isDeadMan = row.state === 'deadman_switch' || 
+    (row.message && (row.message.includes('DEADMAN_SWITCH') || row.message.includes('DEAD MAN SWITCH') || row.message.includes('Dead Man')));
   const isGeofence = row.state === 'geofence_breach' || 
     row.state === 'deviation' || 
     (row.message && row.message.includes('GEOFENCE_BREACH'));
 
   let type = 'MANUAL_SOS';
-  if (isGeofence) {
+  if (isDeadMan) {
+    type = 'DEADMAN_SWITCH';
+  } else if (isGeofence) {
     type = 'GEOFENCE_BREACH';
   } else if (row.state === 'sos') {
     type = 'MANUAL_SOS';
@@ -179,9 +183,11 @@ export const mapAlertToDb = (payload, defaultUserId, defaultTripId) => {
     state = 'warning';
   }
 
-  const defaultMsg = payload.type === 'GEOFENCE_BREACH'
-    ? `🚨 [GEOFENCE_BREACH] Automatic boundary breach detected for ${payload.userName || 'Traveller'}! Exited designated 5km safe zone.`
-    : `🚨 MANUAL SOS triggered by ${payload.userName || 'Traveller'}!`;
+  const defaultMsg = payload.type === 'DEADMAN_SWITCH'
+    ? `🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist ${payload.userName || 'Traveller'} missed check-in deadline!`
+    : (payload.type === 'GEOFENCE_BREACH'
+      ? `🚨 [GEOFENCE_BREACH] Automatic boundary breach detected for ${payload.userName || 'Traveller'}! Exited designated 5km safe zone.`
+      : `🚨 MANUAL SOS triggered by ${payload.userName || 'Traveller'}!`);
 
   const row = {
     user_id: userId,

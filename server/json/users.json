@@ -5,7 +5,7 @@
     "email": "bhoot@gmail.com",
     "phone": "+91 98765 43210",
     "emergencyContact": "+91 98765 43210",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
       "lat": 27.32,
       "lng": 78.12,
@@ -31,12 +31,12 @@
         "number": "SP-BHOOT-001"
       }
     ],
-    "activeTripId": "sz_trp_1795167892331",
-    "lastAlertTimestamp": "2026-11-20T09:45:09.212Z",
-    "lastPing": "2026-11-20T09:44:56.711Z",
+    "activeTripId": "sz_trp_1795168854632",
+    "lastAlertTimestamp": "2026-11-20T10:01:10.725Z",
+    "lastPing": "2026-11-20T10:00:55.572Z",
     "source": "Supabase",
     "activeSafeZone": {
-      "tripId": "sz_trp_1795167892331",
+      "tripId": "sz_trp_1795168854632",
       "destination": "Agra Airport",
       "coords": {
         "lat": 27.1558,
@@ -45,24 +45,24 @@
       "radiusMeters": 5000,
       "status": "ACTIVE"
     },
-    "avatar": "https://jdjluwufmorxeankmqwj.supabase.co/storage/v1/object/public/avatars/tourist_usr_bhoot_live_1795167910584.png",
-    "updatedAt": "2026-11-20T09:45:11.364Z"
+    "avatar": "https://jdjluwufmorxeankmqwj.supabase.co/storage/v1/object/public/avatars/tourist_usr_bhoot_live_1795168872676.png",
+    "updatedAt": "2026-11-20T10:01:13.384Z"
   },
   {
     "id": "3614e1d0-f867-4734-a245-412e8d1f866f",
-    "fullName": "chotu",
+    "fullName": "ojhas",
     "email": "chotu@gmail.com",
     "phone": "+91 98765 43210",
     "emergencyContact": "+91 98765 43210",
-    "status": "EMERGENCY",
+    "status": "Monitored",
     "currentLocation": {
-      "name": "🚨 SOS Distress (24.4346, 77.1619)",
-      "lat": 24.4345865,
-      "lng": 77.1618923,
+      "name": "GPS Fix (24.4350, 77.1615)",
+      "lat": 24.4349827,
+      "lng": 77.1615291,
       "elevation": null
     },
-    "batteryLevel": 57,
-    "networkSignal": "No GPS Fix (Offline)",
+    "batteryLevel": 52,
+    "networkSignal": "Connected (GNSS Active)",
     "offlineDurationMinutes": 0,
     "guardians": [
       {
@@ -79,30 +79,30 @@
         "number": "SP-CHO-9044"
       }
     ],
-    "activeTripId": "921898a9-a5f6-4693-9d13-ed61aa26a8cf",
+    "activeTripId": "ca79b1b1-df48-4f5f-b358-dd603b3a59b2",
     "source": "Supabase",
-    "lastAlertTimestamp": "2026-11-19T10:21:30.879722+00:00"
+    "lastAlertTimestamp": "2026-11-20T09:50:36.626775+00:00"
   },
   {
-    "id": "usr_1794942568604",
-    "fullName": "yash randi ",
-    "email": "yash randi ",
+    "id": "usr_chotu",
+    "fullName": "chotu",
+    "email": "chotu@gmail.com",
     "phone": "+91 98765 43210",
     "emergencyContact": "+91 98765 43210",
     "status": "Monitored",
     "currentLocation": {
-      "name": "GPS Fix (24.4365, 77.1611)",
-      "lat": 24.4365214,
-      "lng": 77.161118,
+      "name": "GPS Fix (24.4346, 77.1619)",
+      "lat": 24.4345865,
+      "lng": 77.1618923,
       "elevation": null
     },
-    "batteryLevel": 20,
-    "networkSignal": "Mobile GNSS (Online)",
+    "batteryLevel": 57,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
     "offlineDurationMinutes": 0,
     "guardians": [
       {
-        "name": "Primary Guardian",
-        "relation": "Family",
+        "name": "Guardian of chotu",
+        "relation": "Family Emergency Contact",
         "phone": "+91 98765 43210",
         "verified": true
       }
@@ -111,12 +111,49 @@
       {
         "type": "Mobile Safety Pass",
         "status": "Verified",
-        "number": "SP-737323"
+        "number": "SP-CHO-5601"
+      }
+    ],
+    "activeTripId": "921898a9-a5f6-4693-9d13-ed61aa26a8cf",
+    "lastAlertTimestamp": "2026-11-19T10:21:30.879722+00:00",
+    "lastPing": "2026-11-19T10:21:30.879722+00:00",
+    "source": "Supabase"
+  },
+  {
+    "id": "usr_yash_randi",
+    "fullName": "yash randi",
+    "email": "oiu@gmail.com",
+    "phone": "+91 98765 43210",
+    "emergencyContact": "+91 98765 43210",
+    "status": "Online",
+    "currentLocation": {
+      "name": "GPS Fix (24.4365, 77.1611)",
+      "lat": 24.4365214,
+      "lng": 77.161118,
+      "elevation": null
+    },
+    "batteryLevel": 20,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of yash randi",
+        "relation": "Family Emergency Contact",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-YAS-5864"
       }
     ],
     "activeTripId": "f0c11a23-4202-48a9-8ba5-51874a05a1d0",
-    "lastPing": "2026-11-17T19:10:28.506Z",
-    "lastAlertTimestamp": "2026-11-17T19:10:18.074724+00:00"
+    "lastAlertTimestamp": "2026-11-17T19:10:18.074724+00:00",
+    "lastPing": "2026-11-17T19:10:18.074724+00:00",
+    "source": "Supabase"
   },
   {
     "id": "usr_kailash_traveler",
@@ -325,41 +362,6 @@
     ],
     "activeTripId": null,
     "lastPing": "2026-11-17T05:46:34.596Z"
-  },
-  {
-    "id": "usr_1794851969510",
-    "fullName": "yash randi ",
-    "email": "oiu@gmail.com",
-    "phone": "1245789630",
-    "emergencyContact": "1245789630",
-    "status": "Monitored",
-    "currentLocation": {
-      "name": "GPS Fix (24.4365, 77.1611)",
-      "lat": 24.4365315,
-      "lng": 77.1610995,
-      "elevation": "387 m"
-    },
-    "batteryLevel": 87,
-    "networkSignal": "Mobile GNSS (Online)",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Primary Guardian",
-        "relation": "Family",
-        "phone": "1245789630",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Mobile Safety Pass",
-        "status": "Verified",
-        "number": "SP-310013"
-      }
-    ],
-    "activeTripId": null,
-    "lastPing": "2026-11-17T05:45:10.057Z",
-    "speedKmH": 0
   },
   {
     "id": "usr_audit_verification_peak",

@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   geocodeDestination,
+  reverseGeocodeDestination,
   createSafeZoneTrip,
   getActiveSafeZoneTrip,
   getSafeZoneTripById,
@@ -20,6 +21,7 @@ const router = express.Router();
 
 // Geocoding query (proxy to OpenStreetMap Nominatim with caching)
 router.get('/geocode', geocodeDestination);
+router.get('/reverse-geocode', reverseGeocodeDestination);
 
 // Escalation Worker Diagnostics
 router.get('/worker-status', getEscalationWorkerStatus);

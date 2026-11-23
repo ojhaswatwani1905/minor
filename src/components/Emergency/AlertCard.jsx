@@ -24,7 +24,8 @@ export const AlertCard = ({
   onResolve, 
   onNotifyGuardian 
 }) => {
-  const isCritical = alert.priority === 'CRITICAL' || alert.type === 'MANUAL_SOS';
+  const isDeadMan = alert.type === 'DEADMAN_SWITCH' || alert.type === "Dead Man's Switch Dispatch";
+  const isCritical = alert.priority === 'CRITICAL' || alert.type === 'MANUAL_SOS' || isDeadMan;
   const isPending = alert.status?.toLowerCase() === 'pending';
   const isAcknowledged = alert.status?.toLowerCase() === 'acknowledged';
   const isResolved = alert.status?.toLowerCase() === 'resolved';
@@ -143,7 +144,7 @@ export const AlertCard = ({
         <div className="bg-white/80 p-3.5 rounded-2xl border border-slate-200/80 space-y-1 shadow-sm">
           <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
             {hasCoords ? <MapPin className="w-3.5 h-3.5 text-pine" /> : <MapPinOff className="w-3.5 h-3.5 text-honey" />}
-            GPS Coordinates
+            {isDeadMan ? 'LAST KNOWN LOCATION' : 'GPS Coordinates'}
           </span>
           {hasCoords ? (
             <div>
@@ -153,6 +154,11 @@ export const AlertCard = ({
               {alert.location?.name && (
                 <p className="text-[11px] text-slate-500 truncate mt-0.5 font-medium">
                   {alert.location.name}
+                </p>
+              )}
+              {isDeadMan && (alert.missedDeadline || alert.deadManSession?.nextDeadlineAt) && (
+                <p className="text-[10px] text-red-600 font-extrabold mt-1">
+                  Missed Deadline: {new Date(alert.missedDeadline || alert.deadManSession.nextDeadlineAt).toLocaleTimeString()}
                 </p>
               )}
             </div>

@@ -9,6 +9,11 @@ export const safeZoneService = {
     return await apiFetch(`/safe-zones/geocode?q=${encodeURIComponent(query || '')}`);
   },
 
+  // Reverse geocode arbitrary coordinates to human-readable address
+  reverseGeocode: async (lat, lng) => {
+    return await apiFetch(`/safe-zones/reverse-geocode?lat=${lat}&lng=${lng}`);
+  },
+
   // Create and activate a Safe Travel Zone (5km boundary)
   createSafeZone: async (tripData) => {
     const res = await apiFetch('/safe-zones', {

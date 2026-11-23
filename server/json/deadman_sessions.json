@@ -1,0 +1,186 @@
+[
+  {
+    "id": "dms_test_esc_1795453597148",
+    "userId": "usr_escalate_1795453597148",
+    "userName": "Overdue Test Traveller",
+    "userPhone": "+91 91111 22222",
+    "intervalSeconds": 15,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-23T17:06:17.148Z",
+    "lastCheckInAt": "2026-11-23T17:06:17.148Z",
+    "nextDeadlineAt": "2026-11-23T17:06:35.148Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "lastKnownLocation": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "accuracy": 12,
+      "timestamp": "2026-11-23T17:06:17.148Z"
+    },
+    "hardwareTelemetry": {
+      "batteryLevel": 22,
+      "networkSignal": "GNSS Distress",
+      "deviceModel": "Samsung Galaxy S24"
+    },
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_1795453597150_ywrt",
+    "createdAt": "2026-11-23T17:06:17.148Z",
+    "updatedAt": "2026-11-23T17:06:17.148Z",
+    "escalatedAt": "2026-11-23T17:06:37.150Z",
+    "history": [
+      {
+        "timestamp": "2026-11-23T17:06:37.183Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_1795453597150_ywrt"
+      }
+    ]
+  },
+  {
+    "id": "dms_1795453596937_fowf",
+    "userId": "usr_p7_1795453589867",
+    "userName": "Phase 7 Test Tourist",
+    "userPhone": "+91 98765 43210",
+    "intervalSeconds": 30,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-23T17:06:36.937Z",
+    "lastCheckInAt": "2026-11-23T17:06:37.142Z",
+    "nextDeadlineAt": "2026-11-23T17:07:07.143Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "lastKnownLocation": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "accuracy": 5,
+      "timestamp": "2026-11-23T17:06:37.141Z"
+    },
+    "hardwareTelemetry": {
+      "batteryLevel": 84
+    },
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_1795453627503_xr4d",
+    "history": [
+      {
+        "timestamp": "2026-11-23T17:07:07.521Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_1795453627503_xr4d"
+      },
+      {
+        "timestamp": "2026-11-23T17:06:37.142Z",
+        "event": "CHECK_IN_CONFIRMED",
+        "nextDeadlineAt": "2026-11-23T17:07:07.142Z",
+        "location": {
+          "lat": 28.612,
+          "lng": 77.207,
+          "accuracy": 5,
+          "timestamp": "2026-11-23T17:06:37.141Z"
+        }
+      },
+      {
+        "timestamp": "2026-11-23T17:06:36.937Z",
+        "event": "SESSION_STARTED",
+        "intervalSeconds": 30,
+        "location": {
+          "lat": 28.61,
+          "lng": 77.205,
+          "accuracy": 8,
+          "timestamp": "2026-11-23T17:06:36.935Z"
+        }
+      }
+    ],
+    "createdAt": "2026-11-23T17:06:36.937Z",
+    "updatedAt": "2026-11-23T17:06:37.147Z",
+    "escalatedAt": "2026-11-23T17:07:07.503Z"
+  },
+  {
+    "id": "dms_test_esc_1795453522336",
+    "userId": "usr_escalate_1795453522336",
+    "userName": "Overdue Test Traveller",
+    "userPhone": "+91 91111 22222",
+    "intervalSeconds": 15,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-23T17:05:02.336Z",
+    "lastCheckInAt": "2026-11-23T17:05:02.336Z",
+    "nextDeadlineAt": "2026-11-23T17:05:20.336Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "lastKnownLocation": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "accuracy": 12,
+      "timestamp": "2026-11-23T17:05:02.336Z"
+    },
+    "hardwareTelemetry": {
+      "batteryLevel": 22,
+      "networkSignal": "GNSS Distress",
+      "deviceModel": "Samsung Galaxy S24"
+    },
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_1795453522383_bdr1",
+    "createdAt": "2026-11-23T17:05:02.336Z",
+    "updatedAt": "2026-11-23T17:05:02.336Z",
+    "escalatedAt": "2026-11-23T17:05:22.383Z",
+    "history": [
+      {
+        "timestamp": "2026-11-23T17:05:22.441Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_1795453522383_bdr1"
+      }
+    ]
+  },
+  {
+    "id": "dms_1795453522122_rb3y",
+    "userId": "usr_p7_1795453514919",
+    "userName": "Phase 7 Test Tourist",
+    "userPhone": "+91 98765 43210",
+    "intervalSeconds": 30,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-23T17:05:22.122Z",
+    "lastCheckInAt": "2026-11-23T17:05:22.328Z",
+    "nextDeadlineAt": "2026-11-23T17:05:52.331Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "lastKnownLocation": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "accuracy": 5,
+      "timestamp": "2026-11-23T17:05:22.326Z"
+    },
+    "hardwareTelemetry": {
+      "batteryLevel": 84
+    },
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_1795453552416_ymbq",
+    "history": [
+      {
+        "timestamp": "2026-11-23T17:05:52.429Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_1795453552416_ymbq"
+      },
+      {
+        "timestamp": "2026-11-23T17:05:22.328Z",
+        "event": "CHECK_IN_CONFIRMED",
+        "nextDeadlineAt": "2026-11-23T17:05:52.328Z",
+        "location": {
+          "lat": 28.612,
+          "lng": 77.207,
+          "accuracy": 5,
+          "timestamp": "2026-11-23T17:05:22.326Z"
+        }
+      },
+      {
+        "timestamp": "2026-11-23T17:05:22.122Z",
+        "event": "SESSION_STARTED",
+        "intervalSeconds": 30,
+        "location": {
+          "lat": 28.61,
+          "lng": 77.205,
+          "accuracy": 8,
+          "timestamp": "2026-11-23T17:05:22.018Z"
+        }
+      }
+    ],
+    "createdAt": "2026-11-23T17:05:22.122Z",
+    "updatedAt": "2026-11-23T17:05:22.335Z",
+    "escalatedAt": "2026-11-23T17:05:52.416Z"
+  }
+]

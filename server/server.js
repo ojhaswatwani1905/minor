@@ -13,6 +13,7 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import settingRoutes from './routes/settingRoutes.js';
 import hazardRoutes from './routes/hazardRoutes.js';
 import safeZoneRoutes from './routes/safeZoneRoutes.js';
+import deadManRoutes from './routes/deadManRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { startDeadManSwitchWorker } from './services/deadManSwitchService.js';
 import { startBreachEscalationWorker, getBreachWorkerMetrics } from './services/breachEscalationWorker.js';
@@ -41,6 +42,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/hazards', hazardRoutes);
 app.use('/api/safe-zones', safeZoneRoutes);
+app.use('/api/deadman', deadManRoutes);
 
 import os from 'os';
 

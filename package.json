@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "server": "node --watch server/server.js",
+    "server": "node --watch-path=server/routes --watch-path=server/controllers --watch-path=server/services --watch-path=server/middlewares --watch-path=server/utils server/server.js",
     "start:server": "node server/server.js",
     "start": "concurrently \"npm run server\" \"npm run dev\"",
     "setup:osm-india": "bash server/scripts/setup-india-osm.sh",
