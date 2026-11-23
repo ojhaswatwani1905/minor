@@ -31,23 +31,29 @@ export const SafeZonePage = () => {
 
   const fetchSafeZoneData = async (isBackground = false) => {
     try {
-      const [szRes, incRes] = await Promise.all([
+      const [szSettled, incSettled] = await Promise.allSettled([
         tripService.getAllSafeZones(),
         tripService.getSafeZoneIncidents()
       ]);
 
-      if (szRes.success && Array.isArray(szRes.safeZones)) {
-        setSafeZones(szRes.safeZones);
-        if (!selectedZoneId && szRes.safeZones.length > 0) {
-          setSelectedZoneId(szRes.safeZones[0].id);
+      if (szSettled.status === 'fulfilled' && szSettled.value?.success && Array.isArray(szSettled.value?.safeZones)) {
+        setSafeZones(szSettled.value.safeZones);
+        if (!selectedZoneId && szSettled.value.safeZones.length > 0) {
+          setSelectedZoneId(szSettled.value.safeZones[0].id);
         }
       }
 
-      if (incRes.success && Array.isArray(incRes.incidents)) {
-        setIncidents(incRes.incidents);
+      if (incSettled.status === 'fulfilled' && incSettled.value?.success && Array.isArray(incSettled.value?.incidents)) {
+        setIncidents(incSettled.value.incidents);
+      }
+
+      if (szSettled.status === 'rejected' && incSettled.status === 'rejected') {
+        const primaryError = szSettled.reason || incSettled.reason;
+        console.error('Error fetching safe zone telemetry:', primaryError);
+        if (!isBackground) toast.error('Failed to sync safe travel zone telemetry');
       }
     } catch (err) {
-      console.error('Error fetching safe zone telemetry:', err);
+      console.error('Unexpected error in fetchSafeZoneData:', err);
       if (!isBackground) toast.error('Failed to sync safe travel zone telemetry');
     } finally {
       setLoading(false);

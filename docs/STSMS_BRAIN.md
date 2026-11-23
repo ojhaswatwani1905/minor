@@ -905,6 +905,43 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 
 ---
 
+### 15.10 Phase 7.3 — Production Activation & End-to-End Release Verification Status
+
+#### 1. Live Supabase Migration Probe (`public.deadman_sessions`)
+- **Status:** `NOT APPLIED` (Verified via PostgREST probe: `code: "PGRST205"`, "Could not find table 'public.deadman_sessions' in schema cache").
+- **Migration SQL:** `server/database/deadman_switch_schema.sql` (Ready for execution in Supabase Dashboard SQL Editor).
+- **Production Safe Failure:** Verified in code (`deadManDb.js` and `deadManController.js`). In `NODE_ENV=production`, backend refuses silent JSON fallback and returns `HTTP 503 DATABASE_UNAVAILABLE` (`durablePersistence: false`).
+
+#### 2. GitHub Authentication & Remote Sync State
+- **Status:** `PENDING AUTHENTICATION`
+- **Remote main Hash:** `7ce9d18a3cc7724af0f7cdfa1f7440e605ed4bac`
+- **Local Commits Pending Push:**
+  - `ac9d1d0`: Phase 7 Universal GPS & Dead Man's Switch
+  - `20137ac`: Phase 7.1 Database Persistence & Security Hardening
+  - `e8b42e9`: Phase 7.2 Durable Outbox Escalation, Production Safe Failure & APK Release Hardening
+- **Authentication Blocker:** GitHub CLI credential helper reports `The token in keyring is invalid`. Re-authentication via `gh auth login -h github.com` required in terminal.
+
+#### 3. Render Production Deployment State
+- **URL:** `https://stsms-backend.onrender.com/api/health`
+- **Status:** Active & Healthy (HTTP 200, Uptime tracking, Database: Supabase PostgreSQL Connected).
+- **Active Deployed Commit:** `7ce9d18` (Auto-redeploy will trigger on Render once GitHub push succeeds).
+
+#### 4. Standalone Release APK & Production Config
+- **Path:** `STSMS-release.apk` (71,804,201 bytes / 68.5 MB)
+- **SHA-256:** `16ad6e872dc499eb0eefa172fcce5b83d9363f66a3116ec94a0d0ba87d759875`
+- **Package:** `com.stsms.tourist`
+- **Production API URL:** `https://stsms-backend.onrender.com/api` (All environments in `eas.json` set to production HTTPS; zero private LAN URLs).
+- **Interval Hardening:** Production release strictly enforces minimum 15-minute interval (`60s (Test)` hidden via `__DEV__`).
+
+#### 5. Admin Safe Travel Zones Resilience
+- **Page Component:** `src/pages/SafeZonePage.jsx`
+- **Enhancement:** Migrated to `Promise.allSettled()` to guarantee that telemetry syncs independently even during momentary backend or proxy restarts.
+
+#### 6. Regression Results
+- **96 / 96 Automated Tests Passed (100%)** across all 4 regression suites.
+
+---
+
 ## 16. Brain Maintenance Rules
 
 Every future task and engineer MUST follow this workflow:

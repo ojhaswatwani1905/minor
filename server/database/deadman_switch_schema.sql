@@ -41,6 +41,7 @@ CREATE INDEX IF NOT EXISTS deadman_created_idx
 ALTER TABLE public.deadman_sessions ENABLE ROW LEVEL SECURITY;
 
 -- Service role policy (backend operations bypass RLS)
+DROP POLICY IF EXISTS "Allow service_role full access to deadman_sessions" ON public.deadman_sessions;
 CREATE POLICY "Allow service_role full access to deadman_sessions" 
   ON public.deadman_sessions
   FOR ALL 
@@ -49,18 +50,21 @@ CREATE POLICY "Allow service_role full access to deadman_sessions"
   WITH CHECK (true);
 
 -- Authenticated tourist policies: tourists can only inspect & modify their own sessions
+DROP POLICY IF EXISTS "Allow authenticated read own deadman_sessions" ON public.deadman_sessions;
 CREATE POLICY "Allow authenticated read own deadman_sessions" 
   ON public.deadman_sessions
   FOR SELECT 
   TO authenticated 
   USING (auth.uid()::text = user_id);
 
+DROP POLICY IF EXISTS "Allow authenticated insert own deadman_sessions" ON public.deadman_sessions;
 CREATE POLICY "Allow authenticated insert own deadman_sessions" 
   ON public.deadman_sessions
   FOR INSERT 
   TO authenticated 
   WITH CHECK (auth.uid()::text = user_id);
 
+DROP POLICY IF EXISTS "Allow authenticated update own deadman_sessions" ON public.deadman_sessions;
 CREATE POLICY "Allow authenticated update own deadman_sessions" 
   ON public.deadman_sessions
   FOR UPDATE 
