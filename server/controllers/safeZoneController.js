@@ -42,7 +42,7 @@ export const geocodeDestination = async (req, res, next) => {
   try {
     const q = (req.query.q || req.query.query || '').trim();
     if (!q || q.length < 2) {
-      return res.json({ success: true, results: POPULAR_DESTINATIONS.slice(0, 5) });
+      return res.json({ success: true, results: [] });
     }
 
     const cacheKey = q.toLowerCase();
@@ -50,7 +50,7 @@ export const geocodeDestination = async (req, res, next) => {
       return res.json({ success: true, source: 'cache', results: geocodeCache.get(cacheKey) });
     }
 
-    // Check built-in fallback matches first for instantaneous response
+    // Check built-in fallback matches strictly containing query
     const localMatches = POPULAR_DESTINATIONS.filter(d => 
       d.name.toLowerCase().includes(cacheKey) || d.displayName.toLowerCase().includes(cacheKey)
     );
@@ -58,7 +58,7 @@ export const geocodeDestination = async (req, res, next) => {
     try {
       const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=6&countrycodes=in`;
       const ctrl = new AbortController();
-      const tid = setTimeout(() => ctrl.abort(), 4000);
+      const tid = setTimeout(() => ctrl.abort(), 4500);
 
       const resp = await fetch(url, {
         headers: {
@@ -70,7 +70,7 @@ export const geocodeDestination = async (req, res, next) => {
 
       if (resp.ok) {
         const rawResults = await resp.json();
-        const formatted = rawResults.map(item => ({
+        const formatted = (rawResults || []).map(item => ({
           name: item.name || item.display_name.split(',')[0],
           displayName: item.display_name,
           lat: parseFloat(item.lat),
@@ -79,25 +79,30 @@ export const geocodeDestination = async (req, res, next) => {
           importance: item.importance
         }));
 
-        // Merge with local matches
+        // Merge with local matches if any
         const combined = [...localMatches];
         formatted.forEach(f => {
-          if (!combined.some(c => Math.abs(c.lat - f.lat) < 0.01 && Math.abs(c.lng - f.lng) < 0.01)) {
+          if (!combined.some(c => Math.abs(c.lat - f.lat) < 0.005 && Math.abs(c.lng - f.lng) < 0.005)) {
             combined.push(f);
           }
         });
 
-        geocodeCache.set(cacheKey, combined);
+        if (combined.length > 0) {
+          geocodeCache.set(cacheKey, combined);
+        }
         return res.json({ success: true, source: 'nominatim', results: combined });
       }
     } catch (netErr) {
       console.warn('[GEOCODE OSM WARNING]', netErr.message);
     }
 
-    // Return local matches if external API failed or timed out
-    const results = localMatches.length > 0 ? localMatches : POPULAR_DESTINATIONS.slice(0, 4);
-    geocodeCache.set(cacheKey, results);
-    res.json({ success: true, source: 'fallback', results });
+    // If external geocode failed, return only genuine local matches (never unrelated hardcoded popular destinations)
+    if (localMatches.length > 0) {
+      geocodeCache.set(cacheKey, localMatches);
+      return res.json({ success: true, source: 'fallback', results: localMatches });
+    }
+
+    res.json({ success: true, source: 'none', results: [] });
   } catch (error) {
     next(error);
   }

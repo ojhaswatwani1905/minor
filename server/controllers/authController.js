@@ -74,7 +74,7 @@ export const register = async (req, res, next) => {
 
     const admins = await readJson('admins');
     const users = await readJson('users');
-    const existing = admins.find(a => a.email.toLowerCase() === email.toLowerCase()) || users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const existing = admins.find(a => a.email && a.email.toLowerCase() === email.toLowerCase()) || users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
 
     if (existing) {
       return res.status(400).json({ success: false, message: 'An account with this email address already exists. Please log in.' });

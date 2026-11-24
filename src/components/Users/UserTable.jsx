@@ -56,7 +56,7 @@ export const UserTable = ({ users, onView, onEdit, onDelete }) => {
                     </div>
                     <div>
                       <p className="font-extrabold text-[#192E2A] group-hover:text-pine transition-colors">{u.fullName}</p>
-                      <p className="text-[11px] text-slate-400">{u.email}</p>
+                      <p className="text-[11px] text-slate-400">{u.email || 'Email unavailable'}</p>
                     </div>
                   </div>
                 </td>

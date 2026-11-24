@@ -133,12 +133,10 @@ export const AlertDetailModal = ({ isOpen, onClose, alertDetail, onUpdateStatus,
               </div>
               <div className="space-y-0.5 min-w-0">
                 <p className="text-sm font-extrabold text-white truncate">{touristName}</p>
-                {touristEmail && (
-                  <p className="text-white/80 flex items-center gap-1 text-[11px] truncate">
-                    <Mail className="w-3 h-3 text-honey flex-shrink-0" />
-                    <span>{touristEmail}</span>
-                  </p>
-                )}
+                <p className="text-white/80 flex items-center gap-1 text-[11px] truncate">
+                  <Mail className="w-3 h-3 text-honey flex-shrink-0" />
+                  <span>{touristEmail || 'Email unavailable'}</span>
+                </p>
                 {touristPhone && (
                   <p className="text-white/80 flex items-center gap-1 text-[11px]">
                     <Phone className="w-3 h-3 text-honey flex-shrink-0" />

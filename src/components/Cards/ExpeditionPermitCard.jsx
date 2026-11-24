@@ -62,7 +62,7 @@ export const ExpeditionPermitCard = ({ users = [], activities, trips = [] }) => 
       return {
         id: u.id || `member_${idx}`,
         fullName: u.fullName || 'Active Traveller',
-        email: u.email || 'telemetry@stsms.gov',
+        email: u.email || 'Email unavailable',
         avatar: u.avatar || null,
         corridor,
         groupSize,

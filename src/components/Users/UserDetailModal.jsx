@@ -53,7 +53,7 @@ export const UserDetailModal = ({ isOpen, onClose, userDetail }) => {
                 <h3 className="text-lg font-extrabold text-white font-sans">{userDetail.fullName}</h3>
                 <StatusBadge status={userDetail.status} />
               </div>
-              <p className="text-xs text-white/70 font-sans mt-0.5">{userDetail.email} • {userDetail.phone}</p>
+              <p className="text-xs text-white/70 font-sans mt-0.5">{userDetail.email || 'Email unavailable'} • {userDetail.phone || 'Phone unavailable'}</p>
             </div>
           </div>
 

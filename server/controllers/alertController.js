@@ -6,6 +6,7 @@ import {
   mapAlertToDb 
 } from '../database/supabase.js';
 import { readJson, writeJson } from '../utils/jsonDb.js';
+import { fetchEnrichedUsers } from './userController.js';
 
 // Helper to get fallback valid profile and trip IDs from database
 const getDatabaseDefaults = async (supabase) => {
@@ -75,7 +76,12 @@ export const getAlerts = async (req, res, next) => {
     let alerts = (data || []).map(mapAlertFromDb);
 
     try {
-      const users = await readJson('users');
+      let users = [];
+      try {
+        users = await fetchEnrichedUsers();
+      } catch (uErr) {
+        users = await readJson('users');
+      }
       const jsonAlerts = await readJson('alerts');
 
       alerts = alerts.map(a => {
@@ -96,10 +102,18 @@ export const getAlerts = async (req, res, next) => {
         const realName = a.userName && a.userName !== 'Active Traveller' && a.userName !== 'Traveller'
           ? a.userName 
           : (match?.fullName || match?.name || a.userName || 'Active Traveller');
-        const realId = match?.id || a.userId;
-        const realAvatar = match?.avatar || null;
-        const realPhone = match?.phone || a.user?.phone || null;
-        const realEmail = match?.email || null;
+
+        // Identity check: Only borrow user details if the matched profile actually corresponds to this tourist
+        const isNameMatch = match && (
+          (match.fullName && match.fullName.toLowerCase().trim() === realName.toLowerCase().trim()) ||
+          (match.name && match.name.toLowerCase().trim() === realName.toLowerCase().trim()) ||
+          (realName === 'Active Traveller' && match.id === a.userId)
+        );
+
+        const realId = isNameMatch ? match.id : (a.userId || 'usr_unassigned');
+        const realAvatar = isNameMatch ? (match.avatar || null) : null;
+        const realPhone = isNameMatch ? (match.phone || null) : (a.user?.phone || null);
+        const realEmail = isNameMatch ? (match.email || null) : null;
 
         return {
           ...a,
@@ -188,7 +202,12 @@ export const getAlertById = async (req, res, next) => {
     } catch (e) {}
 
     // 1. Resolve Tourist Identity from authenticated user profile records
-    const users = await readJson('users');
+    let users = [];
+    try {
+      users = await fetchEnrichedUsers();
+    } catch (uErr) {
+      users = await readJson('users');
+    }
     let matchedUser = null;
     if (alert.userName && alert.userName !== 'Active Traveller' && alert.userName !== 'Traveller') {
       matchedUser = users.find(u => 
@@ -219,10 +238,18 @@ export const getAlertById = async (req, res, next) => {
     const realTouristName = alert.userName && alert.userName !== 'Active Traveller' && alert.userName !== 'Traveller'
       ? alert.userName
       : (matchedUser?.fullName || matchedUser?.name || alert.userName || 'Active Traveller');
-    const realTouristId = matchedUser?.id || alert.userId || alertRow.user_id || 'usr_unassigned';
-    const realTouristAvatar = matchedUser?.avatar || (matchedUser?.medical_info?.avatar_url) || null;
-    const realTouristEmail = matchedUser?.email || null;
-    const realTouristPhone = matchedUser?.phone || alertRow.profiles?.phone || null;
+
+    // Strict identity match: Only use matchedUser email/avatar/phone if the user record matches this tourist
+    const isTouristMatch = matchedUser && (
+      (matchedUser.fullName && matchedUser.fullName.toLowerCase().trim() === realTouristName.toLowerCase().trim()) ||
+      (matchedUser.name && matchedUser.name.toLowerCase().trim() === realTouristName.toLowerCase().trim()) ||
+      (realTouristName === 'Active Traveller' && matchedUser.id === alertRow.user_id)
+    );
+
+    const realTouristId = isTouristMatch ? matchedUser.id : (alert.userId || alertRow.user_id || 'usr_unassigned');
+    const realTouristAvatar = isTouristMatch ? (matchedUser.avatar || matchedUser.medical_info?.avatar_url || null) : null;
+    const realTouristEmail = isTouristMatch ? (matchedUser.email || null) : null;
+    const realTouristPhone = isTouristMatch ? (matchedUser.phone || null) : (alertRow.profiles?.phone || null);
 
     alert.userName = realTouristName;
     alert.userId = realTouristId;

@@ -89,7 +89,7 @@ export const TripDetailModal = ({ isOpen, onClose, tripDetail, onAddCheckpoint }
               </div>
               <div>
                 <p className="font-bold text-white font-sans">{tripDetail.user.fullName}</p>
-                <p className="text-white/70 font-sans">{tripDetail.user.phone} • {tripDetail.user.email}</p>
+                <p className="text-white/70 font-sans">{tripDetail.user.phone || 'Phone unavailable'} • {tripDetail.user.email || 'Email unavailable'}</p>
               </div>
             </div>
 

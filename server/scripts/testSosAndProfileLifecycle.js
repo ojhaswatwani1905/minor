@@ -338,7 +338,7 @@ async function runAudit() {
   // Test 12: Database Synchronization (users.json & fallback)
   const usersJsonPath = path.join(__dirname, '../json/users.json');
   const usersJsonContent = JSON.parse(fs.readFileSync(usersJsonPath, 'utf8'));
-  const userAInJson = usersJsonContent.find(u => u.email.toLowerCase() === emailA.toLowerCase());
+  const userAInJson = usersJsonContent.find(u => u.email && u.email.toLowerCase() === emailA.toLowerCase());
 
   assert(
     userAInJson && userAInJson.phone === '+919876599999' && userAInJson.bloodGroup === 'O+',

@@ -1,5 +1,1424 @@
 [
   {
+    "id": "c333a61b-6445-4855-a1c1-ef7d53da92b0",
+    "userId": "usr_1795539621561",
+    "userName": "Bhavna Sen",
+    "tripId": "5e255a34-3bc3-47ba-8a67-36cc723b69f5",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 User B SOS: Tourist Bhavna requests assistance",
+    "location": {
+      "lat": 23.1995,
+      "lng": 77.4332
+    },
+    "batteryLevel": 92,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-24T17:00:41.044Z"
+  },
+  {
+    "id": "031a2089-7631-4a91-8d52-1629f1a4ff7e",
+    "userId": "usr_1795539621486",
+    "userName": "Aarav Patel",
+    "tripId": "763ef8c0-c378-416a-a61f-16b86831eda5",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Second SOS: New incident later in the day",
+    "location": {
+      "lat": 23.49,
+      "lng": 77.74
+    },
+    "batteryLevel": 65,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-24T17:00:37.052Z",
+    "updatedAt": "2026-11-24T17:00:37.053Z"
+  },
+  {
+    "id": "alt_dms_1795539561710_jjrx",
+    "userId": "usr_prod_bypass_1795539501230",
+    "userName": "Prod Bypass Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T16:59:21.707Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795539501230_y9j3",
+      "intervalSeconds": 60,
+      "lastCheckInAt": "2026-11-24T16:58:21.230Z",
+      "nextDeadlineAt": "2026-11-24T16:59:21.230Z"
+    },
+    "missedDeadline": "2026-11-24T16:59:21.230Z",
+    "lastCheckIn": "2026-11-24T16:58:21.230Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Prod Bypass Test missed safe check-in deadline (10:29:21 PM). Last known check-in: 10:28:21 PM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795539529973_vcld",
+    "userId": "usr_p7_1795539496766",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T16:58:49.971Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-24T16:58:19.753Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795539499548_wy3x",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-24T16:58:19.753Z",
+      "nextDeadlineAt": "2026-11-24T16:58:49.756Z"
+    },
+    "missedDeadline": "2026-11-24T16:58:49.756Z",
+    "lastCheckIn": "2026-11-24T16:58:19.753Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (10:28:49 PM). Last known check-in: 10:28:19 PM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795539509956_ffj2",
+    "userId": "usr_outbox_1795539494163",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T16:58:29.953Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795539494163",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T16:57:44.163Z",
+      "nextDeadlineAt": "2026-11-24T16:58:09.163Z"
+    },
+    "missedDeadline": "2026-11-24T16:58:09.163Z",
+    "lastCheckIn": "2026-11-24T16:57:44.163Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (10:28:09 PM). Last known check-in: 10:27:44 PM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795539499762_mfyk",
+    "userId": "usr_escalate_1795539499760",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T16:58:19.761Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-24T16:57:59.761Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795539499761",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T16:57:59.761Z",
+      "nextDeadlineAt": "2026-11-24T16:58:17.760Z"
+    },
+    "missedDeadline": "2026-11-24T16:58:17.760Z",
+    "lastCheckIn": "2026-11-24T16:57:59.761Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (10:28:17 PM). Last known check-in: 10:27:59 PM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795539494172_eqeg",
+    "userId": "usr_restart_1795539494163",
+    "userName": "Restart Test Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T16:58:14.172Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_restart_1795539494163",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T16:57:44.163Z",
+      "nextDeadlineAt": "2026-11-24T16:58:04.163Z"
+    },
+    "missedDeadline": "2026-11-24T16:58:04.163Z",
+    "lastCheckIn": "2026-11-24T16:57:44.163Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Restart Test Explorer missed safe check-in deadline (10:28:04 PM). Last known check-in: 10:27:44 PM.",
+    "guardianPhone": "+91 99999 66666",
+    "guardianNotified": true
+  },
+  {
+    "id": "44ce8136-a4bd-44ef-914d-96b05fcf35f3",
+    "userName": "Simulation Operator",
+    "tripId": "820c19fa-7e64-4dea-90d5-c80b717b5be6",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 SIMULATED SOS: Emergency response beacon activated by Command Center.",
+    "location": {
+      "lat": 32.3716,
+      "lng": 77.2466
+    },
+    "batteryLevel": 88,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-24T09:18:03.092Z",
+    "updatedAt": "2026-11-24T09:18:03.093Z"
+  },
+  {
+    "id": "alt_dms_1795510598439_o16x",
+    "userId": "usr_guard_test",
+    "userName": "Guard Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T08:56:38.436Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_prod_guard_1795509698363",
+      "intervalSeconds": 900,
+      "lastCheckInAt": "2026-11-24T08:41:38.363+00:00",
+      "nextDeadlineAt": "2026-11-24T08:56:38.363+00:00"
+    },
+    "missedDeadline": "2026-11-24T08:56:38.363+00:00",
+    "lastCheckIn": "2026-11-24T08:41:38.363+00:00",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Guard Test missed safe check-in deadline (2:26:38 PM). Last known check-in: 2:11:38 PM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795510588432_emvg",
+    "userId": "usr_live_audit_test_1795509684403",
+    "userName": "STSMS Live Audit Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T08:56:28.425Z",
+    "location": {
+      "lat": 32.2401,
+      "lng": 77.1892,
+      "name": "Advanced Checkpoint",
+      "accuracy": 15,
+      "timestamp": "2026-11-24T08:41:28.277+00:00"
+    },
+    "batteryLevel": 89,
+    "networkStatus": "5G",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_live_verify_1795509684403",
+      "intervalSeconds": 900,
+      "lastCheckInAt": "2026-11-24T08:41:28.277+00:00",
+      "nextDeadlineAt": "2026-11-24T08:56:28.277+00:00"
+    },
+    "missedDeadline": "2026-11-24T08:56:28.277+00:00",
+    "lastCheckIn": "2026-11-24T08:41:28.277+00:00",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist STSMS Live Audit Explorer missed safe check-in deadline (2:26:28 PM). Last known check-in: 2:11:28 PM.",
+    "guardianPhone": "+91 98765 00000",
+    "guardianNotified": true
+  },
+  {
+    "id": "7e3859e9-f425-440a-8369-0bdd742d1a0e",
+    "userId": "usr_1795509847408",
+    "userName": "Bhavna Sen",
+    "tripId": "24a1ae1a-c731-41fb-8b85-7096f654f64e",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 User B SOS: Tourist Bhavna requests assistance",
+    "location": {
+      "lat": 23.1995,
+      "lng": 77.4332
+    },
+    "batteryLevel": 92,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-24T08:44:22.297Z"
+  },
+  {
+    "id": "557e6e45-236c-42f1-bf7a-7c7f7a72ca15",
+    "userId": "usr_1795509847333",
+    "userName": "Aarav Patel",
+    "tripId": "cbda71a7-34ec-41e6-b324-cf56bd90b27b",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Second SOS: New incident later in the day",
+    "location": {
+      "lat": 23.49,
+      "lng": 77.74
+    },
+    "batteryLevel": 65,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-24T08:44:19.401Z",
+    "updatedAt": "2026-11-24T08:44:19.403Z"
+  },
+  {
+    "id": "alt_dms_1795509824637_rsy9",
+    "userId": "usr_prod_bypass_1795509764493",
+    "userName": "Prod Bypass Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T08:43:44.634Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795509764493_jf63",
+      "intervalSeconds": 60,
+      "lastCheckInAt": "2026-11-24T08:42:44.493Z",
+      "nextDeadlineAt": "2026-11-24T08:43:44.493Z"
+    },
+    "missedDeadline": "2026-11-24T08:43:44.493Z",
+    "lastCheckIn": "2026-11-24T08:42:44.493Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Prod Bypass Test missed safe check-in deadline (2:13:44 PM). Last known check-in: 2:12:44 PM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795509759542_pb5m",
+    "userId": "usr_p7_1795509722062",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T08:42:39.538Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-24T08:42:09.339Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795509729134_wq9c",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-24T08:42:09.340Z",
+      "nextDeadlineAt": "2026-11-24T08:42:39.342Z"
+    },
+    "missedDeadline": "2026-11-24T08:42:39.342Z",
+    "lastCheckIn": "2026-11-24T08:42:09.340Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (2:12:39 PM). Last known check-in: 2:12:09 PM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795509743416_nuup",
+    "userId": "usr_outbox_1795509713991",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T08:42:09.347Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795509713991",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T08:41:23.991Z",
+      "nextDeadlineAt": "2026-11-24T08:41:48.991Z"
+    },
+    "missedDeadline": "2026-11-24T08:41:48.991Z",
+    "lastCheckIn": "2026-11-24T08:41:23.991Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (2:11:48 PM). Last known check-in: 2:11:23 PM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795509744528_ba7j",
+    "userId": "usr_outbox_1795509713991",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T08:42:24.523Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795509713991",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T08:41:23.991Z",
+      "nextDeadlineAt": "2026-11-24T08:41:48.991Z"
+    },
+    "missedDeadline": "2026-11-24T08:41:48.991Z",
+    "lastCheckIn": "2026-11-24T08:41:23.991Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (2:11:48 PM). Last known check-in: 2:11:23 PM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795509729348_oala",
+    "userId": "usr_escalate_1795509729346",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T08:42:09.347Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-24T08:41:49.346Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795509729346",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T08:41:49.346Z",
+      "nextDeadlineAt": "2026-11-24T08:42:07.346Z"
+    },
+    "missedDeadline": "2026-11-24T08:42:07.346Z",
+    "lastCheckIn": "2026-11-24T08:41:49.346Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (2:12:07 PM). Last known check-in: 2:11:49 PM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795509713998_o69q",
+    "userId": "usr_restart_1795509713991",
+    "userName": "Restart Test Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T08:41:53.998Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_restart_1795509713991",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T08:41:23.991Z",
+      "nextDeadlineAt": "2026-11-24T08:41:43.991Z"
+    },
+    "missedDeadline": "2026-11-24T08:41:43.991Z",
+    "lastCheckIn": "2026-11-24T08:41:23.991Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Restart Test Explorer missed safe check-in deadline (2:11:43 PM). Last known check-in: 2:11:23 PM.",
+    "guardianPhone": "+91 99999 66666",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795465743119_jokp",
+    "userId": "usr_outbox_1795465727870",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T20:29:03.118Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795465727870",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T20:28:17.870Z",
+      "nextDeadlineAt": "2026-11-23T20:28:42.870Z"
+    },
+    "missedDeadline": "2026-11-23T20:28:42.870Z",
+    "lastCheckIn": "2026-11-23T20:28:17.870Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (1:58:42 AM). Last known check-in: 1:58:17 AM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795465727882_lwjf",
+    "userId": "usr_restart_1795465727870",
+    "userName": "Restart Test Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T20:28:47.881Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_restart_1795465727870",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T20:28:17.870Z",
+      "nextDeadlineAt": "2026-11-23T20:28:37.870Z"
+    },
+    "missedDeadline": "2026-11-23T20:28:37.870Z",
+    "lastCheckIn": "2026-11-23T20:28:17.870Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Restart Test Explorer missed safe check-in deadline (1:58:37 AM). Last known check-in: 1:58:17 AM.",
+    "guardianPhone": "+91 99999 66666",
+    "guardianNotified": true
+  },
+  {
+    "id": "aa2f3ab7-931e-4f8e-bf21-a0934f0b2102",
+    "userId": "usr_1795464603368",
+    "userName": "Bhavna Sen",
+    "tripId": "e579854c-4f9a-4b87-b913-fe28c5f624dd",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 User B SOS: Tourist Bhavna requests assistance",
+    "location": {
+      "lat": 23.1995,
+      "lng": 77.4332
+    },
+    "batteryLevel": 92,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-23T20:10:27.001Z"
+  },
+  {
+    "id": "2c09aa8c-c759-4b12-90df-da2ee6d249ba",
+    "userId": "usr_1795464603258",
+    "userName": "Aarav Patel",
+    "tripId": "db5f6695-d2ca-46d2-af2b-5b0819170b7e",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Second SOS: New incident later in the day",
+    "location": {
+      "lat": 23.49,
+      "lng": 77.74
+    },
+    "batteryLevel": 65,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-23T20:10:21.762Z",
+    "updatedAt": "2026-11-23T20:10:21.762Z"
+  },
+  {
+    "id": "alt_dms_1795464553134_60dt",
+    "userId": "usr_prod_bypass_1795464492028",
+    "userName": "Prod Bypass Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T20:09:13.133Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795464492028_k3oc",
+      "intervalSeconds": 60,
+      "lastCheckInAt": "2026-11-23T20:08:12.028Z",
+      "nextDeadlineAt": "2026-11-23T20:09:12.028Z"
+    },
+    "missedDeadline": "2026-11-23T20:09:12.028Z",
+    "lastCheckIn": "2026-11-23T20:08:12.028Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Prod Bypass Test missed safe check-in deadline (1:39:12 AM). Last known check-in: 1:38:12 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795464501846_52nv",
+    "userId": "usr_p7_1795464463660",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T20:08:21.843Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-23T20:07:50.922Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795464470718_tut4",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-23T20:07:50.923Z",
+      "nextDeadlineAt": "2026-11-23T20:08:20.925Z"
+    },
+    "missedDeadline": "2026-11-23T20:08:20.925Z",
+    "lastCheckIn": "2026-11-23T20:07:50.923Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (1:38:20 AM). Last known check-in: 1:37:50 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795464470930_7ld7",
+    "userId": "usr_escalate_1795464470928",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T20:07:50.929Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-23T20:07:30.929Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795464470928",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T20:07:30.929Z",
+      "nextDeadlineAt": "2026-11-23T20:07:48.928Z"
+    },
+    "missedDeadline": "2026-11-23T20:07:48.928Z",
+    "lastCheckIn": "2026-11-23T20:07:30.929Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (1:37:48 AM). Last known check-in: 1:37:30 AM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795464470808_r0xi",
+    "userId": "usr_outbox_1795464455590",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T20:07:50.807Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795464455590",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T20:07:05.590Z",
+      "nextDeadlineAt": "2026-11-23T20:07:30.590Z"
+    },
+    "missedDeadline": "2026-11-23T20:07:30.590Z",
+    "lastCheckIn": "2026-11-23T20:07:05.590Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (1:37:30 AM). Last known check-in: 1:37:05 AM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795464455604_1suc",
+    "userId": "usr_restart_1795464455590",
+    "userName": "Restart Test Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T20:07:35.603Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_restart_1795464455590",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T20:07:05.590Z",
+      "nextDeadlineAt": "2026-11-23T20:07:25.590Z"
+    },
+    "missedDeadline": "2026-11-23T20:07:25.590Z",
+    "lastCheckIn": "2026-11-23T20:07:05.590Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Restart Test Explorer missed safe check-in deadline (1:37:25 AM). Last known check-in: 1:37:05 AM.",
+    "guardianPhone": "+91 99999 66666",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795463826122_xo6r",
+    "userId": "usr_outbox_1795463810268",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:57:06.119Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795463810268",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:56:20.268Z",
+      "nextDeadlineAt": "2026-11-23T19:56:45.268Z"
+    },
+    "missedDeadline": "2026-11-23T19:56:45.268Z",
+    "lastCheckIn": "2026-11-23T19:56:20.268Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (1:26:45 AM). Last known check-in: 1:26:20 AM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795463810275_aylf",
+    "userId": "usr_restart_1795463810268",
+    "userName": "Restart Test Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:56:50.275Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_restart_1795463810268",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:56:20.268Z",
+      "nextDeadlineAt": "2026-11-23T19:56:40.268Z"
+    },
+    "missedDeadline": "2026-11-23T19:56:40.268Z",
+    "lastCheckIn": "2026-11-23T19:56:20.268Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Restart Test Explorer missed safe check-in deadline (1:26:40 AM). Last known check-in: 1:26:20 AM.",
+    "guardianPhone": "+91 99999 66666",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795462856765_oxs4",
+    "userId": "usr_prod_bypass_1795462796734",
+    "userName": "Prod Bypass Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:40:56.761Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795462796734_2vtn",
+      "intervalSeconds": 60,
+      "lastCheckInAt": "2026-11-23T19:39:56.734Z",
+      "nextDeadlineAt": "2026-11-23T19:40:56.734Z"
+    },
+    "missedDeadline": "2026-11-23T19:40:56.734Z",
+    "lastCheckIn": "2026-11-23T19:39:56.734Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Prod Bypass Test missed safe check-in deadline (1:10:56 AM). Last known check-in: 1:09:56 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795462822729_31cj",
+    "userId": "usr_p7_1795462784160",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:40:22.724Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-23T19:39:52.257Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795462792049_hq9i",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-23T19:39:52.257Z",
+      "nextDeadlineAt": "2026-11-23T19:40:22.259Z"
+    },
+    "missedDeadline": "2026-11-23T19:40:22.259Z",
+    "lastCheckIn": "2026-11-23T19:39:52.257Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (1:10:22 AM). Last known check-in: 1:09:52 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795462792272_5i3s",
+    "userId": "usr_escalate_1795462792267",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:39:52.270Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-23T19:39:32.268Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795462792268",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:39:32.268Z",
+      "nextDeadlineAt": "2026-11-23T19:39:50.267Z"
+    },
+    "missedDeadline": "2026-11-23T19:39:50.267Z",
+    "lastCheckIn": "2026-11-23T19:39:32.268Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (1:09:50 AM). Last known check-in: 1:09:32 AM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795462731636_0ufm",
+    "userId": "usr_outbox_1795462715695",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:38:51.632Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795462715695",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:38:05.695Z",
+      "nextDeadlineAt": "2026-11-23T19:38:30.695Z"
+    },
+    "missedDeadline": "2026-11-23T19:38:30.695Z",
+    "lastCheckIn": "2026-11-23T19:38:05.695Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (1:08:30 AM). Last known check-in: 1:08:05 AM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795462715707_76bh",
+    "userId": "usr_restart_1795462715695",
+    "userName": "Restart Test Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:38:35.706Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_restart_1795462715695",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:38:05.695Z",
+      "nextDeadlineAt": "2026-11-23T19:38:25.695Z"
+    },
+    "missedDeadline": "2026-11-23T19:38:25.695Z",
+    "lastCheckIn": "2026-11-23T19:38:05.695Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Restart Test Explorer missed safe check-in deadline (1:08:25 AM). Last known check-in: 1:08:05 AM.",
+    "guardianPhone": "+91 99999 66666",
+    "guardianNotified": true
+  },
+  {
+    "id": "ac7f2116-1c64-402a-b2f2-19762029c8f5",
+    "userId": "usr_1795461900302",
+    "userName": "Bhavna Sen",
+    "tripId": "5352c48e-9df6-435a-b54f-6432c18d66f4",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 User B SOS: Tourist Bhavna requests assistance",
+    "location": {
+      "lat": 23.1995,
+      "lng": 77.4332
+    },
+    "batteryLevel": 92,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-23T19:25:38.888Z"
+  },
+  {
+    "id": "alt_dms_1795461916871_sjqf",
+    "userId": "usr_prod_bypass_1795461856217",
+    "userName": "Prod Bypass Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:25:16.868Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795461856217_cw8n",
+      "intervalSeconds": 60,
+      "lastCheckInAt": "2026-11-23T19:24:16.217Z",
+      "nextDeadlineAt": "2026-11-23T19:25:16.217Z"
+    },
+    "missedDeadline": "2026-11-23T19:25:16.217Z",
+    "lastCheckIn": "2026-11-23T19:24:16.217Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Prod Bypass Test missed safe check-in deadline (12:55:16 AM). Last known check-in: 12:54:16 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "17e6ad8d-d9ee-4026-9b51-990a2ab1ec9d",
+    "userId": "usr_1795461900221",
+    "userName": "Aarav Patel",
+    "tripId": "d2f45ed5-c5b8-4c35-8e07-5660465a4684",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Second SOS: New incident later in the day",
+    "location": {
+      "lat": 23.49,
+      "lng": 77.74
+    },
+    "batteryLevel": 65,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-23T19:25:32.536Z",
+    "updatedAt": "2026-11-23T19:25:32.538Z"
+  },
+  {
+    "id": "alt_dms_1795461882831_0sje",
+    "userId": "usr_p7_1795461848585",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:24:42.828Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-23T19:24:12.110Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795461851903_h8l7",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-23T19:24:12.111Z",
+      "nextDeadlineAt": "2026-11-23T19:24:42.115Z"
+    },
+    "missedDeadline": "2026-11-23T19:24:42.115Z",
+    "lastCheckIn": "2026-11-23T19:24:12.111Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (12:54:42 AM). Last known check-in: 12:54:12 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795461852133_atwp",
+    "userId": "usr_escalate_1795461852129",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:24:12.131Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-23T19:23:52.129Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795461852129",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:23:52.129Z",
+      "nextDeadlineAt": "2026-11-23T19:24:10.129Z"
+    },
+    "missedDeadline": "2026-11-23T19:24:10.129Z",
+    "lastCheckIn": "2026-11-23T19:23:52.129Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (12:54:10 AM). Last known check-in: 12:53:52 AM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795461798592_0jar",
+    "userId": "usr_p7_1795461746566",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:23:18.588Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-23T19:22:30.511Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795461750304_5dqy",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-23T19:22:30.513Z",
+      "nextDeadlineAt": "2026-11-23T19:23:00.516Z"
+    },
+    "missedDeadline": "2026-11-23T19:23:00.516Z",
+    "lastCheckIn": "2026-11-23T19:22:30.513Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (12:53:00 AM). Last known check-in: 12:52:30 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795461780720_k3jb",
+    "userId": "usr_p7_1795461746566",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:23:00.716Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-23T19:22:30.511Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795461750304_5dqy",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-23T19:22:30.513Z",
+      "nextDeadlineAt": "2026-11-23T19:23:00.516Z"
+    },
+    "missedDeadline": "2026-11-23T19:23:00.516Z",
+    "lastCheckIn": "2026-11-23T19:22:30.513Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (12:53:00 AM). Last known check-in: 12:52:30 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795461750527_dm19",
+    "userId": "usr_escalate_1795461750524",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:22:30.525Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-23T19:22:10.524Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795461750524",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:22:10.524Z",
+      "nextDeadlineAt": "2026-11-23T19:22:28.524Z"
+    },
+    "missedDeadline": "2026-11-23T19:22:28.524Z",
+    "lastCheckIn": "2026-11-23T19:22:10.524Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (12:52:28 AM). Last known check-in: 12:52:10 AM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795461716651_yaz1",
+    "userId": "usr_outbox_1795461701227",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:21:56.646Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795461701227",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:21:11.227Z",
+      "nextDeadlineAt": "2026-11-23T19:21:36.227Z"
+    },
+    "missedDeadline": "2026-11-23T19:21:36.227Z",
+    "lastCheckIn": "2026-11-23T19:21:11.227Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (12:51:36 AM). Last known check-in: 12:51:11 AM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795461701264_hofk",
+    "userId": "usr_restart_1795461701227",
+    "userName": "Restart Test Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:21:41.261Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_restart_1795461701227",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:21:11.227Z",
+      "nextDeadlineAt": "2026-11-23T19:21:31.227Z"
+    },
+    "missedDeadline": "2026-11-23T19:21:31.227Z",
+    "lastCheckIn": "2026-11-23T19:21:11.227Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Restart Test Explorer missed safe check-in deadline (12:51:31 AM). Last known check-in: 12:51:11 AM.",
+    "guardianPhone": "+91 99999 66666",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795461523582_7ltg",
+    "userId": "usr_outbox_1795461508123",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:18:43.578Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795461508123",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:17:58.123Z",
+      "nextDeadlineAt": "2026-11-23T19:18:23.123Z"
+    },
+    "missedDeadline": "2026-11-23T19:18:23.123Z",
+    "lastCheckIn": "2026-11-23T19:17:58.123Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (12:48:23 AM). Last known check-in: 12:47:58 AM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795461508131_j06y",
+    "userId": "usr_restart_1795461508123",
+    "userName": "Restart Test Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T19:18:28.130Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_restart_1795461508123",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T19:17:58.123Z",
+      "nextDeadlineAt": "2026-11-23T19:18:18.123Z"
+    },
+    "missedDeadline": "2026-11-23T19:18:18.123Z",
+    "lastCheckIn": "2026-11-23T19:17:58.123Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Restart Test Explorer missed safe check-in deadline (12:48:18 AM). Last known check-in: 12:47:58 AM.",
+    "guardianPhone": "+91 99999 66666",
+    "guardianNotified": true
+  },
+  {
+    "id": "a3c344b0-76c3-4d03-a51e-f1046c07f9db",
+    "userId": "usr_1795460111248",
+    "userName": "Bhavna Sen",
+    "tripId": "449d1ffc-ed8b-4914-9f0c-2f32ab0c38fd",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 User B SOS: Tourist Bhavna requests assistance",
+    "location": {
+      "lat": 23.1995,
+      "lng": 77.4332
+    },
+    "batteryLevel": 92,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-23T18:55:27.672Z"
+  },
+  {
+    "id": "3d68b925-02ac-40aa-aa4f-b1ec313f633e",
+    "userId": "usr_1795460111174",
+    "userName": "Aarav Patel",
+    "tripId": "61fc462d-4e8e-40e0-84e6-e0e6a05adaff",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Second SOS: New incident later in the day",
+    "location": {
+      "lat": 23.49,
+      "lng": 77.74
+    },
+    "batteryLevel": 65,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-23T18:55:23.561Z",
+    "updatedAt": "2026-11-23T18:55:23.561Z"
+  },
+  {
+    "id": "alt_dms_1795460114868_t403",
+    "userId": "usr_prod_bypass_1795460054856",
+    "userName": "Prod Bypass Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T18:55:14.866Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795460054856_vyy9",
+      "intervalSeconds": 60,
+      "lastCheckInAt": "2026-11-23T18:54:14.856Z",
+      "nextDeadlineAt": "2026-11-23T18:55:14.856Z"
+    },
+    "missedDeadline": "2026-11-23T18:55:14.856Z",
+    "lastCheckIn": "2026-11-23T18:54:14.856Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Prod Bypass Test missed safe check-in deadline (12:25:14 AM). Last known check-in: 12:24:14 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795460083820_oyhr",
+    "userId": "usr_p7_1795460050537",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T18:54:43.819Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-23T18:54:13.731Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795460053522_mukq",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-23T18:54:13.732Z",
+      "nextDeadlineAt": "2026-11-23T18:54:43.735Z"
+    },
+    "missedDeadline": "2026-11-23T18:54:43.735Z",
+    "lastCheckIn": "2026-11-23T18:54:13.732Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (12:24:43 AM). Last known check-in: 12:24:13 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795460053745_z0hb",
+    "userId": "usr_escalate_1795460053742",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-23T18:54:13.744Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-23T18:53:53.743Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795460053743",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-23T18:53:53.743Z",
+      "nextDeadlineAt": "2026-11-23T18:54:11.742Z"
+    },
+    "missedDeadline": "2026-11-23T18:54:11.742Z",
+    "lastCheckIn": "2026-11-23T18:53:53.743Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (12:24:11 AM). Last known check-in: 12:23:53 AM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
     "id": "alt_dms_1795453627503_xr4d",
     "userId": "usr_p7_1795453589867",
     "userName": "Phase 7 Test Tourist",

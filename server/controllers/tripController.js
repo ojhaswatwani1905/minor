@@ -84,9 +84,24 @@ export const getTripById = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Expedition trip not found' });
     }
 
-    // Attach tourist & guardian info
+    // Attach tourist & guardian info with strict identity resolution
     const users = await readJson('users');
-    const user = users.find(u => u.id === trip.userId);
+    let user = users.find(u => u.id === trip.userId);
+
+    if (trip.userName && trip.userName !== 'Active Traveller') {
+      const nameMatch = users.find(u => u.fullName && u.fullName.toLowerCase().trim() === trip.userName.toLowerCase().trim());
+      if (nameMatch) {
+        user = nameMatch;
+      } else if (user && user.fullName && user.fullName.toLowerCase().trim() !== trip.userName.toLowerCase().trim()) {
+        // User matched by ID belongs to another tourist; do not substitute that user's email
+        user = {
+          id: trip.userId || 'usr_unassigned',
+          fullName: trip.userName,
+          email: null,
+          phone: trip.guardianPhone || null
+        };
+      }
+    }
 
     // Attach alerts for this trip
     const alerts = await readJson('alerts');

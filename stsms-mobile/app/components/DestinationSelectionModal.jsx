@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -78,6 +78,10 @@ export const DestinationSelectionModal = ({
 }) => {
   const { colors } = useTheme();
   const webViewRef = useRef(null);
+  const searchTimerRef = useRef(null);
+  const requestIdRef = useRef(0);
+  const isMapReadyRef = useRef(false);
+  const pendingCoordsRef = useRef(null);
 
   // Default coordinate: current GPS fix or Agra Airport
   const defaultLat = currentCoords?.lat ?? 27.1558;
@@ -97,6 +101,15 @@ export const DestinationSelectionModal = ({
   const [isActivating, setIsActivating] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Clear debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+    };
+  }, []);
+
   // When modal becomes visible, initialize coordinates
   useEffect(() => {
     if (visible) {
@@ -113,10 +126,10 @@ export const DestinationSelectionModal = ({
     try {
       const res = await safeZoneService.reverseGeocode(lat, lng);
       if (res.success && res.location) {
-        const name = res.location.name || res.location.displayName || `Custom Point (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+        const name = res.location.displayName || res.location.name || `Custom Point (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
         setResolvedAddress(name);
         if (!customLabel) {
-          setCustomLabel(name);
+          setCustomLabel(res.location.name || name.split(',')[0]);
         }
       } else {
         setResolvedAddress(`Custom Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
@@ -128,52 +141,81 @@ export const DestinationSelectionModal = ({
     }
   };
 
-  // Place search
-  const handleSearchChange = async (text) => {
+  // Place search with 350ms debounce and stale response rejection
+  const handleSearchChange = (text) => {
     setSearchQuery(text);
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+
     const trimmed = text.trim();
     if (trimmed.length < 2) {
       setSearchResults([]);
       setShowSearchResults(false);
+      setIsSearching(false);
       return;
     }
 
     setIsSearching(true);
     setShowSearchResults(true);
-    try {
-      const res = await safeZoneService.geocode(trimmed);
-      if (res.success && Array.isArray(res.results)) {
-        setSearchResults(res.results);
-      } else {
-        setSearchResults(
-          POPULAR_DESTINATIONS.filter(
-            (p) =>
-              p.name.toLowerCase().includes(trimmed.toLowerCase()) ||
-              p.displayName.toLowerCase().includes(trimmed.toLowerCase())
-          )
-        );
+
+    searchTimerRef.current = setTimeout(async () => {
+      const thisReqId = ++requestIdRef.current;
+      try {
+        const res = await safeZoneService.geocode(trimmed);
+        if (thisReqId !== requestIdRef.current) return; // Stale response discarded
+
+        if (res.success && Array.isArray(res.results)) {
+          setSearchResults(res.results);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (e) {
+        if (thisReqId === requestIdRef.current) {
+          setSearchResults([]);
+        }
+      } finally {
+        if (thisReqId === requestIdRef.current) {
+          setIsSearching(false);
+        }
       }
-    } catch (e) {
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
+    }, 350);
   };
 
   // Select place from search results
   const handleSelectSearchResult = (item) => {
-    const lat = item.lat;
-    const lng = item.lng;
-    setSelectedCoords({ lat, lng });
-    setResolvedAddress(item.name || item.displayName || `Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
-    setCustomLabel(item.name || item.displayName);
+    const lat = Number(item.lat);
+    const lng = Number(item.lng);
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+
+    // 1. Close dropdown and clear query
     setShowSearchResults(false);
     setSearchQuery('');
+    setSearchResults([]);
 
-    // Update WebView map position
+    // 2. Authoritative single state update
+    setSelectedCoords({ lat, lng });
+    const chosenName = item.name || item.displayName?.split(',')[0] || `Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+    const fullAddress = item.displayName || item.name || `Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+    setResolvedAddress(fullAddress);
+    setCustomLabel(chosenName);
+    setErrorMessage('');
+
+    // 3. Move Leaflet map position without reloading WebView
     if (webViewRef.current) {
-      webViewRef.current.injectJavaScript(`window.setMapPosition && window.setMapPosition(${lat}, ${lng}); true;`);
+      if (isMapReadyRef.current) {
+        webViewRef.current.injectJavaScript(`window.setMapPosition && window.setMapPosition(${lat}, ${lng}); true;`);
+      } else {
+        pendingCoordsRef.current = { lat, lng };
+      }
     }
+
+    // 4. Background reverse geocode for full address accuracy
+    performReverseGeocode(lat, lng);
   };
 
   // User taps "Use My Current Location"
@@ -185,20 +227,31 @@ export const DestinationSelectionModal = ({
     const lat = currentCoords.lat;
     const lng = currentCoords.lng;
     setSelectedCoords({ lat, lng });
-    performReverseGeocode(lat, lng);
     setCustomLabel('Current GPS Location');
     setErrorMessage('');
 
     if (webViewRef.current) {
-      webViewRef.current.injectJavaScript(`window.setMapPosition && window.setMapPosition(${lat}, ${lng}); true;`);
+      if (isMapReadyRef.current) {
+        webViewRef.current.injectJavaScript(`window.setMapPosition && window.setMapPosition(${lat}, ${lng}); true;`);
+      } else {
+        pendingCoordsRef.current = { lat, lng };
+      }
     }
+    performReverseGeocode(lat, lng);
   };
 
-  // Message from Leaflet WebView (map click or marker drag)
+  // Message from Leaflet WebView (map click, marker drag, or map ready handshake)
   const handleWebViewMessage = (event) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
-      if (data.type === 'LOCATION_SELECTED' && data.lat != null && data.lng != null) {
+      if (data.type === 'MAP_READY') {
+        isMapReadyRef.current = true;
+        if (pendingCoordsRef.current) {
+          const { lat, lng } = pendingCoordsRef.current;
+          webViewRef.current?.injectJavaScript(`window.setMapPosition && window.setMapPosition(${lat}, ${lng}); true;`);
+          pendingCoordsRef.current = null;
+        }
+      } else if (data.type === 'LOCATION_SELECTED' && data.lat != null && data.lng != null) {
         const lat = parseFloat(data.lat);
         const lng = parseFloat(data.lng);
         setSelectedCoords({ lat, lng });
@@ -274,8 +327,8 @@ export const DestinationSelectionModal = ({
     onClose();
   };
 
-  // Generate Interactive Leaflet Picker HTML
-  const generatePickerHtml = () => {
+  // Generate Interactive Leaflet Picker HTML (Memoized once to guarantee zero Webview reloads)
+  const pickerHtml = useMemo(() => {
     return `
 <!DOCTYPE html>
 <html>
@@ -321,10 +374,10 @@ export const DestinationSelectionModal = ({
 <body>
   <div id="map"></div>
   <script>
-    var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([${selectedCoords.lat}, ${selectedCoords.lng}], 13);
+    var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([${defaultLat}, ${defaultLng}], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-    var circle = L.circle([${selectedCoords.lat}, ${selectedCoords.lng}], {
+    var circle = L.circle([${defaultLat}, ${defaultLng}], {
       radius: 5000,
       color: '#FF5E7E',
       weight: 2.5,
@@ -340,7 +393,7 @@ export const DestinationSelectionModal = ({
       iconAnchor: [18, 36]
     });
 
-    var marker = L.marker([${selectedCoords.lat}, ${selectedCoords.lng}], {
+    var marker = L.marker([${defaultLat}, ${defaultLng}], {
       icon: markerIcon,
       draggable: true
     }).addTo(map);
@@ -357,36 +410,44 @@ export const DestinationSelectionModal = ({
 
     marker.on('drag', function(e) {
       var p = e.target.getLatLng();
-      circle.setLatLng(p);
+      if (circle) circle.setLatLng(p);
     });
 
     marker.on('dragend', function(e) {
       var p = e.target.getLatLng();
-      circle.setLatLng(p);
+      if (circle) circle.setLatLng(p);
       notifyPosition(p.lat, p.lng);
     });
 
     map.on('click', function(e) {
       var lat = e.latlng.lat;
       var lng = e.latlng.lng;
-      marker.setLatLng([lat, lng]);
-      circle.setLatLng([lat, lng]);
+      if (marker) marker.setLatLng([lat, lng]);
+      if (circle) circle.setLatLng([lat, lng]);
       notifyPosition(lat, lng);
     });
 
     window.setMapPosition = function(lat, lng) {
-      marker.setLatLng([lat, lng]);
-      circle.setLatLng([lat, lng]);
-      map.setView([lat, lng], 13, { animate: true });
+      if (marker) marker.setLatLng([lat, lng]);
+      if (circle) circle.setLatLng([lat, lng]);
+      if (map) {
+        map.setView([lat, lng], 13, { animate: true });
+        setTimeout(function() { map.invalidateSize(); }, 200);
+      }
     };
 
-    window.zoomIn = function() { map.zoomIn(); };
-    window.zoomOut = function() { map.zoomOut(); };
+    window.zoomIn = function() { if (map) map.zoomIn(); };
+    window.zoomOut = function() { if (map) map.zoomOut(); };
+
+    // Handshake: Notify React Native that Leaflet map is fully initialized
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'MAP_READY' }));
+    }
   </script>
 </body>
 </html>
     `;
-  };
+  }, []);
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={handleClose}>
@@ -423,7 +484,7 @@ export const DestinationSelectionModal = ({
                 <Ionicons name="search" size={18} color={colors.primary} style={{ marginRight: 10 }} />
                 <TextInput
                   style={[styles.searchInput, { color: colors.text }]}
-                  placeholder="Search hotel, station, campus, village, mountain..."
+                  placeholder="Search city, town, airport, station, landmark..."
                   placeholderTextColor={colors.inputPlaceholder || '#A0ABC0'}
                   value={searchQuery}
                   onChangeText={handleSearchChange}
@@ -455,27 +516,43 @@ export const DestinationSelectionModal = ({
               </View>
 
               {/* Autocomplete Search Dropdown */}
-              {showSearchResults && searchResults.length > 0 && (
+              {showSearchResults && (
                 <View style={[styles.searchDropdown, { backgroundColor: colors.card || '#FFFFFF', borderColor: colors.cardBorder || '#F6DFE6' }, SHADOWS.card]}>
-                  <ScrollView style={{ maxHeight: 200 }} keyboardShouldPersistTaps="handled">
-                    {searchResults.map((item, idx) => (
-                      <TouchableOpacity
-                        key={`${item.name}-${idx}`}
-                        style={[styles.dropdownItem, { borderBottomColor: colors.cardBorder || '#F6DFE6' }]}
-                        onPress={() => handleSelectSearchResult(item)}
-                      >
-                        <Ionicons name="pin" size={16} color={colors.primary} style={{ marginRight: 8, marginTop: 2 }} />
-                        <View style={{ flex: 1 }}>
-                          <Text style={[styles.dropdownTitle, { color: colors.text }]} numberOfLines={1}>
-                            {item.name}
-                          </Text>
-                          <Text style={[styles.dropdownSub, { color: colors.textSecondary }]} numberOfLines={1}>
-                            {item.displayName || `${item.lat?.toFixed(4)}, ${item.lng?.toFixed(4)}`}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
+                  {isSearching ? (
+                    <View style={{ padding: 16, alignItems: 'center', justifyContent: 'center' }}>
+                      <ActivityIndicator size="small" color={colors.primary} />
+                      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 6, fontWeight: '600' }}>
+                        Searching locations in India...
+                      </Text>
+                    </View>
+                  ) : searchResults.length > 0 ? (
+                    <ScrollView style={{ maxHeight: 220 }} keyboardShouldPersistTaps="handled">
+                      {searchResults.map((item, idx) => (
+                        <TouchableOpacity
+                          key={`${item.name}-${idx}`}
+                          style={[styles.dropdownItem, { borderBottomColor: colors.cardBorder || '#F6DFE6' }]}
+                          onPress={() => handleSelectSearchResult(item)}
+                        >
+                          <Ionicons name="pin" size={16} color={colors.primary} style={{ marginRight: 8, marginTop: 2 }} />
+                          <View style={{ flex: 1 }}>
+                            <Text style={[styles.dropdownTitle, { color: colors.text }]} numberOfLines={1}>
+                              {item.name}
+                            </Text>
+                            <Text style={[styles.dropdownSub, { color: colors.textSecondary }]} numberOfLines={1}>
+                              {item.displayName || `${item.lat?.toFixed(4)}, ${item.lng?.toFixed(4)}`}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  ) : searchQuery.trim().length >= 2 ? (
+                    <View style={{ padding: 16, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: colors.text }}>No matching locations found</Text>
+                      <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>
+                        Try searching by city, district, or landmark name
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
               )}
             </View>
@@ -485,7 +562,7 @@ export const DestinationSelectionModal = ({
               <WebView
                 ref={webViewRef}
                 originWhitelist={['*']}
-                source={{ html: generatePickerHtml() }}
+                source={{ html: pickerHtml }}
                 onMessage={handleWebViewMessage}
                 style={styles.webView}
                 javaScriptEnabled={true}

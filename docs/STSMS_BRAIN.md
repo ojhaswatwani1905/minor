@@ -1039,6 +1039,67 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 
 ---
 
+### 15.13 Phase 7.5 — Critical Data Integrity & Universal Location Picker Fixes
+
+#### 1. Bug 1: Tourist Email Cross-Contamination & Fake Generation in Admin Command Center
+- **Observed Issue:** Tourist `ramsingh` was displaying `chotu@gmail.com` on the Admin Command Center dashboard.
+- **Root Cause Analysis:**
+  1. *Supabase Auth Identity Single-Tenant Inconsistency:* In Supabase Auth, only one auth user existed (`3614e1d0-f867-4734-a245-412e8d1f866f` with email `yashmalaiya2006@gmail.com`, formerly `choture`, profile name `amogh`).
+  2. *Cross-Tourist Fallback Leakage:* Test tourist `ramsingh` was created during SOS test simulation (`Alert 1c942917` with trip `abb05dea` linked to `user_id = 3614e1d0-f867-4734-a245-412e8d1f866f`).
+  3. *Unsafe Joins:* In `server/controllers/alertController.js`, `monitoringController.js`, and `tripController.js`, when tourist name did not match, fallback queries fell back to `u.id === a.userId` or `a.user_id`, wrongly assigning `3614e1d0...`'s email (`chotu@gmail.com` / `yashmalaiya2006@gmail.com`) to `ramsingh`, `Bhavna Sen`, `Aarav Patel`, and other tourists.
+  4. *Synthetic Email Generation:* In `server/controllers/userController.js`, lines 42 and 124 invented fake `${name.toLowerCase()}@gmail.com` addresses for unregistered users, or substituted `matchedAdmin.email`.
+  5. *Null Crash in Auth Controller:* In `server/controllers/authController.js` line 77, `u.email.toLowerCase()` caused unhandled TypeError exceptions when users had `email: null`.
+- **Architectural Fixes:**
+  - *Strict Identity Isolation:* Enforced strict identity matching (`isNameMatch` / `isTouristMatch`) across `alertController.js`, `monitoringController.js`, `tripController.js`, and `userController.js`. Mismatched user IDs never leak or cross-contaminate another user's email.
+  - *Elimination of Synthetic Emails:* Completely removed fake `${name}@gmail.com` generation and admin email fallback for tourists. Unregistered tourists receive `email: null`.
+  - *Authoritative Auth Resolution:* Added `supabase.auth.admin.listUsers()` enrichment in `fetchEnrichedUsers()` with dynamic mapping and caching.
+  - *Safe Null Navigation:* Added `u.email && u.email.toLowerCase()` guards in `authController.js` and `userController.js`.
+  - *UI Graceful Degrade:* Updated `UserTable.jsx`, `UserDetailModal.jsx`, `AlertDetailModal.jsx`, `TripDetailModal.jsx`, and `ExpeditionPermitCard.jsx` to render `user.email || 'Email unavailable'`.
+
+#### 2. Bug 2: Universal Location Picker Geocoding & Leaflet Map Selection
+- **Observed Issue:** Searching `new delhi` in the mobile Universal Location Picker continued showing hardcoded destinations (`Agra Airport`, `Sanchi Stupa`, `Rohtang Pass Summit`, `Solang Valley`). Map stayed centered on previous coordinates, and selecting search results did not update coordinates.
+- **Root Cause Analysis:**
+  1. *Bogus Cache & Hardcoded Fallback:* In `server/controllers/safeZoneController.js` lines 97-100, whenever Nominatim rate-limited, timed out, or returned no matches, the controller fell back to `POPULAR_DESTINATIONS.slice(0, 4)` and cached this dummy list under the searched query key.
+  2. *Keystroke Race Conditions:* In `DestinationSelectionModal.jsx`, the text input had zero debouncing; each keystroke fired concurrent network requests, triggering Nominatim 429 rate limits. Slower previous responses overwrote newer responses due to lack of request IDs.
+  3. *WebView Destruction & Map Unmount:* The Leaflet HTML was generated dynamically inside `source={{ html: generatePickerHtml(...) }}` which recalculated on every React state change. Each render completely destroyed and reloaded the WebView, breaking the Leaflet JavaScript bridge and causing `injectJavaScript('window.setMapPosition(...)')` to fail silently.
+- **Architectural Fixes:**
+  - *Backend Fallback Elimination:* Removed `POPULAR_DESTINATIONS` fallback from `safeZoneController.js`. Unmatched queries or queries `< 2` characters return clean empty arrays `[]`.
+  - *Mobile Debounce & Request Stale Protection:* Added 350ms debounce with `searchTimerRef` and monotonically incrementing `requestIdRef` to cancel stale responses.
+  - *WebView Memoization:* Memoized `pickerHtml` via `useMemo` with zero reactive dependencies so the Leaflet WebView loads once and never reloads on re-renders.
+  - *Leaflet Bridge Protocol:* Added `MAP_READY` handshake. Injected scripts safely execute against live Leaflet instance via `setMapPosition(lat, lng)`.
+  - *Clean Search Dropdown:* Replaced hardcoded chips with an interactive search dropdown containing an `ActivityIndicator` during fetch and a "No matching locations found" empty state.
+  - *Single Authoritative Coordinate State:* Bound map touch/drag, search selection, and reverse geocoding to a single coordinate state (`selectedCoords`).
+
+#### 3. Verification Suite Evidence (`server/scripts/testPhase7BugFixes.js`) — 18 / 18 PASSED (100%)
+- `[PASS] Test 1`: fetchEnrichedUsers returns valid users array
+- `[PASS] Test 2`: Tourist ramsingh does NOT have chotu@gmail.com as email
+- `[PASS] Test 3`: Tourist ramsingh email is null (unregistered auth account -> Email unavailable)
+- `[PASS] Test 4`: Tourist choture has authoritative Supabase Auth email (`yashmalaiya2006@gmail.com`)
+- `[PASS] Test 5`: GET /api/alerts returns 200 OK
+- `[PASS] Test 6`: Alert for ramsingh returns user.email === null (not chotu@gmail.com)
+- `[PASS] Test 7`: Alert for Bhavna Sen returns user.email === null (never cross-contaminates another user email)
+- `[PASS] Test 8`: Alert for registered Supabase user (amogh) returns authoritative email `yashmalaiya2006@gmail.com`
+- `[PASS] Test 9`: GET /api/alerts/:id for ramsingh alert preserves user.email === null
+- `[PASS] Test 10`: Geocode "New Delhi" returns search results
+- `[PASS] Test 11`: Geocode "New Delhi" coordinates correspond to Delhi region (~28.61, ~77.20)
+- `[PASS] Test 12`: Geocode "New Delhi" results DO NOT contain Agra Airport
+- `[PASS] Test 13`: Geocode "Mumbai" coordinates correspond to Mumbai region (~19.07, ~72.87)
+- `[PASS] Test 14`: Unmatched query returns empty array [] (never unrelated popular destinations)
+- `[PASS] Test 15`: Short query (<2 chars) returns empty array [] (never populates suggestions prematurely)
+- `[PASS] Test 16`: Reverse geocode (28.6139, 77.2090) resolves to Delhi address
+- `[PASS] Test 17`: POST /api/safe-zones creates trip with selected location
+- `[PASS] Test 18`: Created Safe Zone trip retains exact selected coordinates (28.6139, 77.2090)
+
+#### 4. Full Regression Verification Summary — 114 / 114 PASSED (100%)
+1. `testPhase7BugFixes.js`: **18 / 18 PASSED (100%)**
+2. `testAtomicEscalationOutbox.js`: **19 / 19 PASSED (100%)**
+3. `testPhase7Verification.js`: **42 / 42 PASSED (100%)**
+4. `testPhase61Verification.js`: **22 / 22 PASSED (100%)**
+5. `testSosAndProfileLifecycle.js`: **13 / 13 PASSED (100%)**
+6. Frontend Build (`npm run build`): **PASSED in 2.09s (0 errors)**
+
+---
+
 ## 16. Brain Maintenance Rules
 
 Every future task and engineer MUST follow this workflow:

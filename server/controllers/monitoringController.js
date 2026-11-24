@@ -99,18 +99,10 @@ export const getLiveLocations = async (req, res, next) => {
         matchedIdx = combinedUsers.findIndex((u) => u.id === a.user_id && (!u.fullName || u.fullName === 'Active Traveller'));
       }
 
-      // Also check admins list for email or phone details
-      const matchedAdmin = admins.find((adm) => 
-        adm.name && extractedName && adm.name.toLowerCase() === extractedName.toLowerCase()
-      );
-
       if (matchedIdx !== -1) {
         // Update existing record
         if (extractedName && combinedUsers[matchedIdx].fullName === 'Active Traveller') {
           combinedUsers[matchedIdx].fullName = extractedName;
-        }
-        if (matchedAdmin && (!combinedUsers[matchedIdx].email || combinedUsers[matchedIdx].email === 'N/A')) {
-          combinedUsers[matchedIdx].email = matchedAdmin.email;
         }
 
         if (isOpen) {
@@ -149,11 +141,12 @@ export const getLiveLocations = async (req, res, next) => {
         }
       } else {
         // Create new tourist entry from live alert
+        const uniqueId = `usr_${extractedName.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
         const newTourist = {
-          id: a.user_id || a.id,
+          id: uniqueId,
           fullName: extractedName,
-          email: matchedAdmin?.email || 'tourist.explorer@stsms.gov',
-          phone: a.profiles?.phone || matchedAdmin?.phone || 'Mobile GPS Fix',
+          email: null,
+          phone: a.profiles?.phone || '',
           status: isOpen ? 'EMERGENCY' : 'Online',
           batteryLevel: a.battery ?? null,
           networkSignal: 'Mobile GNSS (Distress Beacon)',

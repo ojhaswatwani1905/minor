@@ -17,6 +17,23 @@ export const fetchEnrichedUsers = async () => {
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseClient();
+      // Query profiles, alerts, and authoritative Supabase Auth users
+      let authEmailMap = {};
+      try {
+        if (supabase.auth?.admin?.listUsers) {
+          const { data: authData } = await supabase.auth.admin.listUsers();
+          if (authData?.users) {
+            authData.users.forEach((au) => {
+              if (au.id && au.email) {
+                authEmailMap[au.id] = au.email.trim();
+              }
+            });
+          }
+        }
+      } catch (authErr) {
+        // Non-fatal if service role auth listing is restricted
+      }
+
       const [profileRes, alertRes] = await Promise.all([
         supabase.from('profiles').select('*').order('created_at', { ascending: false }),
         supabase.from('alerts').select('*').order('raised_at', { ascending: false })
@@ -31,17 +48,19 @@ export const fetchEnrichedUsers = async () => {
         const existingIndex = users.findIndex(
           (u) =>
             u.id === p.id ||
-            (u.fullName && u.fullName.toLowerCase().trim() === p.full_name.toLowerCase().trim()) ||
-            (p.phone && u.phone === p.phone)
+            (u.fullName && u.fullName.toLowerCase().trim() === p.full_name.toLowerCase().trim())
         );
+
+        const authoritativeEmail = authEmailMap[p.id] || p.email || null;
+
         if (existingIndex === -1) {
           const uniqueId = `usr_${p.full_name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
           users.push({
             id: p.id && !users.some(u => u.id === p.id) ? p.id : uniqueId,
             fullName: p.full_name,
-            email: p.email || `${p.full_name.toLowerCase().replace(/[^a-z0-9]/g, '')}@gmail.com`,
-            phone: p.phone || '+91 98765 43210',
-            emergencyContact: p.phone || '+91 98765 43210',
+            email: authoritativeEmail,
+            phone: p.phone || null,
+            emergencyContact: p.phone || null,
             status: 'Offline',
             currentLocation: null,
             batteryLevel: null,
@@ -67,7 +86,9 @@ export const fetchEnrichedUsers = async () => {
             source: 'Supabase'
           });
         } else {
+          if (p.id) users[existingIndex].id = p.id;
           if (p.full_name) users[existingIndex].fullName = p.full_name;
+          if (authoritativeEmail) users[existingIndex].email = authoritativeEmail;
           if (p.phone) users[existingIndex].phone = p.phone;
           if (p.medical_info?.avatar_url) users[existingIndex].avatar = p.medical_info.avatar_url;
         }
@@ -103,12 +124,9 @@ export const fetchEnrichedUsers = async () => {
           return;
         }
 
-        const matchedAdmin = admins.find(
-          (adm) => adm.name && adm.name.toLowerCase().trim() === extractedName.toLowerCase().trim()
-        );
         const uniqueId = `usr_${extractedName.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
 
-        // Match by exact name or uniqueId (prevent colliding on shared default Supabase user_id)
+        // Match strictly by exact full name or uniqueId
         let uIdx = users.findIndex(
           (u) =>
             (u.fullName && u.fullName.toLowerCase().trim() === extractedName.toLowerCase().trim()) ||
@@ -121,9 +139,9 @@ export const fetchEnrichedUsers = async () => {
           const newTourist = {
             id: uniqueId,
             fullName: extractedName,
-            email: matchedAdmin?.email || `${extractedName.toLowerCase().replace(/[^a-z0-9]/g, '')}@gmail.com`,
-            phone: matchedAdmin?.phone || '+91 98765 43210',
-            emergencyContact: matchedAdmin?.phone || '+91 98765 43210',
+            email: null, // Never invent emails or substitute admin emails for tourists
+            phone: null,
+            emergencyContact: null,
             status: isOpen ? 'EMERGENCY' : 'Online',
             currentLocation: (lat != null && lng != null) ? {
               name: isOpen ? `🚨 SOS Distress (${lat.toFixed(4)}, ${lng.toFixed(4)})` : `GPS Fix (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
@@ -138,7 +156,7 @@ export const fetchEnrichedUsers = async () => {
               {
                 name: `Guardian of ${extractedName}`,
                 relation: 'Family Emergency Contact',
-                phone: matchedAdmin?.phone || '+91 98765 43210',
+                phone: '+91 98765 43210',
                 verified: true
               }
             ],
