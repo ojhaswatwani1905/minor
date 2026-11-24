@@ -1,17 +1,17 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { readJson, writeJson } from '../utils/jsonDb.js';
+import { isSupabaseConfigured, getSupabaseClient } from '../database/supabase.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'STSMS_SUPER_SECRET_KEY_2026';
 
-const generateToken = (admin) => {
+const generateToken = (user) => {
   return jwt.sign(
-    { id: admin.id, email: admin.email, name: admin.name, role: admin.role },
+    { id: user.id, email: user.email, name: user.name || user.fullName, role: user.role },
     JWT_SECRET,
     { expiresIn: '7d' }
   );
 };
-
 
 export const login = async (req, res, next) => {
   try {
@@ -21,23 +21,129 @@ export const login = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Please provide email and password' });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // 1. If Supabase is configured, authenticate authoritatively via Supabase Auth
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = getSupabaseClient();
+        const { data: sbData, error: sbError } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password
+        });
+
+        if (sbData?.user) {
+          const authUser = sbData.user;
+          // Retrieve profile details from profiles table
+          let fullName = authUser.user_metadata?.name || authUser.user_metadata?.full_name || 'Registered Explorer';
+          let phone = authUser.phone || null;
+          let avatar = authUser.user_metadata?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(fullName)}`;
+          const userRole = authUser.user_metadata?.role || 'Explorer User';
+
+          try {
+            const { data: prof } = await supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle();
+            if (prof?.full_name) fullName = prof.full_name;
+            if (prof?.phone) phone = prof.phone;
+            if (prof?.medical_info?.avatar_url) avatar = prof.medical_info.avatar_url;
+          } catch (pErr) {
+            console.warn('[AUTH LOGIN] Profile lookup note:', pErr.message);
+          }
+
+          // Sync to local admins.json / users.json for fast local caching & offline fallback
+          try {
+            const admins = await readJson('admins');
+            let aIdx = admins.findIndex(a => a.id === authUser.id || (a.email && a.email.toLowerCase() === normalizedEmail));
+            if (aIdx === -1) {
+              const salt = await bcrypt.genSalt(10);
+              const hashed = await bcrypt.hash(password, salt);
+              admins.push({
+                id: authUser.id,
+                name: fullName,
+                email: normalizedEmail,
+                password: hashed,
+                role: userRole,
+                avatar,
+                department: 'Tourist Explorer',
+                createdAt: authUser.created_at || new Date().toISOString()
+              });
+              await writeJson('admins', admins);
+            }
+
+            const users = await readJson('users');
+            let uIdx = users.findIndex(u => u.id === authUser.id || (u.email && u.email.toLowerCase() === normalizedEmail));
+            if (uIdx !== -1) {
+              users[uIdx].id = authUser.id;
+              users[uIdx].fullName = fullName;
+              users[uIdx].email = normalizedEmail;
+              if (phone) users[uIdx].phone = phone;
+              await writeJson('users', users);
+            }
+          } catch (syncErr) {
+            console.warn('[AUTH LOGIN] Local cache sync note:', syncErr.message);
+          }
+
+          const token = generateToken({
+            id: authUser.id,
+            email: normalizedEmail,
+            name: fullName,
+            role: userRole
+          });
+
+          return res.json({
+            success: true,
+            token,
+            user: {
+              id: authUser.id,
+              name: fullName,
+              fullName,
+              email: normalizedEmail,
+              role: userRole,
+              avatar,
+              department: 'Tourist Explorer'
+            },
+            admin: {
+              id: authUser.id,
+              name: fullName,
+              email: normalizedEmail,
+              role: userRole,
+              avatar,
+              department: 'Tourist Explorer'
+            }
+          });
+        }
+
+        if (sbError) {
+          const errMsg = sbError.message?.toLowerCase() || '';
+          if (errMsg.includes('email not confirmed')) {
+            return res.status(403).json({
+              success: false,
+              message: 'Email address is not confirmed. Please check your inbox or verify your account.'
+            });
+          }
+        }
+      } catch (sbEx) {
+        console.warn('[AUTH LOGIN] Supabase Auth query error, attempting local fallback:', sbEx.message);
+      }
+    }
+
+    // 2. Check local admins.json (for demo accounts e.g. admin@stsms.gov or local offline dev)
     const admins = await readJson('admins');
-    const admin = admins.find(a => a.email.toLowerCase() === email.toLowerCase());
+    const admin = admins.find(a => a.email && a.email.toLowerCase() === normalizedEmail);
 
     if (!admin) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
     // Check bcrypt password or default demo pass
     let isMatch = false;
-    if (admin.password.startsWith('$2a$') || admin.password.startsWith('$2b$')) {
+    if (admin.password && (admin.password.startsWith('$2a$') || admin.password.startsWith('$2b$'))) {
       isMatch = await bcrypt.compare(password, admin.password);
     } else {
       isMatch = admin.password === password;
     }
 
     // Allow Admin@123 or admin123 default fallback for initial demo account
-    if (!isMatch && email.toLowerCase() === 'admin@stsms.gov' && (password === 'Admin@123' || password === 'admin123' || password === 'admin')) {
+    if (!isMatch && normalizedEmail === 'admin@stsms.gov' && (password === 'Admin@123' || password === 'admin123' || password === 'admin')) {
       isMatch = true;
     }
 
@@ -50,6 +156,15 @@ export const login = async (req, res, next) => {
     res.json({
       success: true,
       token,
+      user: {
+        id: admin.id,
+        name: admin.name,
+        fullName: admin.name,
+        email: admin.email,
+        role: admin.role,
+        avatar: admin.avatar,
+        department: admin.department
+      },
       admin: {
         id: admin.id,
         name: admin.name,
@@ -72,42 +187,133 @@ export const register = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Full name, email, and password are required' });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanName = name.trim();
+    const guardianPhone = req.body.guardianPhone || req.body.phone || '+91 98765 43210';
+    const userRole = role || 'Explorer User';
+
+    let userId = null;
+    const isSb = isSupabaseConfigured();
+
+    // 1. Authoritative Registration via Supabase Auth when configured
+    if (isSb) {
+      const supabase = getSupabaseClient();
+
+      // Check if user already exists in Supabase Auth
+      try {
+        if (supabase.auth?.admin?.listUsers) {
+          const { data: existingList } = await supabase.auth.admin.listUsers();
+          const alreadyExists = existingList?.users?.some(u => u.email && u.email.toLowerCase() === normalizedEmail);
+          if (alreadyExists) {
+            return res.status(400).json({
+              success: false,
+              message: 'An account with this email address already exists. Please log in.'
+            });
+          }
+        }
+      } catch (checkErr) {
+        // Non-fatal if listUsers is not permitted
+      }
+
+      // Create authoritative user in Supabase Auth with auto-confirmed email
+      const { data: authCreated, error: authErr } = await supabase.auth.admin.createUser({
+        email: normalizedEmail,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          name: cleanName,
+          full_name: cleanName,
+          role: userRole,
+          department: department || 'Tourist Explorer'
+        }
+      });
+
+      if (authErr) {
+        const msg = authErr.message || '';
+        if (msg.toLowerCase().includes('already exists') || msg.toLowerCase().includes('duplicate') || authErr.status === 422) {
+          return res.status(400).json({
+            success: false,
+            message: 'An account with this email address already exists. Please log in.'
+          });
+        }
+        return res.status(400).json({
+          success: false,
+          message: authErr.message || 'Registration failed in Supabase Auth.'
+        });
+      }
+
+      if (authCreated?.user?.id) {
+        userId = authCreated.user.id;
+      }
+
+      // 2. Create authoritative corresponding profile in Supabase profiles table
+      if (userId) {
+        try {
+          await supabase.from('profiles').upsert({
+            id: userId,
+            full_name: cleanName,
+            phone: req.body.phone || guardianPhone || null,
+            language: 'en',
+            medical_info: {
+              emergency_contact_phone: guardianPhone || null,
+              emergency_contact_email: normalizedEmail,
+              department: department || 'Tourist Explorer'
+            }
+          });
+        } catch (profErr) {
+          console.error('[AUTH REGISTER] Supabase profiles upsert error:', profErr.message);
+        }
+      }
+    }
+
+    // 3. Fallback / Local ID generation if Supabase not configured
+    if (!userId) {
+      userId = `usr_${Date.now()}`;
+    }
+
+    // 4. Also store in local JSON DBs for caching, offline dev & regression suite consistency
     const admins = await readJson('admins');
     const users = await readJson('users');
-    const existing = admins.find(a => a.email && a.email.toLowerCase() === email.toLowerCase()) || users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
 
-    if (existing) {
+    const localExisting = admins.find(a => a.email && a.email.toLowerCase() === normalizedEmail) ||
+      users.find(u => u.email && u.email.toLowerCase() === normalizedEmail);
+
+    if (localExisting && !isSb) {
       return res.status(400).json({ success: false, message: 'An account with this email address already exists. Please log in.' });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const userId = `usr_${Date.now()}`;
-    const guardianPhone = req.body.guardianPhone || req.body.phone || '+91 98765 43210';
 
     const newAdmin = {
       id: userId,
-      name,
-      email: email.toLowerCase(),
+      name: cleanName,
+      email: normalizedEmail,
       password: hashedPassword,
-      role: role || 'Explorer User',
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
+      role: userRole,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanName)}`,
       department: department || 'Tourist Explorer',
       createdAt: new Date().toISOString()
     };
 
-    admins.push(newAdmin);
+    // Upsert into admins.json
+    const aIdx = admins.findIndex(a => a.id === userId || (a.email && a.email.toLowerCase() === normalizedEmail));
+    if (aIdx !== -1) {
+      admins[aIdx] = newAdmin;
+    } else {
+      admins.push(newAdmin);
+    }
     await writeJson('admins', admins);
 
-    // Also register user into users.json (Tourist Registry) so they immediately display on the Admin Dashboard & Live Map!
+    // Register user into users.json (Tourist Registry)
     const parsedLat = req.body.lat != null ? parseFloat(req.body.lat) : null;
     const parsedLng = req.body.lng != null ? parseFloat(req.body.lng) : null;
     const hasValidCoords = parsedLat != null && parsedLng != null && !isNaN(parsedLat) && !isNaN(parsedLng);
 
     const newUserProfile = {
       id: userId,
-      fullName: name,
-      email: email.toLowerCase(),
+      fullName: cleanName,
+      email: normalizedEmail,
       phone: req.body.phone || guardianPhone,
       emergencyContact: guardianPhone,
       status: 'Online',
@@ -138,7 +344,13 @@ export const register = async (req, res, next) => {
       activeTripId: null,
       lastPing: hasValidCoords ? new Date().toISOString() : null
     };
-    users.unshift(newUserProfile);
+
+    const uIdx = users.findIndex(u => u.id === userId || (u.email && u.email.toLowerCase() === normalizedEmail));
+    if (uIdx !== -1) {
+      users[uIdx] = { ...users[uIdx], ...newUserProfile };
+    } else {
+      users.unshift(newUserProfile);
+    }
     await writeJson('users', users);
 
     const token = generateToken(newAdmin);
@@ -149,17 +361,18 @@ export const register = async (req, res, next) => {
       token,
       user: {
         id: userId,
-        name: newAdmin.name,
-        email: newAdmin.email,
-        role: newAdmin.role,
+        name: cleanName,
+        fullName: cleanName,
+        email: normalizedEmail,
+        role: userRole,
         avatar: newAdmin.avatar,
         department: newAdmin.department
       },
       admin: {
         id: userId,
-        name: newAdmin.name,
-        email: newAdmin.email,
-        role: newAdmin.role,
+        name: cleanName,
+        email: normalizedEmail,
+        role: userRole,
         avatar: newAdmin.avatar,
         department: newAdmin.department
       }

@@ -48,7 +48,29 @@ export const TouristTelemetryPanel = ({ tourist, movementHistory, onClose }) => 
               <Gauge className="w-3.5 h-3.5 text-honey" />
               Movement Speed
             </p>
-            <p className="text-lg font-extrabold text-white font-mono">{tourist.speedKmH} <span className="text-xs text-white/60 font-normal">km/h</span></p>
+            <p className="text-lg font-extrabold text-white font-mono flex items-baseline gap-1">
+              {(() => {
+                const hasGps = tourist?.location && tourist.location.lat != null && tourist.location.lng != null;
+                if (!hasGps) {
+                  return <span className="text-sm font-extrabold text-white/60">GPS unavailable</span>;
+                }
+                const lastPingTime = tourist?.lastPing ? new Date(tourist.lastPing).getTime() : 0;
+                const isStale = tourist?.status === 'Offline' || 
+                  tourist?.speedStatus === 'Stale location' || 
+                  (!lastPingTime || (Date.now() - lastPingTime > 5 * 60 * 1000));
+                if (isStale) {
+                  return <span className="text-sm font-extrabold text-amber-300">Stale location</span>;
+                }
+                if (tourist?.speedKmH !== null && tourist?.speedKmH !== undefined && !isNaN(tourist.speedKmH)) {
+                  const spd = Number(tourist.speedKmH);
+                  if (spd <= 0.2) {
+                    return <>0 <span className="text-xs text-white/60 font-normal">km/h</span></>;
+                  }
+                  return <>{spd.toFixed(1)} <span className="text-xs text-white/60 font-normal">km/h</span></>;
+                }
+                return <span className="text-sm font-extrabold text-honey animate-pulse">Calculating...</span>;
+              })()}
+            </p>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-[#1E3732] border border-white/10 space-y-1 shadow-sm">
@@ -131,7 +153,7 @@ export const TouristTelemetryPanel = ({ tourist, movementHistory, onClose }) => 
                   <span className="text-[10px] text-white/60">{new Date(bh.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
                 <div className="text-right font-mono text-white/70">
-                  <p className="text-honey font-bold">{bh.speedKmH} km/h</p>
+                  <p className="text-honey font-bold">{bh.speedKmH != null ? `${Number(bh.speedKmH).toFixed(1)} km/h` : '0 km/h'}</p>
                   <p className="text-[10px]">{bh.elevation}</p>
                 </div>
               </div>

@@ -154,7 +154,8 @@ export const useLocation = (trackingActive = true, isOffline = false) => {
             batteryLevel: currentBattery,
             networkSignal: isOffline ? 'Offline (Local SQLite Buffer)' : networkStatus,
             distanceMovedMeters: Math.round(distFromLast),
-            pollingMode: 'Adaptive 100m Distance Polling'
+            pollingMode: 'Adaptive 100m Distance Polling',
+            timestamp: new Date().toISOString()
           };
 
           if (isOffline) {

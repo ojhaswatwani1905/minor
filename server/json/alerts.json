@@ -1,5 +1,337 @@
 [
   {
+    "id": "alt_geo_1795550020414",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "tripId": "sz_trp_1795550004644",
+    "type": "GEOFENCE_BREACH",
+    "subtype": "AUTOMATIC_SAFEZONE_BREACH",
+    "priority": "CRITICAL",
+    "message": "🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Tourist: bhoot. Destination: Agra Airport (5 km boundary). Outside by: 18811m. Coordinates: (27.3200, 78.1200). Battery: 65%.",
+    "location": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "name": "Automatic Safe-Zone Breach (27.3200, 78.1200)"
+    },
+    "batteryLevel": 65,
+    "deviceInfo": {
+      "manufacturer": "Google",
+      "model": "Pixel 7",
+      "platform": "Android",
+      "androidVersion": "14",
+      "appVersion": "1.0.0",
+      "batteryPercentage": 65
+    },
+    "status": "Pending",
+    "source": "app",
+    "timestamp": "2026-11-24T19:53:29.834Z"
+  },
+  {
+    "id": "alt_geo_1795548414719",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "tripId": "sz_trp_1795548403240",
+    "type": "GEOFENCE_BREACH",
+    "subtype": "AUTOMATIC_SAFEZONE_BREACH",
+    "priority": "CRITICAL",
+    "message": "🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Tourist: bhoot. Destination: Agra Airport (5 km boundary). Outside by: 18811m. Coordinates: (27.3200, 78.1200). Battery: 65%.",
+    "location": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "name": "Automatic Safe-Zone Breach (27.3200, 78.1200)"
+    },
+    "batteryLevel": 65,
+    "deviceInfo": {
+      "manufacturer": "Google",
+      "model": "Pixel 7",
+      "platform": "Android",
+      "androidVersion": "14",
+      "appVersion": "1.0.0",
+      "batteryPercentage": 65
+    },
+    "status": "Pending",
+    "source": "app",
+    "timestamp": "2026-11-24T19:26:44.473Z"
+  },
+  {
+    "id": "alt_geo_1795548126404",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "tripId": "sz_trp_1795548114632",
+    "type": "GEOFENCE_BREACH",
+    "subtype": "AUTOMATIC_SAFEZONE_BREACH",
+    "priority": "CRITICAL",
+    "message": "🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Tourist: bhoot. Destination: Agra Airport (5 km boundary). Outside by: 18811m. Coordinates: (27.3200, 78.1200). Battery: 65%.",
+    "location": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "name": "Automatic Safe-Zone Breach (27.3200, 78.1200)"
+    },
+    "batteryLevel": 65,
+    "deviceInfo": {
+      "manufacturer": "Google",
+      "model": "Pixel 7",
+      "platform": "Android",
+      "androidVersion": "14",
+      "appVersion": "1.0.0",
+      "batteryPercentage": 65
+    },
+    "status": "Pending",
+    "source": "app",
+    "timestamp": "2026-11-24T19:21:55.677Z"
+  },
+  {
+    "id": "alt_geo_1795548151849",
+    "userId": "usr_bhoot_live",
+    "userName": "bhoot",
+    "tripId": "sz_trp_1795548114632",
+    "type": "GEOFENCE_BREACH",
+    "subtype": "AUTOMATIC_SAFEZONE_BREACH",
+    "priority": "CRITICAL",
+    "message": "🚨 AUTOMATIC SAFE-ZONE BREACH: Tourist exited the 5 km safety boundary and did not acknowledge the emergency warning within 10 seconds. Tourist: bhoot. Destination: Agra Airport (5 km boundary). Outside by: 18811m. Coordinates: (27.3200, 78.1200). Battery: 65%.",
+    "location": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "name": "Automatic Safe-Zone Breach (27.3200, 78.1200)"
+    },
+    "batteryLevel": 65,
+    "deviceInfo": {
+      "platform": "Android",
+      "manufacturer": "Unavailable",
+      "model": "Unavailable",
+      "osVersion": "Unavailable"
+    },
+    "status": "Pending",
+    "source": "app",
+    "timestamp": "2026-11-24T19:22:31.849Z"
+  },
+  {
+    "id": "4e241daf-b967-4627-9e0c-d4d5fe70c60e",
+    "userId": "5c8b1f7f-f25b-431a-94d1-6fc390194197",
+    "userName": "Bhavna Sen",
+    "tripId": "c3331a74-f707-43ef-94ae-2fd058e28dea",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 User B SOS: Tourist Bhavna requests assistance",
+    "location": {
+      "lat": 23.1995,
+      "lng": 77.4332
+    },
+    "batteryLevel": 92,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-24T19:21:15.561Z"
+  },
+  {
+    "id": "969befd0-bf5f-49c4-8e42-4b9fb104fb09",
+    "userId": "aeb1c30e-d01d-41c9-8dc7-42d14e1be5bf",
+    "userName": "Aarav Patel",
+    "tripId": "6fd35231-cd4a-4ec6-a7e0-7d33609b000a",
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Second SOS: New incident later in the day",
+    "location": {
+      "lat": 23.49,
+      "lng": 77.74
+    },
+    "batteryLevel": 65,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-24T19:21:08.259Z",
+    "updatedAt": "2026-11-24T19:21:08.262Z"
+  },
+  {
+    "id": "alt_dms_1795547694668_acnj",
+    "userId": "usr_prod_bypass_1795547634335",
+    "userName": "Prod Bypass Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T19:14:54.665Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795547634335_03lf",
+      "intervalSeconds": 60,
+      "lastCheckInAt": "2026-11-24T19:13:54.335Z",
+      "nextDeadlineAt": "2026-11-24T19:14:54.335Z"
+    },
+    "missedDeadline": "2026-11-24T19:14:54.335Z",
+    "lastCheckIn": "2026-11-24T19:13:54.335Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Prod Bypass Test missed safe check-in deadline (12:44:54 AM). Last known check-in: 12:43:54 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_sos_1795547671155",
+    "userId": "8908ade6-6655-49c5-aca2-d51eef395021",
+    "userName": "Bhavna Sen",
+    "tripId": null,
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 User B SOS: Tourist Bhavna requests assistance",
+    "location": {
+      "lat": 23.1995,
+      "lng": 77.4332
+    },
+    "batteryLevel": 92,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-24T19:14:31.156Z"
+  },
+  {
+    "id": "alt_dms_1795547661634_xv0e",
+    "userId": "usr_p7_1795547628982",
+    "userName": "Phase 7 Test Tourist",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T19:14:21.631Z",
+    "location": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "name": "Last Known GPS Fix (28.6120, 77.2070)",
+      "accuracy": 5,
+      "timestamp": "2026-11-24T19:13:51.542Z"
+    },
+    "batteryLevel": 84,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_1795547631334_i0bj",
+      "intervalSeconds": 30,
+      "lastCheckInAt": "2026-11-24T19:13:51.542Z",
+      "nextDeadlineAt": "2026-11-24T19:14:21.545Z"
+    },
+    "missedDeadline": "2026-11-24T19:14:21.545Z",
+    "lastCheckIn": "2026-11-24T19:13:51.542Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Phase 7 Test Tourist missed safe check-in deadline (12:44:21 AM). Last known check-in: 12:43:51 AM.",
+    "guardianPhone": "+91 98765 43210",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_sos_1795547667531",
+    "userId": "f4473dac-b00b-4fdd-a419-4891dabe2921",
+    "userName": "Aarav Patel",
+    "tripId": null,
+    "type": "MANUAL_SOS",
+    "priority": "CRITICAL",
+    "message": "🚨 Second SOS: New incident later in the day",
+    "location": {
+      "lat": 23.49,
+      "lng": 77.74
+    },
+    "batteryLevel": 65,
+    "deviceInfo": null,
+    "status": "Pending",
+    "source": "mobile_app",
+    "timestamp": "2026-11-24T19:14:27.531Z",
+    "updatedAt": "2026-11-24T19:14:27.533Z"
+  },
+  {
+    "id": "alt_dms_1795547642612_6pgk",
+    "userId": "usr_outbox_1795547627559",
+    "userName": "Concurrent Race Test",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T19:14:02.608Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_race_1795547627559",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T19:13:17.559Z",
+      "nextDeadlineAt": "2026-11-24T19:13:42.559Z"
+    },
+    "missedDeadline": "2026-11-24T19:13:42.559Z",
+    "lastCheckIn": "2026-11-24T19:13:17.559Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Concurrent Race Test missed safe check-in deadline (12:43:42 AM). Last known check-in: 12:43:17 AM.",
+    "guardianPhone": "+91 99999 88888",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795547631554_pnml",
+    "userId": "usr_escalate_1795547631552",
+    "userName": "Overdue Test Traveller",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T19:13:51.553Z",
+    "location": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "name": "Last Known GPS Fix (27.1800, 78.0200)",
+      "accuracy": 12,
+      "timestamp": "2026-11-24T19:13:31.552Z"
+    },
+    "batteryLevel": 22,
+    "networkStatus": "GNSS Distress",
+    "deviceInfo": {
+      "model": "Samsung Galaxy S24",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_test_esc_1795547631552",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T19:13:31.552Z",
+      "nextDeadlineAt": "2026-11-24T19:13:49.552Z"
+    },
+    "missedDeadline": "2026-11-24T19:13:49.552Z",
+    "lastCheckIn": "2026-11-24T19:13:31.552Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Overdue Test Traveller missed safe check-in deadline (12:43:49 AM). Last known check-in: 12:43:31 AM.",
+    "guardianPhone": "+91 91111 22222",
+    "guardianNotified": true
+  },
+  {
+    "id": "alt_dms_1795547627568_8jex",
+    "userId": "usr_restart_1795547627559",
+    "userName": "Restart Test Explorer",
+    "type": "DEADMAN_SWITCH",
+    "priority": "CRITICAL",
+    "status": "Pending",
+    "timestamp": "2026-11-24T19:13:47.567Z",
+    "location": null,
+    "batteryLevel": 75,
+    "networkStatus": "Cellular GNSS",
+    "deviceInfo": {
+      "model": "Mobile Device",
+      "platform": "Android",
+      "source": "deadman_switch_engine"
+    },
+    "deadManSession": {
+      "id": "dms_restart_1795547627559",
+      "intervalSeconds": 15,
+      "lastCheckInAt": "2026-11-24T19:13:17.559Z",
+      "nextDeadlineAt": "2026-11-24T19:13:37.559Z"
+    },
+    "missedDeadline": "2026-11-24T19:13:37.559Z",
+    "lastCheckIn": "2026-11-24T19:13:17.559Z",
+    "message": "🚨 [DEADMAN_SWITCH] Automated emergency dispatch: Tourist Restart Test Explorer missed safe check-in deadline (12:43:37 AM). Last known check-in: 12:43:17 AM.",
+    "guardianPhone": "+91 99999 66666",
+    "guardianNotified": true
+  },
+  {
     "id": "c333a61b-6445-4855-a1c1-ef7d53da92b0",
     "userId": "usr_1795539621561",
     "userName": "Bhavna Sen",

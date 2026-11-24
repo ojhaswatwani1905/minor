@@ -174,9 +174,32 @@ export const getAlertById = async (req, res, next) => {
       .from('alerts')
       .select('*, profiles(full_name, phone), trips(title)')
       .eq('id', req.params.id)
-      .single();
+      .maybeSingle();
 
     if (error || !alertRow) {
+      const localAlerts = await readJson('alerts');
+      const localA = localAlerts.find(a => a.id === req.params.id);
+      if (localA) {
+        return res.json({
+          success: true,
+          alert: {
+            ...localA,
+            rescueNotes: localA.rescueNotes || [],
+            user: {
+              id: localA.userId || 'usr_unassigned',
+              fullName: localA.userName || 'Active Traveller',
+              email: null,
+              phone: null
+            }
+          },
+          user: {
+            id: localA.userId || 'usr_unassigned',
+            fullName: localA.userName || 'Active Traveller',
+            email: null,
+            phone: null
+          }
+        });
+      }
       return res.status(404).json({ success: false, message: 'Emergency alert record not found' });
     }
 
@@ -345,13 +368,25 @@ export const updateAlertStatus = async (req, res, next) => {
       .update(updateFields)
       .eq('id', req.params.id)
       .select('*, profiles(full_name, phone), trips(title)')
-      .single();
+      .maybeSingle();
 
-    if (updateError) {
-      console.error('[SUPABASE UPDATE ERROR]', updateError.message);
+    if (updateError || !updatedRow) {
+      const localAlerts = await readJson('alerts');
+      const idx = localAlerts.findIndex(a => a.id === req.params.id);
+      if (idx !== -1) {
+        localAlerts[idx].status = status;
+        localAlerts[idx].updatedAt = now;
+        if (note) localAlerts[idx].resolution = note;
+        await writeJson('alerts', localAlerts);
+        return res.json({
+          success: true,
+          message: `Alert status updated to ${status}`,
+          alert: localAlerts[idx]
+        });
+      }
       return res.status(500).json({
         success: false,
-        message: `Database error updating alert status: ${updateError.message}`
+        message: `Database error updating alert status: ${updateError?.message || 'Record not found'}`
       });
     }
 
@@ -689,7 +724,12 @@ export const createSosAlert = async (req, res, next) => {
          (a.status === 'Pending' || a.status === 'open'))
       );
       if (existingIdx !== -1) {
-        alerts[existingIdx] = { ...alerts[existingIdx], ...jsonAlert, updatedAt: new Date().toISOString() };
+        const existingId = alerts[existingIdx].id;
+        alerts[existingIdx] = { ...alerts[existingIdx], ...jsonAlert, id: existingId, updatedAt: new Date().toISOString() };
+        jsonAlert.id = existingId;
+        if (!targetAlertRow) {
+          createdAlert = alerts[existingIdx];
+        }
         isUpdate = true;
       } else {
         alerts.unshift(jsonAlert);

@@ -1,5 +1,205 @@
 [
   {
+    "id": "dms_1795547634335_03lf",
+    "userId": "usr_prod_bypass_1795547634335",
+    "userName": "Prod Bypass Test",
+    "userPhone": "+91 98765 43210",
+    "intervalSeconds": 60,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-24T19:13:54.335Z",
+    "lastCheckInAt": "2026-11-24T19:13:54.335Z",
+    "nextDeadlineAt": "2026-11-24T19:14:54.335Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "lastKnownLocation": null,
+    "hardwareTelemetry": null,
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_1795547694668_acnj",
+    "escalatedAt": "2026-11-24T19:14:54.665Z",
+    "history": [
+      {
+        "timestamp": "2026-11-24T19:14:54.665Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_1795547694668_acnj"
+      },
+      {
+        "timestamp": "2026-11-24T19:13:54.335Z",
+        "event": "SESSION_STARTED",
+        "intervalSeconds": 60,
+        "location": null
+      }
+    ],
+    "createdAt": "2026-11-24T19:13:54.335Z",
+    "updatedAt": "2026-11-24T19:14:54.665Z"
+  },
+  {
+    "id": "dms_test_esc_1795547631552",
+    "userId": "usr_escalate_1795547631552",
+    "userName": "Overdue Test Traveller",
+    "userPhone": "+91 91111 22222",
+    "intervalSeconds": 15,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-24T19:13:31.552Z",
+    "lastCheckInAt": "2026-11-24T19:13:31.552Z",
+    "nextDeadlineAt": "2026-11-24T19:13:49.552Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "lastKnownLocation": {
+      "lat": 27.18,
+      "lng": 78.02,
+      "accuracy": 12,
+      "timestamp": "2026-11-24T19:13:31.552Z"
+    },
+    "hardwareTelemetry": {
+      "batteryLevel": 22,
+      "networkSignal": "GNSS Distress",
+      "deviceModel": "Samsung Galaxy S24"
+    },
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_1795547631554_pnml",
+    "createdAt": "2026-11-24T19:13:31.552Z",
+    "updatedAt": "2026-11-24T19:13:51.553Z",
+    "escalatedAt": "2026-11-24T19:13:51.553Z",
+    "history": [
+      {
+        "timestamp": "2026-11-24T19:13:51.553Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_1795547631554_pnml"
+      }
+    ]
+  },
+  {
+    "id": "dms_1795547631334_i0bj",
+    "userId": "usr_p7_1795547628982",
+    "userName": "Phase 7 Test Tourist",
+    "userPhone": "+91 98765 43210",
+    "intervalSeconds": 30,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-24T19:13:51.334Z",
+    "lastCheckInAt": "2026-11-24T19:13:51.542Z",
+    "nextDeadlineAt": "2026-11-24T19:14:21.545Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "lastKnownLocation": {
+      "lat": 28.612,
+      "lng": 77.207,
+      "accuracy": 5,
+      "timestamp": "2026-11-24T19:13:51.542Z"
+    },
+    "hardwareTelemetry": {
+      "batteryLevel": 84
+    },
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_1795547661634_xv0e",
+    "escalatedAt": "2026-11-24T19:14:21.631Z",
+    "history": [
+      {
+        "timestamp": "2026-11-24T19:14:21.631Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_1795547661634_xv0e"
+      },
+      {
+        "timestamp": "2026-11-24T19:13:51.542Z",
+        "event": "CHECK_IN_CONFIRMED",
+        "nextDeadlineAt": "2026-11-24T19:14:21.542Z",
+        "location": {
+          "lat": 28.612,
+          "lng": 77.207,
+          "accuracy": 5,
+          "timestamp": "2026-11-24T19:13:51.542Z"
+        }
+      },
+      {
+        "timestamp": "2026-11-24T19:13:51.334Z",
+        "event": "SESSION_STARTED",
+        "intervalSeconds": 30,
+        "location": {
+          "lat": 28.61,
+          "lng": 77.205,
+          "accuracy": 8,
+          "timestamp": "2026-11-24T19:13:51.334Z"
+        }
+      }
+    ],
+    "createdAt": "2026-11-24T19:13:51.334Z",
+    "updatedAt": "2026-11-24T19:14:21.631Z"
+  },
+  {
+    "id": "dms_restart_1795547627559",
+    "userId": "usr_restart_1795547627559",
+    "userName": "Restart Test Explorer",
+    "userPhone": "+91 99999 66666",
+    "intervalSeconds": 15,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-24T19:13:17.559Z",
+    "lastCheckInAt": "2026-11-24T19:13:17.559Z",
+    "nextDeadlineAt": "2026-11-24T19:13:37.559Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_1795547627568_8jex",
+    "createdAt": "2026-11-24T19:13:17.559Z",
+    "updatedAt": "2026-11-24T19:13:47.567Z",
+    "escalatedAt": "2026-11-24T19:13:47.567Z",
+    "history": [
+      {
+        "timestamp": "2026-11-24T19:13:47.567Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_1795547627568_8jex"
+      }
+    ]
+  },
+  {
+    "id": "dms_fail_retry_1795547627559",
+    "userId": "usr_fail_1795547627559",
+    "userName": "Stalled Dispatch Explorer",
+    "userPhone": "+91 99999 77777",
+    "intervalSeconds": 15,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-24T19:13:07.559Z",
+    "lastCheckInAt": "2026-11-24T19:13:07.559Z",
+    "nextDeadlineAt": "2026-11-24T19:13:22.559Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_recovered_1795547627559",
+    "escalatedAt": "2026-11-24T19:13:47.566Z",
+    "createdAt": "2026-11-24T19:13:07.559Z",
+    "updatedAt": "2026-11-24T19:13:47.566Z",
+    "history": [
+      {
+        "timestamp": "2026-11-24T19:13:47.566Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_recovered_1795547627559"
+      }
+    ]
+  },
+  {
+    "id": "dms_race_1795547627559",
+    "userId": "usr_outbox_1795547627559",
+    "userName": "Concurrent Race Test",
+    "userPhone": "+91 99999 88888",
+    "intervalSeconds": 15,
+    "status": "ESCALATED",
+    "startedAt": "2026-11-24T19:13:17.559Z",
+    "lastCheckInAt": "2026-11-24T19:13:17.559Z",
+    "nextDeadlineAt": "2026-11-24T19:13:42.559Z",
+    "pausedAt": null,
+    "pausedRemainingMs": null,
+    "escalationProcessed": true,
+    "escalationIncidentId": "alt_dms_1795547642612_6pgk",
+    "createdAt": "2026-11-24T19:13:17.559Z",
+    "updatedAt": "2026-11-24T19:14:02.608Z",
+    "escalatedAt": "2026-11-24T19:14:02.608Z",
+    "history": [
+      {
+        "timestamp": "2026-11-24T19:14:02.608Z",
+        "event": "DEADLINE_EXPIRED_ESCALATED",
+        "alertId": "alt_dms_1795547642612_6pgk"
+      }
+    ]
+  },
+  {
     "id": "dms_test_esc_1795453597148",
     "userId": "usr_escalate_1795453597148",
     "userName": "Overdue Test Traveller",

@@ -1,5 +1,162 @@
 [
   {
+    "id": "usr_bhoot",
+    "fullName": "bhoot",
+    "email": null,
+    "phone": null,
+    "emergencyContact": null,
+    "status": "EMERGENCY",
+    "currentLocation": {
+      "lat": 27.32,
+      "lng": 78.12,
+      "accuracy": 20,
+      "name": "GPS Fix (27.3200, 78.1200)",
+      "elevation": null
+    },
+    "batteryLevel": 65,
+    "networkSignal": "Mobile GNSS (Distress Beacon)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of bhoot",
+        "relation": "Family Emergency Contact",
+        "phone": "+91 98765 43210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-BHO-6535"
+      }
+    ],
+    "activeTripId": "sz_trp_1795550004644",
+    "lastAlertTimestamp": "2026-11-24T19:26:58.318Z",
+    "lastPing": "2026-11-24T19:53:29.834Z",
+    "source": "Supabase",
+    "activeSafeZone": {
+      "tripId": "sz_trp_1795550004644",
+      "destination": "Agra Airport",
+      "coords": {
+        "lat": 27.1558,
+        "lng": 77.9654
+      },
+      "radiusMeters": 5000,
+      "status": "ACTIVE"
+    }
+  },
+  {
+    "id": "5c8b1f7f-f25b-431a-94d1-6fc390194197",
+    "fullName": "Bhavna Sen",
+    "email": "tourist_b_1795548047445@stsms.gov",
+    "phone": "+919876500003",
+    "emergencyContact": "+919876500003",
+    "status": "EMERGENCY",
+    "currentLocation": {
+      "name": "Emergency GPS Fix (23.1995, 77.4332)",
+      "lat": 23.1995,
+      "lng": 77.4332,
+      "elevation": null
+    },
+    "batteryLevel": 92,
+    "networkSignal": "No GPS Fix (Offline)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Guardian of Bhavna Sen",
+        "relation": "Family Emergency Contact",
+        "phone": "+919876500003",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-BHA-3739"
+      }
+    ],
+    "activeTripId": null,
+    "avatar": null,
+    "source": "Supabase",
+    "lastAlertTimestamp": "2026-11-24T19:21:15.567Z",
+    "lastPing": "2026-11-24T19:21:15.567Z"
+  },
+  {
+    "id": "aeb1c30e-d01d-41c9-8dc7-42d14e1be5bf",
+    "fullName": "Aarav Patel (Verified)",
+    "email": "tourist_a_1795548045401@stsms.gov",
+    "phone": "+919876599999",
+    "emergencyContact": "+919876588888",
+    "status": "EMERGENCY",
+    "currentLocation": {
+      "name": "Emergency GPS Fix (23.4900, 77.7400)",
+      "lat": 23.49,
+      "lng": 77.74,
+      "elevation": null
+    },
+    "batteryLevel": 65,
+    "networkSignal": "Good (5G)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Ramesh Patel (Father)",
+        "phone": "+919876588888",
+        "relation": "Family",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-108212"
+      }
+    ],
+    "activeTripId": null,
+    "lastPing": "2026-11-24T19:21:08.266Z",
+    "lastAlertTimestamp": "2026-11-24T19:21:08.266Z",
+    "bloodGroup": "O+",
+    "updatedAt": "2026-11-24T19:21:15.605Z"
+  },
+  {
+    "id": "8908ade6-6655-49c5-aca2-d51eef395021",
+    "fullName": "Hacked By User B",
+    "email": "tourist_b_1795547649730@stsms.gov",
+    "phone": "+910000000000",
+    "emergencyContact": "+919876500003",
+    "status": "EMERGENCY",
+    "currentLocation": {
+      "name": "Emergency GPS Fix (23.1995, 77.4332)",
+      "lat": 23.1995,
+      "lng": 77.4332,
+      "elevation": null
+    },
+    "batteryLevel": 92,
+    "networkSignal": "Good (5G)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Primary Guardian",
+        "relation": "Family",
+        "phone": "+919876500003",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-453160"
+      }
+    ],
+    "activeTripId": null,
+    "lastPing": "2026-11-24T19:14:31.163Z",
+    "lastAlertTimestamp": "2026-11-24T19:14:31.163Z",
+    "updatedAt": "2026-11-24T19:14:34.452Z"
+  },
+  {
     "id": "usr_1795539621561",
     "fullName": "Hacked By User B",
     "email": "tourist_b_1795539621491@stsms.gov",
@@ -37,9 +194,9 @@
   },
   {
     "id": "3614e1d0-f867-4734-a245-412e8d1f866f",
-    "fullName": "Bhavna Sen",
+    "fullName": "amogh",
     "email": "yashmalaiya2006@gmail.com",
-    "phone": "+919876500001",
+    "phone": "+91 98765 43210",
     "emergencyContact": "+919876500001",
     "status": "EMERGENCY",
     "currentLocation": {
@@ -69,53 +226,6 @@
     "activeTripId": null,
     "lastPing": "2026-11-24T17:00:37.056Z",
     "lastAlertTimestamp": "2026-11-24T17:00:37.056Z"
-  },
-  {
-    "id": "usr_bhoot",
-    "fullName": "bhoot",
-    "email": null,
-    "phone": null,
-    "emergencyContact": null,
-    "status": "EMERGENCY",
-    "currentLocation": {
-      "lat": 27.32,
-      "lng": 78.12,
-      "accuracy": 20,
-      "name": "GPS Fix (27.3200, 78.1200)",
-      "elevation": null
-    },
-    "batteryLevel": 65,
-    "networkSignal": "Mobile GNSS (Distress Beacon)",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Guardian of bhoot",
-        "relation": "Family Emergency Contact",
-        "phone": "+91 98765 43210",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Mobile Safety Pass",
-        "status": "Verified",
-        "number": "SP-BHO-6535"
-      }
-    ],
-    "activeTripId": "sz_trp_1795539509501",
-    "lastAlertTimestamp": "2026-11-24T16:58:43.088Z",
-    "lastPing": "2026-11-24T16:58:30.503Z",
-    "source": "Supabase",
-    "activeSafeZone": {
-      "tripId": "sz_trp_1795539509501",
-      "destination": "Agra Airport",
-      "coords": {
-        "lat": 27.1558,
-        "lng": 77.9654
-      },
-      "radiusMeters": 5000,
-      "status": "ACTIVE"
-    }
   },
   {
     "id": "3614e1d0-f867-4734-a245-412e8d1f866f",
@@ -394,63 +504,26 @@
     "updatedAt": "2026-11-23T20:10:27.010Z"
   },
   {
-    "id": "usr_1795461900221",
-    "fullName": "Aarav Patel (Verified)",
-    "email": "tourist_a_1795461900144@stsms.gov",
-    "phone": "+919876599999",
-    "emergencyContact": "+919876588888",
-    "status": "EMERGENCY",
+    "id": "622613cb-8937-4c78-9bb8-a3d083d064aa",
+    "fullName": "Auth Verification Traveller",
+    "email": "tourist_auth_test_1795547586390@stsms.gov",
+    "phone": "+91 98765 00001",
+    "emergencyContact": "+91 98765 00002",
+    "status": "Online",
     "currentLocation": {
-      "name": "Emergency GPS Fix (23.4900, 77.7400)",
-      "lat": 23.49,
-      "lng": 77.74,
+      "name": "GPS Fix (29.6148, 77.2090)",
+      "lat": 29.6148,
+      "lng": 77.209,
       "elevation": null
     },
-    "batteryLevel": 65,
-    "networkSignal": "Good (5G)",
-    "offlineDurationMinutes": 0,
-    "guardians": [
-      {
-        "name": "Ramesh Patel (Father)",
-        "phone": "+919876588888",
-        "relation": "Family",
-        "verified": true
-      }
-    ],
-    "documents": [
-      {
-        "type": "Mobile Safety Pass",
-        "status": "Verified",
-        "number": "SP-188105"
-      }
-    ],
-    "activeTripId": null,
-    "lastPing": "2026-11-23T19:25:32.541Z",
-    "lastAlertTimestamp": "2026-11-23T19:25:32.541Z",
-    "bloodGroup": "O+",
-    "updatedAt": "2026-11-23T19:25:38.905Z"
-  },
-  {
-    "id": "usr_1795460111248",
-    "fullName": "Hacked By User B",
-    "email": "tourist_b_1795460111177@stsms.gov",
-    "phone": "+910000000000",
-    "emergencyContact": "+919876500003",
-    "status": "EMERGENCY",
-    "currentLocation": {
-      "name": "Emergency GPS Fix (23.1995, 77.4332)",
-      "lat": 23.1995,
-      "lng": 77.4332,
-      "elevation": null
-    },
-    "batteryLevel": 92,
-    "networkSignal": "Good (5G)",
+    "batteryLevel": 91,
+    "networkSignal": "Mobile GNSS (Online)",
     "offlineDurationMinutes": 0,
     "guardians": [
       {
         "name": "Primary Guardian",
         "relation": "Family",
-        "phone": "+919876500003",
+        "phone": "+91 98765 00002",
         "verified": true
       }
     ],
@@ -458,35 +531,87 @@
       {
         "type": "Mobile Safety Pass",
         "status": "Verified",
-        "number": "SP-456771"
+        "number": "SP-579896"
       }
     ],
     "activeTripId": null,
-    "lastPing": "2026-11-23T18:55:27.675Z",
-    "lastAlertTimestamp": "2026-11-23T18:55:27.675Z",
-    "updatedAt": "2026-11-23T18:55:28.179Z"
+    "lastPing": "2026-11-25T10:00:40.000Z",
+    "speedKmH": null,
+    "headingDirection": "Stationary",
+    "movementHistory": [
+      {
+        "timestamp": "2026-11-25T10:00:00.000Z",
+        "locationName": "Connaught Place Point 1",
+        "lat": 28.6139,
+        "lng": 77.209,
+        "elevation": null,
+        "speedKmH": null,
+        "headingDirection": "Stationary",
+        "battery": 95
+      },
+      {
+        "timestamp": "2026-11-25T10:00:10.000Z",
+        "locationName": "Connaught Place Point 2",
+        "lat": 28.6148,
+        "lng": 77.209,
+        "elevation": null,
+        "speedKmH": 36,
+        "headingDirection": "N",
+        "battery": 94
+      },
+      {
+        "timestamp": "2026-11-25T10:00:20.000Z",
+        "locationName": "Stationary Bench",
+        "lat": 28.614805,
+        "lng": 77.209,
+        "elevation": null,
+        "speedKmH": 0,
+        "headingDirection": "Stationary",
+        "battery": 93
+      },
+      {
+        "timestamp": "2026-11-25T10:00:30.000Z",
+        "locationName": "GPS Fix (28.6250, 77.2150)",
+        "lat": 28.625,
+        "lng": 77.215,
+        "elevation": null,
+        "speedKmH": null,
+        "headingDirection": "Stationary",
+        "battery": 92
+      },
+      {
+        "timestamp": "2026-11-25T10:00:40.000Z",
+        "locationName": "GPS Fix (29.6148, 77.2090)",
+        "lat": 29.6148,
+        "lng": 77.209,
+        "elevation": null,
+        "speedKmH": null,
+        "headingDirection": "Stationary",
+        "battery": 91
+      }
+    ]
   },
   {
-    "id": "usr_1795460111174",
-    "fullName": "Aarav Patel (Verified)",
-    "email": "tourist_a_1795460111097@stsms.gov",
-    "phone": "+919876599999",
-    "emergencyContact": "+919876588888",
-    "status": "EMERGENCY",
+    "id": "71c5fd7d-fa09-4b47-bd37-3e3fb770a737",
+    "fullName": "Auth Verification Traveller",
+    "email": "tourist_auth_test_1795547035928@stsms.gov",
+    "phone": "+91 98765 00001",
+    "emergencyContact": "+91 98765 00002",
+    "status": "Online",
     "currentLocation": {
-      "name": "Emergency GPS Fix (23.4900, 77.7400)",
-      "lat": 23.49,
-      "lng": 77.74,
+      "name": "GPS Fix (29.6148, 77.2090)",
+      "lat": 29.6148,
+      "lng": 77.209,
       "elevation": null
     },
-    "batteryLevel": 65,
-    "networkSignal": "Good (5G)",
+    "batteryLevel": 91,
+    "networkSignal": "Mobile GNSS (Online)",
     "offlineDurationMinutes": 0,
     "guardians": [
       {
-        "name": "Ramesh Patel (Father)",
-        "phone": "+919876588888",
+        "name": "Primary Guardian",
         "relation": "Family",
+        "phone": "+91 98765 00002",
         "verified": true
       }
     ],
@@ -494,14 +619,65 @@
       {
         "type": "Mobile Safety Pass",
         "status": "Verified",
-        "number": "SP-666955"
+        "number": "SP-839418"
       }
     ],
     "activeTripId": null,
-    "lastPing": "2026-11-23T18:55:23.563Z",
-    "lastAlertTimestamp": "2026-11-23T18:55:23.563Z",
-    "bloodGroup": "O+",
-    "updatedAt": "2026-11-23T18:55:27.682Z"
+    "lastPing": "2026-11-25T10:00:40.000Z",
+    "speedKmH": null,
+    "headingDirection": "Stationary",
+    "movementHistory": [
+      {
+        "timestamp": "2026-11-25T10:00:00.000Z",
+        "locationName": "Connaught Place Point 1",
+        "lat": 28.6139,
+        "lng": 77.209,
+        "elevation": null,
+        "speedKmH": null,
+        "headingDirection": "Stationary",
+        "battery": 95
+      },
+      {
+        "timestamp": "2026-11-25T10:00:10.000Z",
+        "locationName": "Connaught Place Point 2",
+        "lat": 28.6148,
+        "lng": 77.209,
+        "elevation": null,
+        "speedKmH": 36,
+        "headingDirection": "N",
+        "battery": 94
+      },
+      {
+        "timestamp": "2026-11-25T10:00:20.000Z",
+        "locationName": "Stationary Bench",
+        "lat": 28.614805,
+        "lng": 77.209,
+        "elevation": null,
+        "speedKmH": 0,
+        "headingDirection": "Stationary",
+        "battery": 93
+      },
+      {
+        "timestamp": "2026-11-25T10:00:30.000Z",
+        "locationName": "GPS Fix (28.6250, 77.2150)",
+        "lat": 28.625,
+        "lng": 77.215,
+        "elevation": null,
+        "speedKmH": null,
+        "headingDirection": "Stationary",
+        "battery": 92
+      },
+      {
+        "timestamp": "2026-11-25T10:00:40.000Z",
+        "locationName": "GPS Fix (29.6148, 77.2090)",
+        "lat": 29.6148,
+        "lng": 77.209,
+        "elevation": null,
+        "speedKmH": null,
+        "headingDirection": "Stationary",
+        "battery": 91
+      }
+    ]
   },
   {
     "id": "usr_1795539621486",
@@ -589,6 +765,116 @@
     "activeTripId": null,
     "lastPing": null,
     "updatedAt": "2026-11-23T19:25:39.328Z"
+  },
+  {
+    "id": "usr_1795461900221",
+    "fullName": "Aarav Patel (Verified)",
+    "email": "tourist_a_1795461900144@stsms.gov",
+    "phone": "+919876599999",
+    "emergencyContact": "+919876588888",
+    "status": "Monitored",
+    "currentLocation": {
+      "name": "Emergency GPS Fix (23.4900, 77.7400)",
+      "lat": 23.49,
+      "lng": 77.74,
+      "elevation": null
+    },
+    "batteryLevel": 65,
+    "networkSignal": "Good (5G)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Ramesh Patel (Father)",
+        "phone": "+919876588888",
+        "relation": "Family",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-188105"
+      }
+    ],
+    "activeTripId": null,
+    "lastPing": "2026-11-23T19:25:32.541Z",
+    "lastAlertTimestamp": "2026-11-23T19:25:32.541Z",
+    "bloodGroup": "O+",
+    "updatedAt": "2026-11-23T19:25:38.905Z"
+  },
+  {
+    "id": "usr_1795460111248",
+    "fullName": "Hacked By User B",
+    "email": "tourist_b_1795460111177@stsms.gov",
+    "phone": "+910000000000",
+    "emergencyContact": "+919876500003",
+    "status": "Monitored",
+    "currentLocation": {
+      "name": "Emergency GPS Fix (23.1995, 77.4332)",
+      "lat": 23.1995,
+      "lng": 77.4332,
+      "elevation": null
+    },
+    "batteryLevel": 92,
+    "networkSignal": "Good (5G)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Primary Guardian",
+        "relation": "Family",
+        "phone": "+919876500003",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-456771"
+      }
+    ],
+    "activeTripId": null,
+    "lastPing": "2026-11-23T18:55:27.675Z",
+    "lastAlertTimestamp": "2026-11-23T18:55:27.675Z",
+    "updatedAt": "2026-11-23T18:55:28.179Z"
+  },
+  {
+    "id": "usr_1795460111174",
+    "fullName": "Aarav Patel (Verified)",
+    "email": "tourist_a_1795460111097@stsms.gov",
+    "phone": "+919876599999",
+    "emergencyContact": "+919876588888",
+    "status": "Monitored",
+    "currentLocation": {
+      "name": "Emergency GPS Fix (23.4900, 77.7400)",
+      "lat": 23.49,
+      "lng": 77.74,
+      "elevation": null
+    },
+    "batteryLevel": 65,
+    "networkSignal": "Good (5G)",
+    "offlineDurationMinutes": 0,
+    "guardians": [
+      {
+        "name": "Ramesh Patel (Father)",
+        "phone": "+919876588888",
+        "relation": "Family",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-666955"
+      }
+    ],
+    "activeTripId": null,
+    "lastPing": "2026-11-23T18:55:23.563Z",
+    "lastAlertTimestamp": "2026-11-23T18:55:23.563Z",
+    "bloodGroup": "O+",
+    "updatedAt": "2026-11-23T18:55:27.682Z"
   },
   {
     "id": "usr_1793704367014",
@@ -1135,5 +1421,92 @@
     "lastAlertTimestamp": "2026-10-25T19:03:55.557568+00:00",
     "lastPing": "2026-10-25T19:03:55.557568+00:00",
     "source": "Supabase"
+  },
+  {
+    "id": "6856218e-9797-47be-b609-b308eec9b140",
+    "fullName": "Profile Test Explorer",
+    "email": "test_auth_profile_1795546563522@stsms.gov",
+    "phone": "+919876543210",
+    "emergencyContact": "+919876543211",
+    "status": "Offline",
+    "currentLocation": null,
+    "batteryLevel": null,
+    "networkSignal": "No GPS Fix (Offline)",
+    "offlineDurationMinutes": 15,
+    "guardians": [
+      {
+        "name": "Primary Guardian",
+        "relation": "Family",
+        "phone": "+919876543211",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-817882"
+      }
+    ],
+    "activeTripId": null,
+    "lastPing": null
+  },
+  {
+    "id": "6288ae91-ef6a-4929-95fd-aa0747ba88d3",
+    "fullName": "Auth Audit Tourist",
+    "email": "test_auth_audit_1795546452342@stsms.gov",
+    "phone": "+919876543210",
+    "emergencyContact": "+919876543211",
+    "status": "Offline",
+    "currentLocation": null,
+    "batteryLevel": null,
+    "networkSignal": "No GPS Fix (Offline)",
+    "offlineDurationMinutes": 15,
+    "guardians": [
+      {
+        "name": "Primary Guardian",
+        "relation": "Family",
+        "phone": "+919876543211",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-817329"
+      }
+    ],
+    "activeTripId": null,
+    "lastPing": null
+  },
+  {
+    "id": "usr_1795545746067",
+    "fullName": "Test User",
+    "email": "test_login_fail@example.com",
+    "phone": "+919876543210",
+    "emergencyContact": "+919876543210",
+    "status": "Offline",
+    "currentLocation": null,
+    "batteryLevel": null,
+    "networkSignal": "No GPS Fix (Offline)",
+    "offlineDurationMinutes": 15,
+    "guardians": [
+      {
+        "name": "Primary Guardian",
+        "relation": "Family",
+        "phone": "+919876543210",
+        "verified": true
+      }
+    ],
+    "documents": [
+      {
+        "type": "Mobile Safety Pass",
+        "status": "Verified",
+        "number": "SP-783718"
+      }
+    ],
+    "activeTripId": null,
+    "lastPing": null
   }
 ]

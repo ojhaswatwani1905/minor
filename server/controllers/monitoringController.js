@@ -1,6 +1,34 @@
 import { readJson, writeJson } from '../utils/jsonDb.js';
 import { isSupabaseConfigured, getSupabaseClient, mapAlertFromDb } from '../database/supabase.js';
 
+// Haversine formula to compute geodesic distance in meters
+export const calculateHaversineMeters = (lat1, lon1, lat2, lon2) => {
+  const R = 6371000; // Earth radius in meters
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
+// Compass heading bearing calculation
+export const calculateBearingCompass = (lat1, lon1, lat2, lon2) => {
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const y = Math.sin(dLon) * Math.cos((lat2 * Math.PI) / 180);
+  const x =
+    Math.cos((lat1 * Math.PI) / 180) * Math.sin((lat2 * Math.PI) / 180) -
+    Math.sin((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.cos(dLon);
+  let brng = (Math.atan2(y, x) * 180) / Math.PI;
+  brng = (brng + 360) % 360;
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+  return directions[Math.round(brng / 45)];
+};
+
 export const getLiveLocations = async (req, res, next) => {
   try {
     const users = await readJson('users');
@@ -217,6 +245,27 @@ export const getLiveLocations = async (req, res, next) => {
         offlineMins = 0;
       }
 
+      let finalSpeed = (user.speedKmH !== null && user.speedKmH !== undefined && !isNaN(parseFloat(user.speedKmH))) 
+        ? parseFloat(user.speedKmH) 
+        : null;
+      let speedStatus = 'Calculating...';
+
+      if (!hasGps) {
+        finalSpeed = null;
+        speedStatus = 'GPS unavailable';
+      } else if (!isFresh) {
+        finalSpeed = null;
+        speedStatus = 'Stale location';
+      } else if (finalSpeed !== null) {
+        speedStatus = finalSpeed <= 0.2 ? '0 km/h' : `${finalSpeed} km/h`;
+      } else if (user.movementHistory && user.movementHistory.length >= 2) {
+        finalSpeed = 0.0;
+        speedStatus = '0 km/h';
+      } else {
+        finalSpeed = null;
+        speedStatus = 'Calculating...';
+      }
+
       return {
         id: user.id,
         fullName: user.fullName || user.name || 'Registered Traveller',
@@ -229,8 +278,9 @@ export const getLiveLocations = async (req, res, next) => {
           : (user.networkSignal || 'Good (GNSS Active)'),
         offlineDurationMinutes: offlineMins,
         location: user.currentLocation || null,
-        speedKmH: user.speedKmH ?? null,
-        headingDirection: user.headingDirection || 'Stationary',
+        speedKmH: finalSpeed,
+        speedStatus,
+        headingDirection: (finalSpeed && finalSpeed > 1.0) ? (user.headingDirection || 'Moving') : 'Stationary',
         guardians: user.guardians || [],
         activeTrip: activeTrip || null,
         activeAlertsCount: (user.activeAlertsCount || 0) + userAlerts.length,
@@ -328,7 +378,7 @@ export const getMovementHistory = async (req, res, next) => {
 // Update Tourist GPS Location & Telemetry from Mobile App
 export const updateLocation = async (req, res, next) => {
   try {
-    const { userId, email, name, fullName, phone, lat, lng, locationName, speedKmH, batteryLevel, networkSignal } = req.body;
+    const { userId, email, name, fullName, phone, lat, lng, locationName, speedKmH, batteryLevel, networkSignal, accuracy, timestamp } = req.body;
     const users = await readJson('users');
 
     const cleanEmail = email ? email.toLowerCase().trim() : '';
@@ -353,8 +403,56 @@ export const updateLocation = async (req, res, next) => {
       ? Math.max(0, Math.min(100, parseInt(batteryLevel))) 
       : null;
 
+    const currentTimeMs = timestamp ? new Date(timestamp).getTime() : Date.now();
+    const currentIso = new Date(currentTimeMs).toISOString();
+
+    let computedSpeed = null;
+    let heading = 'Stationary';
+
     if (userIndex !== -1) {
       if (hasValidCoords) {
+        const prevLoc = users[userIndex].currentLocation;
+        const prevPing = users[userIndex].lastPing ? new Date(users[userIndex].lastPing).getTime() : 0;
+        const elapsedSeconds = prevPing > 0 ? (currentTimeMs - prevPing) / 1000 : 0;
+
+        // Filter inaccurate GPS readings (accuracy > 50m)
+        const isAccurate = accuracy == null || parseFloat(accuracy) <= 50;
+
+        if (isAccurate && prevLoc && prevLoc.lat != null && prevLoc.lng != null && elapsedSeconds > 0 && elapsedSeconds <= 3600) {
+          const distMeters = calculateHaversineMeters(prevLoc.lat, prevLoc.lng, parsedLat, parsedLng);
+
+          if (distMeters < 2.0) {
+            // Stationary established (GPS jitter while standing still)
+            computedSpeed = 0.0;
+            heading = 'Stationary';
+          } else {
+            // Derived Speed (km/h) = (Distance (meters) / Elapsed time (seconds)) * 3.6
+            const rawSpeed = (distMeters / elapsedSeconds) * 3.6;
+
+            // Reject impossible jumps & noisy speed spikes (> 250 km/h)
+            if (rawSpeed > 250) {
+              console.warn(`[TELEMETRY] Rejected impossible GPS jump: ${rawSpeed.toFixed(1)} km/h over ${distMeters.toFixed(1)}m`);
+              computedSpeed = users[userIndex].speedKmH ?? null;
+            } else {
+              computedSpeed = parseFloat(rawSpeed.toFixed(1));
+              heading = calculateBearingCompass(prevLoc.lat, prevLoc.lng, parsedLat, parsedLng);
+            }
+          }
+        }
+
+        // Check if device supplied a reliable positive hardware speed reading
+        const deviceSpeedNum = speedKmH !== undefined && speedKmH !== null && !isNaN(parseFloat(speedKmH)) ? parseFloat(speedKmH) : null;
+        if (deviceSpeedNum !== null && deviceSpeedNum >= 0) {
+          if (computedSpeed === null || deviceSpeedNum > 0) {
+            computedSpeed = parseFloat(deviceSpeedNum.toFixed(1));
+          }
+        }
+
+        if (computedSpeed !== null && computedSpeed <= 0.2) {
+          computedSpeed = 0.0;
+          heading = 'Stationary';
+        }
+
         users[userIndex].currentLocation = {
           name: locationName || `GPS Fix (${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)})`,
           lat: parsedLat,
@@ -366,7 +464,26 @@ export const updateLocation = async (req, res, next) => {
         }
         users[userIndex].networkSignal = networkSignal || 'Mobile GNSS (Online)';
         users[userIndex].offlineDurationMinutes = 0;
-        users[userIndex].lastPing = new Date().toISOString();
+        users[userIndex].speedKmH = computedSpeed;
+        users[userIndex].headingDirection = heading;
+        users[userIndex].lastPing = currentIso;
+
+        if (!users[userIndex].movementHistory) {
+          users[userIndex].movementHistory = [];
+        }
+        users[userIndex].movementHistory.push({
+          timestamp: currentIso,
+          locationName: locationName || `GPS Fix (${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)})`,
+          lat: parsedLat,
+          lng: parsedLng,
+          elevation: req.body.elevation || null,
+          speedKmH: computedSpeed,
+          headingDirection: heading,
+          battery: parsedBattery
+        });
+        if (users[userIndex].movementHistory.length > 50) {
+          users[userIndex].movementHistory.shift();
+        }
       } else {
         // Not active / not getting GPS location -> marked as Offline
         if (users[userIndex].status !== 'EMERGENCY') {
@@ -374,13 +491,12 @@ export const updateLocation = async (req, res, next) => {
         }
         users[userIndex].networkSignal = 'No GPS Fix (Offline)';
         users[userIndex].offlineDurationMinutes = Math.max(1, users[userIndex].offlineDurationMinutes || 1);
+        users[userIndex].speedKmH = null;
+        users[userIndex].headingDirection = 'Stationary';
       }
 
       if (parsedBattery !== null) {
         users[userIndex].batteryLevel = parsedBattery;
-      }
-      if (speedKmH !== undefined && !isNaN(parseFloat(speedKmH))) {
-        users[userIndex].speedKmH = parseFloat(speedKmH);
       }
 
       await writeJson('users', users);
@@ -396,14 +512,16 @@ export const updateLocation = async (req, res, next) => {
 
       const targetId = userId || matchedAdmin?.id || `usr_${Date.now()}`;
       const targetName = name || fullName || matchedAdmin?.name || 'Mobile Explorer';
-      const targetEmail = cleanEmail || matchedAdmin?.email || `${targetName.toLowerCase().replace(/\s+/g, '.')}@stsms.gov`;
+      const targetEmail = cleanEmail || matchedAdmin?.email || null;
+
+      const deviceSpeedNum = speedKmH !== undefined && speedKmH !== null && !isNaN(parseFloat(speedKmH)) ? parseFloat(speedKmH) : null;
 
       const newRecord = {
         id: targetId,
         fullName: targetName,
         email: targetEmail,
-        phone: phone || matchedAdmin?.phone || 'N/A',
-        emergencyContact: phone || 'N/A',
+        phone: phone || matchedAdmin?.phone || null,
+        emergencyContact: phone || null,
         status: hasValidCoords ? 'Online' : 'Offline',
         currentLocation: hasValidCoords ? {
           name: locationName || `GPS Fix (${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)})`,
@@ -412,12 +530,24 @@ export const updateLocation = async (req, res, next) => {
           elevation: req.body.elevation || null
         } : null,
         batteryLevel: parsedBattery,
+        speedKmH: deviceSpeedNum,
+        headingDirection: 'Stationary',
         networkSignal: hasValidCoords ? (networkSignal || 'Good (5G)') : 'No GPS Fix (Offline)',
         offlineDurationMinutes: hasValidCoords ? 0 : 5,
         guardians: [],
         documents: [],
         activeTripId: null,
-        lastPing: hasValidCoords ? new Date().toISOString() : null
+        lastPing: hasValidCoords ? currentIso : null,
+        movementHistory: hasValidCoords ? [{
+          timestamp: currentIso,
+          locationName: locationName || `GPS Fix (${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)})`,
+          lat: parsedLat,
+          lng: parsedLng,
+          elevation: req.body.elevation || null,
+          speedKmH: deviceSpeedNum,
+          headingDirection: 'Stationary',
+          battery: parsedBattery
+        }] : []
       };
 
       users.unshift(newRecord);
@@ -428,9 +558,14 @@ export const updateLocation = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Real mobile GPS & battery telemetry synced successfully!',
-      lastPing: new Date().toISOString(),
+      lastPing: currentIso,
       updatedUserId: users[userIndex]?.id,
       currentLocation: users[userIndex]?.currentLocation,
+      speedKmH: users[userIndex]?.speedKmH,
+      speedStatus: users[userIndex]?.speedKmH !== null 
+        ? (users[userIndex].speedKmH <= 0.2 ? '0 km/h' : `${users[userIndex].speedKmH} km/h`) 
+        : 'Calculating...',
+      headingDirection: users[userIndex]?.headingDirection,
       batteryLevel: users[userIndex]?.batteryLevel
     });
   } catch (error) {

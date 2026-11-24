@@ -171,7 +171,8 @@ export const updateProfile = async (req, res, next) => {
     const authEmail = (req.admin?.email || req.user?.email || '').toLowerCase();
 
     // A tourist cannot overwrite another tourist's profile details
-    if (req.user?.id && req.body.userId && req.body.userId !== req.user.id && !req.admin) {
+    const targetBodyId = req.body.userId || req.body.id;
+    if (req.user?.id && targetBodyId && targetBodyId !== req.user.id && !req.admin) {
       return res.status(403).json({ success: false, message: "Not authorized to update another tourist's profile." });
     }
 

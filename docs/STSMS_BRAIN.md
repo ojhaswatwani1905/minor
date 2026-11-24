@@ -971,6 +971,7 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 - **Production API URL:** `https://stsms-backend.onrender.com/api` (All environments in `eas.json` set to production HTTPS; zero private LAN URLs).
 - **Interval Hardening:** Production release strictly enforces minimum 15-minute interval (`60s (Test)` hidden via `__DEV__`).
 
+
 #### 6. Admin Safe Travel Zones Resilience
 - **Page Component:** `src/pages/SafeZonePage.jsx`
 - **Enhancement:** Migrated to `Promise.allSettled()` to guarantee that telemetry syncs independently even during momentary backend or proxy restarts.
@@ -1090,13 +1091,73 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 - `[PASS] Test 17`: POST /api/safe-zones creates trip with selected location
 - `[PASS] Test 18`: Created Safe Zone trip retains exact selected coordinates (28.6139, 77.2090)
 
-#### 4. Full Regression Verification Summary — 114 / 114 PASSED (100%)
-1. `testPhase7BugFixes.js`: **18 / 18 PASSED (100%)**
-2. `testAtomicEscalationOutbox.js`: **19 / 19 PASSED (100%)**
-3. `testPhase7Verification.js`: **42 / 42 PASSED (100%)**
-4. `testPhase61Verification.js`: **22 / 22 PASSED (100%)**
-5. `testSosAndProfileLifecycle.js`: **13 / 13 PASSED (100%)**
-6. Frontend Build (`npm run build`): **PASSED in 2.09s (0 errors)**
+---
+
+### 15.14 Phase 7.6 — Critical Authentication Failure & Movement Speed Telemetry Fix
+
+#### 1. Bug 1: Registration Succeeds but Login Fails
+- **Observed Issue:** A tourist registered with an email and password via mobile, but immediately logging in with the exact same credentials failed with 401 Unauthorized.
+- **Root Cause Analysis:**
+  1. *Dual Identity Split:* `authController.js` previously wrote registrations only to ephemeral `admins.json` and `users.json` using dummy IDs (`usr_${Date.now()}`).
+  2. *Supabase Auth Bypassed:* New tourist accounts were never created in Supabase Auth or `public.profiles`.
+  3. *Ephemeral Disk Loss:* On container restarts or on Render, ephemeral local files were wiped or reverted, breaking logins.
+  4. *Profile Foreign Key & PGRST204 Error:* Initial attempt to insert extra columns into `public.profiles` failed with PostgREST PGRST204 because emergency contacts must reside within the `medical_info` JSONB column.
+- **Architectural Fixes:**
+  - *Authoritative Supabase Registration:* Connected `register` in `authController.js` to `supabase.auth.admin.createUser()` with `email_confirm: true`.
+  - *Synchronized Profile Upsert:* Inserts/updates `public.profiles` with `id: user.id`, `full_name`, `phone`, `language: 'en'`, and `medical_info` JSONB containing emergency contacts.
+  - *Authoritative Supabase Login:* Authenticates credentials via `supabase.auth.signInWithPassword({ email, password })`. Returns a signed JWT accepted by `protect` middleware.
+  - *Legacy Admin Account Compatibility:* Preserves local bcrypt fallback for predefined admin/demo accounts (`admin@stsms.gov`, `director@stsms.gov`) without sacrificing tourist Supabase identity.
+  - *Explicit Error Reporting:* Returns HTTP 403 when email confirmation is pending; returns HTTP 401 on invalid credentials.
+
+#### 2. Bug 2: Live Monitoring Movement Speed Telemetry Blank
+- **Observed Issue:** In the Admin Command Center Live Monitoring (`/monitoring`), the Movement Speed card displayed `km/h` with no numeric value.
+- **Root Cause Analysis:**
+  1. *Speed Dropped in Controller:* In `monitoringController.js` (`updateLocation`), mobile GPS pings were recorded, but if the tourist record lacked a pre-existing speed, `speedKmH` was omitted or set to `null`.
+  2. *Lack of Consecutive GPS Speed Calculation:* Neither mobile nor backend calculated speed between consecutive GPS pings when device hardware speed was unavailable or null.
+  3. *Unsafe Frontend Display:* `TouristTelemetryPanel.jsx` rendered `{tourist.speedKmH} km/h` directly without checking for null/undefined, resulting in blank space before `km/h`.
+- **Architectural Fixes:**
+  - *Backend Haversine Speed Derivation:* Implemented Haversine distance and elapsed time speed calculation ($\text{Speed} = \frac{\Delta \text{distance}}{\Delta t} \times 3.6$) in `monitoringController.js`.
+  - *Accuracy Filtering & Noise Spike Rejection:* Rejects GPS pings with accuracy worse than 50m; rejects physical noise spikes ($> 250\text{ km/h}$).
+  - *Stationary Coordinate Threshold:* Coordinates moving $< 2.0\text{m}$ are cleanly classified as `0.0 km/h` with `'Stationary'` heading.
+  - *Telemetry History Tracking:* Retains the last 50 movement points per tourist in memory.
+  - *Frontend State Handling:* Updated `TouristTelemetryPanel.jsx` to display:
+    - `0 km/h` when stationary.
+    - `X.X km/h` when moving.
+    - `Calculating...` when fewer than 2 valid GPS points exist.
+    - `GPS unavailable` when coordinates are missing.
+    - `Stale location` when the latest ping is older than 5 minutes.
+  - *Mobile Timestamp Enrichment:* Added explicit ISO `timestamp` to `useLocation.js` ping payload.
+
+#### 3. Verification Suite Evidence (`server/scripts/testPhase7BugFixes2.js`) — 20 / 20 PASSED (100%)
+- `[PASS] Test 1`: Register new tourist in Supabase Auth via POST /api/auth/register
+- `[PASS] Test 2`: Verify tourist profile exists in Supabase public.profiles table
+- `[PASS] Test 3`: Login with exact same registered credentials via POST /api/auth/login
+- `[PASS] Test 4`: Login returns valid JWT token and correct user payload
+- `[PASS] Test 5`: Protected route /api/users/profile accepts generated JWT token
+- `[PASS] Test 6`: Login with incorrect password returns HTTP 401
+- `[PASS] Test 7`: Login with non-existent email returns HTTP 401
+- `[PASS] Test 8`: Registering duplicate email returns HTTP 409 or 400
+- `[PASS] Test 9`: Admin login continues to work (admin@stsms.gov)
+- `[PASS] Test 10`: Admin token accepted by protected routes
+- `[PASS] Test 11`: Safe zone trip created for registered Supabase tourist associates correct user ID
+- `[PASS] Test 12`: First GPS ping returns Calculating... or initial telemetry (movementHistory initialized)
+- `[PASS] Test 13`: Consecutive moving GPS ping (100m in 10s) calculates correct speed (~36 km/h)
+- `[PASS] Test 14`: Stationary GPS ping (<2m displacement) calculates 0 km/h and Stationary heading
+- `[PASS] Test 15`: Hardware speed from mobile is preserved when provided
+- `[PASS] Test 16`: GPS ping with poor accuracy (>50m) is rejected from speed calculation
+- `[PASS] Test 17`: Noise spike (>250 km/h) is rejected as anomalous jump
+- `[PASS] Test 18`: Telemetry response includes all required fields (speedKmH, heading, coordinates, timestamp)
+- `[PASS] Test 19`: GET /api/monitoring/tourists returns calculated speed and movement data for active tourists
+- `[PASS] Test 20`: Missing GPS coordinates handled gracefully without null crashes
+
+#### 4. Full Regression Verification Summary — 134 / 134 PASSED (100%)
+1. `testPhase7BugFixes2.js`: **20 / 20 PASSED (100%)**
+2. `testPhase7BugFixes.js`: **18 / 18 PASSED (100%)**
+3. `testAtomicEscalationOutbox.js`: **19 / 19 PASSED (100%)**
+4. `testPhase7Verification.js`: **42 / 42 PASSED (100%)**
+5. `testPhase61Verification.js`: **22 / 22 PASSED (100%)**
+6. `testSosAndProfileLifecycle.js`: **13 / 13 PASSED (100%)**
+7. Frontend Build (`npm run build`): **PASSED in 2.09s (0 errors)**
 
 ---
 
