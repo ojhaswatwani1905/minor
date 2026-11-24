@@ -1012,6 +1012,33 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 
 ---
 
+### 15.12 Phase 7 Production Release & Remote Deployment Verification
+
+#### 1. Remote GitHub Push Verification
+- **Remote Repository:** `https://github.com/ojhaswatwani1905/minor.git`
+- **Branch:** `main`
+- **Remote Head Commit:** `465dee5d6f1c411934f64578e581b972696cab7d`
+- **Pushed Commits:**
+  - `ac9d1d0`: `feat(phase7): implement universal GPS location selection and dead man's switch emergency system`
+  - `20137ac`: `feat(phase7.1): implement database-backed dead man switch persistence, atomic claiming, and security hardening`
+  - `e8b42e9`: `feat(phase7.2): implement durable outbox escalation, production safe failure, and APK release hardening`
+  - `c87eb6b`: `docs(phase7.3): update STSMS_BRAIN with Supabase live audit, idempotent schema migration, and deployment readiness`
+  - `825d584`: `docs(brain): record detailed 19-column schema audit and live Supabase row counts in Section 15.10`
+  - `cb8700b`: `security(deadman-rls): eliminate client write access, enforce backend-authoritative service role and read-only least privilege SELECT`
+  - `465dee5`: `feat(phase7.4): implement post-migration live Supabase verification suite and record 37/37 passed evidence in STSMS_BRAIN`
+
+#### 2. Render Production Deployment Verification (`https://stsms-backend.onrender.com`)
+- **Health Check (`GET /api/health`):**
+  - **Status:** HTTP 200 OK (`{"status": "ok"}`)
+  - **Service Title:** `STSMS Wilderness Safety Engine & Dead Man Switch`
+  - **Database Connection:** `Supabase PostgreSQL (Connected)`
+  - **Active Unified Worker:** `STSMS Cloud Safe-Zone & Dead-Man Escalation Engine`
+  - **Metrics Reported:** `pendingBreachEventsCount: 0`, `totalEscalatedCount: 0`, `totalDeadManEscalatedCount: 0`, `failedEscalationsCount: 0`, `lastError: null`
+- **Dead Man Switch Router Mounting (`GET /api/deadman/all`):**
+  - Verified route is active and mounted (returned HTTP 401 Unauthorized for unauthenticated access; previous 404 eliminated).
+
+---
+
 ## 16. Brain Maintenance Rules
 
 Every future task and engineer MUST follow this workflow:
