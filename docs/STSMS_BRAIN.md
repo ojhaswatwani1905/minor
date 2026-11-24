@@ -980,6 +980,38 @@ Verified via automated test suite `server/scripts/testPhase7Verification.js`:
 
 ---
 
+### 15.11 Phase 7.4 — Post-Migration Live Supabase Verification & Release Readiness
+
+#### 1. Live Supabase PostgreSQL Verification (`jdjluwufmorxeankmqwj`)
+- **Table Status:** `public.deadman_sessions` **EXISTS & ACTIVE** (Verified via PostgREST live query; `PGRST205` eliminated).
+- **Backend Connectivity:** `checkDeadManTableAvailability()` returns `true`.
+- **Database Authority:** `isDbAuthoritative()` returns `true` (Supabase PostgreSQL is active authoritative source of truth; JSON fallback is isolated to local offline mode).
+- **RLS Configuration:**
+  - `service_role`: Full read/write access explicitly verified for backend processes.
+  - `authenticated`: Read-only `SELECT` strictly scoped to `auth.uid()::text = user_id`.
+  - Direct client `INSERT`, `UPDATE`, `DELETE` are prohibited by PostgreSQL RLS.
+
+#### 2. Live Verification Suite (`server/scripts/verifyLiveSupabaseDeadMan.js`) — 37 / 37 PASSED (100%)
+- **Test Record Lifecycle:** Dedicated test session `dms_live_verify_*` created and validated against all 19 columns.
+- **Direct PostgreSQL Parity:** Verified `id`, `user_id`, `user_name`, `interval_seconds`, `status`, `escalation_processed`, `last_known_location` (JSONB), and `hardware_telemetry` (JSONB).
+- **Deadline Advancement:** Check-in test successfully advanced `next_deadline_at` into the future and appended audit event to `history` JSONB.
+- **State Machine Transitions:** Verified `ACTIVE` → `PAUSED` (with `paused_remaining_ms` stored) → `ACTIVE` (with deadline recalculated).
+- **Atomic Claim & Outbox Confirmation:**
+  - Overdue session claimed atomically via `dbClaimExpiredDeadManSessions` (`status = 'ESCALATING'`, `escalated_at` timestamped).
+  - Outbox finalized via `dbConfirmDeadManEscalation` (`status = 'ESCALATED'`, `escalation_processed = true`, mock incident linked).
+- **Safe Cleanup:** Dedicated test session safely deleted from `public.deadman_sessions`.
+- **Integrity Verification:** Real data tables completely untouched (`profiles`: 1, `trips`: 84, `alerts`: 51).
+- **Production Safe-Failure:** Verified production mode writes to PostgreSQL and refuses unpersisted writes.
+
+#### 3. Complete Regression Suite Status — 133 / 133 Tests Passed (100%)
+1. `verifyLiveSupabaseDeadMan.js`: **37 / 37 PASSED (100%)** (Live Supabase database lifecycle)
+2. `testAtomicEscalationOutbox.js`: **19 / 19 PASSED (100%)** (Outbox pattern & mutex race condition protection)
+3. `testPhase7Verification.js`: **42 / 42 PASSED (100%)** (Universal GPS selection & Dead Man Switch)
+4. `testPhase61Verification.js`: **22 / 22 PASSED (100%)** (Server-side 10s geofence escalation & avatar storage)
+5. `testSosAndProfileLifecycle.js`: **13 / 13 PASSED (100%)** (Emergency SOS & profile isolation)
+
+---
+
 ## 16. Brain Maintenance Rules
 
 Every future task and engineer MUST follow this workflow:
