@@ -226,7 +226,7 @@ export const updateProfile = async (req, res, next) => {
       const newUser = {
         id: authId || `usr_${Date.now()}`,
         fullName: newName || 'Active Tourist',
-        email: authEmail || 'tourist@stsms.gov',
+        email: authEmail || null,
         phone: phone || '',
         bloodGroup: bloodGroup || '',
         emergencyContact: guardianPhone || emergencyContact || phone || '',
@@ -263,7 +263,15 @@ export const updateProfile = async (req, res, next) => {
           med.avatar_url = resolvedAvatar;
           sbUpdate.medical_info = med;
         }
-        await supabase.from('profiles').update(sbUpdate).eq('id', authId);
+        const { data: updData, error: updError } = await supabase.from('profiles').update(sbUpdate).eq('id', authId);
+        if (updError) {
+          console.error('[PROFILE SUPABASE UPDATE ERROR]', updError.message);
+        }
+        if (supabase.auth?.admin?.updateUserById) {
+          await supabase.auth.admin.updateUserById(authId, {
+            user_metadata: { full_name: newName, name: newName }
+          }).catch(e => console.warn('[AUTH METADATA UPDATE NOTE]', e.message));
+        }
       } catch (sbErr) {
         console.warn('[PROFILE SUPABASE SYNC NOTE]', sbErr.message);
       }

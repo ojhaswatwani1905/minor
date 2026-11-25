@@ -779,7 +779,7 @@ export const createSosAlert = async (req, res, next) => {
         users.unshift({
           id: userId || matchedAdmin?.id || `usr_${Date.now()}`,
           fullName: userName || matchedAdmin?.name || 'Active Traveller',
-          email: matchedAdmin?.email || 'emergency-sos@stsms.gov',
+          email: matchedAdmin?.email || null,
           phone: matchedAdmin?.phone || 'Mobile GPS Fix',
           emergencyContact: matchedAdmin?.phone || 'Mobile GPS Fix',
           status: 'EMERGENCY',

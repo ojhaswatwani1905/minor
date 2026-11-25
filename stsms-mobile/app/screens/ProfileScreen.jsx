@@ -231,7 +231,7 @@ export const ProfileScreen = ({ onBack }) => {
 
           <View style={styles.userInfo}>
             <Text style={[styles.userName, { color: colors.text }]}>{name || user?.name || user?.fullName || 'Active Tourist'}</Text>
-            <Text style={[styles.userEmail, { color: colors.textSecondary }]}>{user?.email || 'tourist@stsms.gov'}</Text>
+            <Text style={[styles.userEmail, { color: colors.textSecondary }]}>{user?.email || 'Email unavailable'}</Text>
             <View style={styles.safetyPassBadge}>
               <Ionicons name="shield-checkmark" size={12} color="#06D6A0" style={{ marginRight: 4 }} />
               <Text style={styles.safetyPassText}>Mobile Safety Pass: Active</Text>

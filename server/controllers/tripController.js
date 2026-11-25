@@ -153,7 +153,7 @@ export const createTrip = async (req, res, next) => {
       deadManSwitchTriggered: false,
       geofenceViolated: false,
       guardianPhone: guardianPhone || '+91 98765 43210',
-      guardianEmail: guardianEmail || 'guardian@safety.org',
+      guardianEmail: guardianEmail || null,
       lastCheckIn: new Date().toISOString(),
       checkpoints: checkpoints || [
         { name: startPoint, status: 'Passed', time: new Date().toISOString() },

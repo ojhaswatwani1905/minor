@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getSupabaseClient, isSupabaseConfigured } from '../database/supabase.js';
+
+const supabase = isSupabaseConfigured() ? getSupabaseClient() : null;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,7 +48,7 @@ async function runAudit() {
   }
 
   // Register or Login User A
-  const emailA = `tourist_a_${Date.now()}@stsms.gov`;
+  const emailA = `tourist_a_${Date.now()}@example.com`;
   const regARes = await fetch(`${BASE_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -63,7 +66,7 @@ async function runAudit() {
   userA = regAData.user;
 
   // Register or Login User B
-  const emailB = `tourist_b_${Date.now()}@stsms.gov`;
+  const emailB = `tourist_b_${Date.now()}@example.com`;
   const regBRes = await fetch(`${BASE_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -344,6 +347,19 @@ async function runAudit() {
     userAInJson && userAInJson.phone === '+919876599999' && userAInJson.bloodGroup === 'O+',
     '12. JSON / DB Consistency: users.json synchronized with verified profile values'
   );
+
+  // Cleanup test accounts from Supabase Auth & profiles
+  if (supabase) {
+    if (userA?.id) {
+      await supabase.from('profiles').delete().eq('id', userA.id);
+      await supabase.auth.admin.deleteUser(userA.id);
+    }
+    if (userB?.id) {
+      await supabase.from('profiles').delete().eq('id', userB.id);
+      await supabase.auth.admin.deleteUser(userB.id);
+    }
+    console.log('Cleaned up test accounts userA and userB from Supabase.');
+  }
 
   console.log('\n================================================================');
   console.log(`AUDIT RESULTS: ${passed} PASSED, ${failed} FAILED`);

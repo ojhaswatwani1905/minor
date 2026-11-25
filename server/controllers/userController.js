@@ -466,7 +466,7 @@ export const createUser = async (req, res, next) => {
     const newUser = {
       id: `usr_${Date.now()}`,
       fullName,
-      email: email || `${fullName.toLowerCase().replace(/\s+/g, '.')}@example.com`,
+      email: email || null,
       phone,
       emergencyContact: emergencyContact || phone,
       status: hasValidCoords ? 'Online' : 'Offline',

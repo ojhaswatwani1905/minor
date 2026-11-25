@@ -1,3 +1,4 @@
+
 import { getSupabaseClient, isSupabaseConfigured } from '../database/supabase.js';
 import { calculateHaversineMeters, calculateBearingCompass } from '../controllers/monitoringController.js';
 
@@ -33,7 +34,7 @@ async function runTests() {
   // =================================================================
   console.log('--- SECTION 1: BUG 1 — Registration & Authoritative Supabase Auth ---');
 
-  const testEmail = `tourist_auth_test_${Date.now()}@stsms.gov`;
+  const testEmail = `tourist_auth_test_${Date.now()}@example.com`;
   const testPassword = 'Password@123';
   const testFullName = 'Auth Verification Traveller';
   let createdUserId = null;
@@ -47,7 +48,7 @@ async function runTests() {
       name: testFullName,
       email: testEmail.toUpperCase(), // Test case insensitivity / normalization
       password: testPassword,
-      phone: '+91 98765 00001',
+      phone: `+91 ${Math.floor(6000000000 + Math.random() * 3000000000)}`,
       guardianPhone: '+91 98765 00002'
     })
   });
@@ -80,7 +81,15 @@ async function runTests() {
     );
 
     // Test 4: Supabase profiles table record exists
-    const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', createdUserId).maybeSingle();
+    let profileRow = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const { data } = await supabase.from('profiles').select('*').eq('id', createdUserId).maybeSingle();
+      if (data) {
+        profileRow = data;
+        break;
+      }
+      await new Promise(r => setTimeout(r, 200));
+    }
     assert(
       profileRow && profileRow.full_name === testFullName,
       'Supabase profiles table row created with matching UUID id and full_name',
@@ -179,7 +188,7 @@ async function runTests() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      email: `non_existent_${Date.now()}@stsms.gov`,
+      email: `non_existent_${Date.now()}@example.com`,
       password: 'AnyPassword123!'
     })
   });
@@ -393,3 +402,4 @@ runTests().catch((err) => {
   console.error('Unhandled verification error:', err);
   process.exit(1);
 });
+

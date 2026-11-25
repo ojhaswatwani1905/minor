@@ -54,21 +54,36 @@ export const getLiveLocations = async (req, res, next) => {
           supabaseAlerts = dbAlerts;
         }
 
-        // 2. Fetch profiles from Supabase
+        // 2. Fetch profiles & auth users from Supabase
         const { data: profiles, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .order('created_at', { ascending: false });
 
+        const supabaseAuthEmailMap = {};
+        try {
+          if (supabase.auth?.admin?.listUsers) {
+            const { data: authData } = await supabase.auth.admin.listUsers();
+            if (authData?.users) {
+              authData.users.forEach(u => {
+                if (u.id && u.email) {
+                  supabaseAuthEmailMap[u.id] = u.email;
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
         if (!profileError && profiles) {
           profiles.forEach((p) => {
             const exists = combinedUsers.some((u) => u.id === p.id);
+            const authoritativeEmail = supabaseAuthEmailMap[p.id] || null;
             if (!exists) {
               combinedUsers.push({
                 id: p.id,
                 fullName: p.full_name || 'Active Traveller',
-                email: p.email || 'N/A',
-                phone: p.phone || 'N/A',
+                email: authoritativeEmail,
+                phone: p.phone || '',
                 status: 'Offline',
                 currentLocation: null,
                 batteryLevel: null,
@@ -78,6 +93,11 @@ export const getLiveLocations = async (req, res, next) => {
                 documents: [],
                 activeTripId: null
               });
+            } else {
+              const idx = combinedUsers.findIndex(u => u.id === p.id);
+              if (idx !== -1 && authoritativeEmail) {
+                combinedUsers[idx].email = authoritativeEmail;
+              }
             }
           });
         }

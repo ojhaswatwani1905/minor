@@ -278,7 +278,7 @@ export const createSafeZoneTrip = async (req, res, next) => {
       activeAlertId: null,
       guardianName: guardianName || 'Primary Guardian',
       guardianPhone: guardianPhone || '+91 98765 43210',
-      guardianEmail: guardianEmail || 'guardian@stsms.gov',
+      guardianEmail: guardianEmail || null,
       notes: notes || 'Safe Travel Zone auto-geofencing active.',
       createdAt: now,
       updatedAt: now,

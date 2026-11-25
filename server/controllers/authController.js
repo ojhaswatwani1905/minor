@@ -181,15 +181,16 @@ export const login = async (req, res, next) => {
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password, department, role } = req.body;
+    const rawName = req.body.name || req.body.fullName;
+    const { email, password, department, role } = req.body;
 
-    if (!name || !email || !password) {
+    if (!rawName || !email || !password) {
       return res.status(400).json({ success: false, message: 'Full name, email, and password are required' });
     }
 
     const normalizedEmail = email.trim().toLowerCase();
-    const cleanName = name.trim();
-    const guardianPhone = req.body.guardianPhone || req.body.phone || '+91 98765 43210';
+    const cleanName = rawName.trim();
+    const guardianPhone = req.body.guardianPhone || req.body.phone || null;
     const userRole = role || 'Explorer User';
 
     let userId = null;
@@ -215,11 +216,15 @@ export const register = async (req, res, next) => {
         // Non-fatal if listUsers is not permitted
       }
 
-      // Create authoritative user in Supabase Auth with auto-confirmed email
+      // In wilderness safety context, auto-confirm accounts unless explicitly configured to require SMTP email validation
+      const requireEmailVerification = process.env.REQUIRE_EMAIL_VERIFICATION === 'true';
+      const autoConfirmEmail = !requireEmailVerification;
+
+      // Create authoritative user in Supabase Auth
       const { data: authCreated, error: authErr } = await supabase.auth.admin.createUser({
         email: normalizedEmail,
         password,
-        email_confirm: true,
+        email_confirm: autoConfirmEmail,
         user_metadata: {
           name: cleanName,
           full_name: cleanName,
@@ -249,10 +254,10 @@ export const register = async (req, res, next) => {
       // 2. Create authoritative corresponding profile in Supabase profiles table
       if (userId) {
         try {
-          await supabase.from('profiles').upsert({
+          const { error: profErr } = await supabase.from('profiles').upsert({
             id: userId,
             full_name: cleanName,
-            phone: req.body.phone || guardianPhone || null,
+            phone: req.body.phone || null,
             language: 'en',
             medical_info: {
               emergency_contact_phone: guardianPhone || null,
@@ -260,8 +265,11 @@ export const register = async (req, res, next) => {
               department: department || 'Tourist Explorer'
             }
           });
-        } catch (profErr) {
-          console.error('[AUTH REGISTER] Supabase profiles upsert error:', profErr.message);
+          if (profErr) {
+            console.error('[AUTH REGISTER] Supabase profiles upsert error:', profErr.message || profErr);
+          }
+        } catch (profEx) {
+          console.error('[AUTH REGISTER] Supabase profiles upsert exception:', profEx.message);
         }
       }
     }
